@@ -1,91 +1,124 @@
-# 🚀 Rocket Multiplier Web Game
+# 🎰 NeonArc Casino
 
-A web-based Rocket game inspired by DraftKings Casino’s **Rocket**.  
-Watch the rocket soar, the multiplier rise, and cash out before it explodes!  
+Welcome to **NeonArc Casino** — a futuristic, skill-based web casino built entirely with **HTML**, **CSS**, and **JavaScript**.  
+Each game is an original creation that blends strategy, timing, and risk into fast-paced arcade tension.  
 
-Built with **HTML**, **CSS**, and **JavaScript** — no frameworks required.
-
----
-
-## 🎮 Gameplay Overview
-
-1. **Set Your Bet:**  
-   Enter your desired bet amount in the input field.
-
-2. **Launch:**  
-   Click **Launch** to start the round. The rocket begins to ascend, and the multiplier increases from **1.00x** upward.
-
-3. **Cash Out:**  
-   Click **Cash Out** before the rocket explodes to secure your winnings.  
-   - If you cash out at 3.42x, and your bet was $10 → You win **$34.20!**
-   - If the rocket explodes before you cash out → You lose the bet.
-
-4. **Random Explosion:**  
-   The rocket explodes at a random multiplier between **1.00x and 100.00x**.  
-   Each round’s outcome is unique and unpredictable.
-
-5. **Reset:**  
-   After the explosion or cash-out, the game resets automatically and lets you play again.
+All games share a single glowing universe — one balance, one aesthetic, endless adrenaline.
 
 ---
 
-## ⚙️ Features
+## 🏗️ Overview
 
-- 🎯 Real-time multiplier growth (smooth JS animation)  
-- 💸 Cash-out system with live balance updates  
-- 💥 Random explosion logic with fair randomness  
-- 🌈 Animated background gradient as multiplier rises  
-- 🔊 Optional sound effects for launch, cash-out, and explosion  
-- 🏆 Optional leaderboard for highest multipliers  
-- 🧠 Optional auto-cash-out feature (e.g., auto at 2.00x)
+NeonArc Casino is designed as a modular environment that hosts multiple original games:
 
----
+| Category | Games | Description |
+|-----------|--------|-------------|
+| 💥 **Skill Games** | Rocket · Pulse Cash · Mind Bet · StackJack | Real-time timing & crash games that test nerves and strategy. |
+| 🃏 **Card Games** | Binary Poker *(and more coming)* | Strategic, logic-driven games where every card can turn your fate. |
 
-## 🧩 Tech Stack
-
-- **HTML5** – structure and layout  
-- **CSS3** – visual design, gradients, transitions  
-- **JavaScript (ES6)** – game logic, multiplier engine, UI interactivity  
+Each game runs inside its own `<div>` container with a unified balance system and theme.
 
 ---
 
-## 🛠️ How to Run
+## 🌌 Features
 
-1. Clone or download this repository.  
-2. Open `index.html` in any modern web browser (Chrome, Firefox, Edge).  
-3. Play immediately — no setup required!
-
----
-
-## 🧮 Game Logic Summary
-
-- A random explosion multiplier is generated when the player clicks **Launch**.  
-- The displayed multiplier increases by small increments (e.g., 0.01x) at short time intervals.  
-- If the current multiplier reaches or exceeds the random explosion multiplier → the rocket explodes.  
-- If the player cashes out before that happens → winnings are calculated and displayed.
+- 🧩 **Multiple Game Modes** – Switch between skill and card-based games instantly.  
+- 💰 **Global Wallet System** – One balance shared across all games.  
+- ⚡ **Pure HTML/CSS/JS** – No frameworks or dependencies.  
+- 🎨 **Neon-Cyber Visuals** – Smooth glowing animations and dynamic transitions.  
+- 🧠 **Original Gameplay Concepts** – 100% invented mechanics, not remakes of existing casino titles.  
+- 🧾 **In-Game Instructions** – Built-in help panels for each mode.  
+- 🕹️ **Expandable Architecture** – Easily add new games using consistent structure and shared functions.
 
 ---
 
-## 🧠 Future Improvements
+## 🕹️ Current Games
 
-- Add backend tracking for high scores and balances  
-- Implement multiplayer rounds with shared rocket timing  
-- Integrate WebSocket or Firebase for real-time play  
-- Create a mobile-friendly UI layout  
-- Add authentication and user stats
+### 💥 Skill Games
+| Game | Summary |
+|------|----------|
+| **Rocket** | Classic crash-style rocket launch — cash out before it explodes. |
+| **Pulse Cash** | Rising energy waveform — overload risk grows with multiplier. |
+| **Mind Bet** | Guess when a rogue AI will “change its mind” — moods are fake, odds are real. |
+
+### 🃏 Card Games
+| Game | Summary |
+|------|----------|
+| **Binary Poker** | Match your 4-bit binary cards to a secret target number. Flip bits wisely! |
+| *(More Coming Soon)* | StackJack, Echo Hand, Fuse, Perception, and more will join the Card Games section. |
 
 ---
 
-## 🧑‍💻 Author
+## 🧱 Architecture
 
-Developed by **Jonathan**  
-Creative coder & tech enthusiast 💻✨
+| Path | Description |
+|------|--------------|
+| **index.html** | Main entry point — includes all game modes and layout. |
+| **/css/** | Contains all shared and game-specific stylesheets. |
+| **/js/** | Holds core scripts and modular game logic files. |
+| **/assets/** | Optional folder for icons, glow effects, and sounds. |
+| **README.md** | Documentation for developers and contributors. |
+
+**Main Shared Functions:**
+- `updateBalance(amount)`
+- `switchMode(modeName)`
+- `resetRound()`
+- `toggleInstructions()`
+
+**Each Game Adds:**
+- A container `<div id="gameName">`  
+- Its own start, play, and result functions  
+- Optional special buttons or animations  
+
+---
+
+## 🧭 How to Run
+
+1. Download or clone the repository.  
+2. Open `index.html` in your browser — no build step required.  
+3. Play any game using the mode selector at the top.  
+4. Watch your balance rise (or fall 👀).  
+
+---
+
+## 🧠 Developer Notes
+
+All games share **one global JavaScript environment**, making it simple to add, remove, or modify game logic.
+
+Each game follows a consistent lifecycle pattern:
+
+    startGame();
+    playTurn();
+    endRound();
+    updateBalance();
+
+### 🎨 UI Design
+
+- **Reusable Components:** Neon buttons, toggles, sliders, and balance displays.  
+- **Consistent Aesthetic:** Every game inherits the shared dark-neon theme.  
+- **Lightweight Animations:** All transitions and effects use pure CSS (`transform`, `transition`, `keyframes`) — no heavy libraries.  
+
+---
+
+## 💡 Future Roadmap
+
+- 🃏 Add more **Card Games** (Echo Hand, Fuse, Perception)  
+- 🪙 Add **Vault & Leaderboard** sections  
+- 🧭 Build **Animated Lobby Hub** for selecting games  
+- 🎵 Include **Selectable Ambient Soundtracks**  
+- 🧬 Create **“Archive Mode”** for experimental prototype games  
 
 ---
 
 ## ⚠️ Disclaimer
 
-This project is for **educational and entertainment purposes only**.  
-It is **not** a gambling application and **does not handle real money**.
+This project is for **educational and entertainment purposes only.**  
+NeonArc Casino **does not** handle real currency, nor does it promote gambling of any kind.  
 
 ---
+
+## 👨‍💻 Author
+
+**Jon**  
+💻 Developer • Inventor • Tech Artist  
+Creator of the **NeonArc Universe & Casino** ✨
