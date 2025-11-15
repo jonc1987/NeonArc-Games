@@ -386,6 +386,118 @@
         overflow: hidden;
       }
 
+      /* Mind Bet wrapper keeps the UI centered and scaled to the viewport */
+      #mindBetGame {
+        --mind-stage-scale: 1; /* Default scale for the stage that can shrink on short screens */
+        position: relative;
+        isolation: isolate;
+        width: 100%;
+        min-height: clamp(360px, 62vh, 780px);
+        max-height: min(90vh, 900px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(18px, 4vw, 42px);
+        margin: 0 auto;
+        border-radius: clamp(22px, 4vw, 38px);
+        background: radial-gradient(circle at 50% 20%, rgba(46, 140, 191, 0.22), rgba(1, 6, 18, 0.92));
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+        overflow-y: auto; /* Allows scrolling if the viewport becomes extremely short */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(110, 243, 255, 0.5) transparent;
+      }
+
+      #mindBetGame::before {
+        content: '';
+        position: absolute;
+        inset: clamp(12px, 3vw, 24px);
+        border-radius: inherit;
+        background: radial-gradient(circle at 50% 25%, rgba(0, 255, 229, 0.14), rgba(0, 0, 0, 0));
+        opacity: 0.9;
+        filter: blur(10px);
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      #mindBetGame .mind-stage {
+        width: min(92vw, 720px);
+        min-height: clamp(320px, 55vh, 640px);
+        transform: scale(var(--mind-stage-scale));
+        transform-origin: center;
+        transition: transform 0.35s ease;
+        margin: auto;
+        background-size: cover;
+      }
+
+      #mindBetGame .mind-stage::before {
+        content: '';
+        position: absolute;
+        width: min(70vw, 520px);
+        aspect-ratio: 1 / 1;
+        border-radius: 50%;
+        top: 15%;
+        left: 50%;
+        transform: translate(-50%, -20%);
+        background: radial-gradient(circle, rgba(76, 209, 255, 0.35), rgba(0, 0, 0, 0));
+        filter: blur(30px);
+        opacity: 0.65;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      #mindBetGame .ai-face,
+      #mindBetGame .mind-mood,
+      #mindBetGame .multiplier-readout,
+      #mindBetGame .potential-readout,
+      #mindBetGame .history {
+        z-index: 2;
+      }
+
+      #mindBetGame .mind-mood,
+      #mindBetGame #mindRoundResult,
+      #mindBetGame #mindPotential {
+        text-align: center;
+        width: min(90%, 520px);
+        margin-inline: auto;
+      }
+
+      #mindBetGame .mind-stage .potential-readout {
+        top: clamp(14px, 3vw, 32px);
+        right: clamp(14px, 4vw, 36px);
+      }
+
+      #mindBetGame .mind-stage .history {
+        left: clamp(14px, 4vw, 32px);
+        top: clamp(14px, 4vw, 32px);
+      }
+
+      @media (max-width: 640px) {
+        #mindBetGame {
+          padding: clamp(16px, 6vw, 32px);
+        }
+        #mindBetGame .mind-stage {
+          width: 100%;
+        }
+      }
+
+      @media (max-height: 880px) {
+        #mindBetGame {
+          --mind-stage-scale: 0.96; /* Slight scale-down keeps content in frame on shorter screens */
+        }
+      }
+
+      @media (max-height: 760px) {
+        #mindBetGame {
+          --mind-stage-scale: 0.9;
+        }
+      }
+
+      @media (max-height: 640px) {
+        #mindBetGame {
+          --mind-stage-scale: 0.82;
+        }
+      }
+
       .mind-stage .scroll-field {
         opacity: 0.25;
       }
@@ -1640,18 +1752,20 @@
         <section class="mode-panel" id="mindMode" aria-label="Mind Bet Mode">
           <div class="main-layout">
             <div class="device-shell">
-              <div class="stage idle mind-stage" id="mindStage">
-                <div class="scroll-field"></div>
-                <div class="mind-glitch" id="mindGlitch"></div>
-                <div class="ai-face" id="aiFace">
-                  <div class="ai-emotion" id="aiEmotion">😌</div>
-                </div>
-                <div class="mind-mood" id="mindMood">AI calm and observant.</div>
-                <ul class="history" id="mindHistory"></ul>
-                <div class="potential-readout" id="mindPotential">Potential: $0.00</div>
-                <div class="multiplier-readout">
-                  <div id="mindMultiplier">1.00x</div>
-                  <div id="mindRoundResult">Sync a wager to begin.</div>
+              <div id="mindBetGame">
+                <div class="stage idle mind-stage" id="mindStage">
+                  <div class="scroll-field"></div>
+                  <div class="mind-glitch" id="mindGlitch"></div>
+                  <div class="ai-face" id="aiFace">
+                    <div class="ai-emotion" id="aiEmotion">😌</div>
+                  </div>
+                  <div class="mind-mood" id="mindMood">AI calm and observant.</div>
+                  <ul class="history" id="mindHistory"></ul>
+                  <div class="potential-readout" id="mindPotential">Potential: $0.00</div>
+                  <div class="multiplier-readout">
+                    <div id="mindMultiplier">1.00x</div>
+                    <div id="mindRoundResult">Sync a wager to begin.</div>
+                  </div>
                 </div>
               </div>
             </div>
