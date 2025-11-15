@@ -918,6 +918,16 @@
         color: rgba(255, 255, 255, 0.58);
       }
 
+      .card-tile.stackjack-link {
+        border-color: rgba(110, 255, 236, 0.4);
+        background: linear-gradient(135deg, rgba(6, 32, 44, 0.95), rgba(0, 10, 22, 0.9));
+        box-shadow: 0 16px 40px rgba(0, 255, 236, 0.15);
+      }
+
+      .card-tile.stackjack-link .card-meta {
+        color: rgba(110, 255, 236, 0.85);
+      }
+
       .card-tile:hover:not(:disabled) {
         transform: translateY(-4px);
         border-color: rgba(110, 255, 236, 0.4);
@@ -1236,35 +1246,233 @@
 
       .stack-stage {
         display: flex;
+        flex-direction: column;
+        gap: clamp(18px, 3vw, 28px);
+        padding: clamp(32px, 5vw, 60px);
+        aspect-ratio: auto;
+        min-height: clamp(380px, 62vh, 560px);
+        overflow: visible;
+      }
+
+      .stack-grid {
+        display: flex;
+        align-items: stretch;
+        gap: clamp(20px, 4vw, 32px);
+        width: 100%;
+      }
+
+      .stack-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .stack-area {
+        position: relative;
+        width: clamp(160px, 30vw, 240px);
+        height: clamp(240px, 42vw, 380px);
+        border-radius: 28px;
+        border: 1px solid rgba(110, 255, 236, 0.22);
+        background: radial-gradient(circle at 50% 15%, rgba(18, 30, 40, 0.8), rgba(5, 8, 16, 0.95));
+        box-shadow: inset 0 0 40px rgba(0, 255, 235, 0.12);
+        overflow: hidden;
+        transform-origin: center bottom;
+        animation: stackSway 5s ease-in-out infinite;
+        --stack-wobble: 0;
+      }
+
+      .stack-stage.live .stack-area {
+        --stack-wobble: 2;
+      }
+
+      .stack-stage.collapsed .stack-area {
+        animation: stackShake 0.3s linear infinite;
+      }
+
+      @keyframes stackSway {
+        0% {
+          transform: rotate(calc(var(--stack-wobble, 0) * -1deg));
+        }
+        50% {
+          transform: rotate(calc(var(--stack-wobble, 0) * 1deg));
+        }
+        100% {
+          transform: rotate(calc(var(--stack-wobble, 0) * -1deg));
+        }
+      }
+
+      @keyframes stackShake {
+        0% {
+          transform: translate(1px, 0);
+        }
+        25% {
+          transform: translate(-1px, -1px);
+        }
+        50% {
+          transform: translate(1px, 1px);
+        }
+        75% {
+          transform: translate(-1px, 1px);
+        }
+        100% {
+          transform: translate(1px, -1px);
+        }
+      }
+
+      .stack-tower {
+        position: absolute;
+        bottom: 58px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      .stack-base {
+        position: absolute;
+        bottom: 22px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 140%;
+        height: 26px;
+        background: linear-gradient(90deg, rgba(110, 255, 236, 0), rgba(110, 255, 236, 0.45), rgba(110, 255, 236, 0));
+        border-radius: 40px;
+        box-shadow: 0 0 30px rgba(110, 255, 236, 0.4);
+      }
+
+      .stack-card {
+        width: 100%;
+        min-height: 40px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: linear-gradient(135deg, rgba(0, 255, 200, 0.7), rgba(0, 110, 255, 0.65));
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35), 0 0 25px rgba(0, 255, 204, 0.35);
+        text-align: center;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 22px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #011;
+        display: flex;
         align-items: center;
         justify-content: center;
-        text-align: center;
-        padding: clamp(40px, 6vw, 80px);
+        opacity: 0;
+        transform: translateY(16px) scale(0.95);
+        transition: opacity 0.25s ease, transform 0.25s ease;
       }
 
-      .stack-message {
-        position: relative;
-        z-index: 2;
-        max-width: 320px;
-        display: grid;
-        gap: 10px;
+      .stack-card.landed {
+        opacity: 1;
+        transform: translateY(0) scale(1);
       }
 
-      .stack-message h3 {
-        margin: 0;
+      .stack-card[data-value='10'],
+      .stack-card[data-value='11'] {
+        background: linear-gradient(135deg, rgba(255, 120, 210, 0.85), rgba(255, 220, 120, 0.85));
+      }
+
+      .stack-card[data-value='2'],
+      .stack-card[data-value='3'] {
+        background: linear-gradient(135deg, rgba(110, 255, 236, 0.8), rgba(0, 180, 255, 0.75));
+      }
+
+      .stack-bust {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-family: 'Orbitron', sans-serif;
-        letter-spacing: 0.24em;
-        text-transform: uppercase;
-        font-size: clamp(18px, 2.6vw, 22px);
-        color: rgba(110, 255, 236, 0.9);
+        font-size: clamp(24px, 4vw, 40px);
+        letter-spacing: 0.3em;
+        color: rgba(255, 90, 90, 0.85);
+        text-shadow: 0 0 18px rgba(255, 90, 90, 0.7);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
       }
 
-      .stack-message p {
-        margin: 0;
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.65);
-        letter-spacing: 0.1em;
+      .stack-stage.collapsed .stack-bust {
+        opacity: 1;
+      }
+
+      .stack-hud {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
         text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .stack-hud strong {
+        display: block;
+        font-size: clamp(18px, 2.2vw, 24px);
+        color: #6ef3ff;
+      }
+
+      .instability-panel {
+        flex: 0 0 180px;
+        border-radius: 22px;
+        border: 1px solid rgba(110, 255, 236, 0.18);
+        padding: 18px;
+        background: rgba(2, 12, 22, 0.6);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .instability-meter {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .meter-track {
+        flex: 1;
+        height: 180px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(0, 255, 204, 0.2), rgba(255, 196, 0, 0.2), rgba(255, 85, 85, 0.25));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .meter-fill {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 0%;
+        background: linear-gradient(180deg, #00ffc8, #ffd257, #ff5c5c);
+        box-shadow: 0 0 22px rgba(255, 140, 0, 0.35);
+        transition: height 0.25s ease;
+      }
+
+      .instability-value {
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        font-size: 16px;
+        color: #6ef3ff;
+      }
+
+      .stack-status {
+        text-align: center;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 13px;
       }
 
       @media (max-width: 960px) {
@@ -1294,6 +1502,22 @@
 
         button {
           width: 100%;
+        }
+
+        .stack-grid {
+          flex-direction: column;
+        }
+
+        .instability-panel {
+          width: 100%;
+        }
+
+        .instability-meter {
+          justify-content: center;
+        }
+
+        .meter-track {
+          height: 140px;
         }
       }
     </style>
@@ -1453,19 +1677,57 @@
         <section class="mode-panel" id="stackMode" aria-label="StackJack Mode">
           <div class="main-layout">
             <div class="device-shell">
-              <div class="stage idle stack-stage">
-                <div class="scroll-field"></div>
-                <div class="stack-message">
-                  <h3>StackJack</h3>
-                  <p>Deck neuralizer calibrating. The stacked odds will open soon.</p>
+              <div class="stage idle stack-stage" id="stackStage">
+                <div class="stack-grid" id="stackJackGame">
+                  <div class="stack-column">
+                    <div class="stack-area" id="stackArea">
+                      <div class="stack-tower" id="stackTower"></div>
+                      <div class="stack-base"></div>
+                      <div class="stack-bust" id="stackBust">BUSTED!</div>
+                    </div>
+                    <div class="stack-hud">
+                      <div>
+                        Stack Total
+                        <strong id="stackTotalValue">0</strong>
+                      </div>
+                      <div>
+                        Potential
+                        <strong id="stackPotential">$0.00</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="instability-panel">
+                    <div class="instability-meter">
+                      <div class="meter-track">
+                        <div class="meter-fill" id="instabilityFill"></div>
+                      </div>
+                      <span class="instability-value" id="instabilityValue">0%</span>
+                    </div>
+                    <p>Instability builds with each hit. Balance once per round to steady the tower.</p>
+                  </div>
                 </div>
+                <div class="stack-status" id="stackStatus">Enter a bet to begin.</div>
               </div>
             </div>
             <aside class="control-panel">
-              <h2>Coming Soon</h2>
-              <div class="status">
-                StackJack is almost ready for play. Tune your tactics while the dealer AI locks in.
+              <h2>StackJack Console</h2>
+              <div>
+                <label for="stackBet">Bet Amount</label>
+                <input type="number" id="stackBet" min="1" step="1" value="25" />
               </div>
+              <div class="panel-meta">
+                <span>Total: <strong id="stackTotalLabel">0</strong></span>
+                <span>Instability: <strong id="stackInstabilityLabel">0%</strong></span>
+              </div>
+              <div class="button-row">
+                <button class="launch" id="stackStartBtn">Start StackJack</button>
+                <button class="ghost-button" id="stackBalanceBtn" disabled>Balance Tower</button>
+              </div>
+              <div class="button-row">
+                <button class="launch" id="stackHitBtn" disabled>Hit</button>
+                <button class="cashout" id="stackHoldBtn" disabled>Hold</button>
+              </div>
+              <div class="status" id="stackConsoleStatus">Stack tower idle.</div>
             </aside>
           </div>
         </section>
@@ -1635,6 +1897,16 @@
       let mindLastTick = 0;
       let mindMoodScore = 0;
 
+      // ---------------- StackJack state ----------------
+      let stackRunning = false;
+      let stackCollapsed = false;
+      let stackBet = 0;
+      let stackTotal = 0;
+      let stackInstability = 0;
+      let stackCards = [];
+      let stackBalanceUsed = false;
+      let stackResetTimeout = null;
+
       let pathLength = 1;
       let activeMode = 'rocket';
       let activeSection = 'skill';
@@ -1737,6 +2009,24 @@
       const mindEmotionEl = document.getElementById('aiEmotion');
       const mindHistoryList = document.getElementById('mindHistory');
 
+      // StackJack elements
+      const stackStage = document.getElementById('stackStage');
+      const stackArea = document.getElementById('stackArea');
+      const stackTower = document.getElementById('stackTower');
+      const stackBetInput = document.getElementById('stackBet');
+      const stackStartBtn = document.getElementById('stackStartBtn');
+      const stackHitBtn = document.getElementById('stackHitBtn');
+      const stackHoldBtn = document.getElementById('stackHoldBtn');
+      const stackBalanceBtn = document.getElementById('stackBalanceBtn');
+      const stackStatusEl = document.getElementById('stackStatus');
+      const stackConsoleStatus = document.getElementById('stackConsoleStatus');
+      const stackTotalValue = document.getElementById('stackTotalValue');
+      const stackTotalLabel = document.getElementById('stackTotalLabel');
+      const stackInstabilityLabel = document.getElementById('stackInstabilityLabel');
+      const stackPotentialEl = document.getElementById('stackPotential');
+      const instabilityFill = document.getElementById('instabilityFill');
+      const instabilityValue = document.getElementById('instabilityValue');
+
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
       } else {
@@ -1800,6 +2090,11 @@
         mindStartBtn.addEventListener('click', startMindBet);
         mindCashBtn.addEventListener('click', cashOutMindBet);
         mindBetInput.addEventListener('input', updateMindInsight);
+        stackStartBtn.addEventListener('click', startStackJack);
+        stackHitBtn.addEventListener('click', hitStackJack);
+        stackHoldBtn.addEventListener('click', holdStackJack);
+        stackBalanceBtn.addEventListener('click', balanceTower);
+        resetStackJack(true);
       }
 
       // ---------------- Shared helpers ----------------
@@ -1834,6 +2129,10 @@
             return;
           }
         }
+        if (stackRunning && mode !== 'stack') {
+          setStackStatus('Ride out the StackJack round before switching modes.');
+          return;
+        }
 
         activeMode = mode;
         Object.entries(panels).forEach(([key, panel]) => {
@@ -1850,6 +2149,192 @@
         };
         if (activeSection === 'skill') {
           setTitle(titles[mode] || 'Skill Games');
+        }
+      }
+
+      // ---------------- StackJack helpers ----------------
+      function startStackJack() {
+        if (stackRunning) return;
+        const bet = parseFloat(stackBetInput.value);
+        if (!Number.isFinite(bet) || bet <= 0) {
+          setStackStatus('Enter a valid bet to stack.');
+          return;
+        }
+        if (bet > balance) {
+          setStackStatus('Insufficient balance for that tower.');
+          return;
+        }
+        if (stackResetTimeout) {
+          clearTimeout(stackResetTimeout);
+          stackResetTimeout = null;
+        }
+        balance -= bet;
+        updateBalance();
+        stackBet = bet;
+        stackRunning = true;
+        stackCollapsed = false;
+        stackTotal = 0;
+        stackInstability = 8;
+        stackCards = [];
+        stackBalanceUsed = false;
+        stackStage.classList.remove('idle', 'collapsed');
+        stackStage.classList.add('live');
+        stackTower.innerHTML = '';
+        stackBetInput.disabled = true;
+        stackStartBtn.disabled = true;
+        updateStackControls();
+        updateStackHUD();
+        setStackStatus('Tower initialized. Hit to draw your first card.');
+      }
+
+      function hitStackJack() {
+        if (!stackRunning || stackCollapsed) return;
+        const value = drawStackCard();
+        stackCards.push(value);
+        stackTotal += value;
+        const card = document.createElement('div');
+        card.className = 'stack-card';
+        card.dataset.value = value;
+        card.textContent = value;
+        stackTower.appendChild(card);
+        requestAnimationFrame(() => card.classList.add('landed'));
+        stackInstability = Math.min(100, stackInstability + computeInstabilityGain(value));
+        updateStackControls();
+        updateStackHUD();
+        setStackStatus(`Drew ${value}. Tower at ${stackTotal}.`);
+        if (stackInstability >= 100) {
+          collapseTower();
+        }
+      }
+
+      function holdStackJack() {
+        if (!stackRunning || stackCollapsed || stackCards.length === 0) {
+          setStackStatus('Draw at least one card before holding.');
+          return;
+        }
+        stackRunning = false;
+        stackStage.classList.remove('live');
+        stackBetInput.disabled = false;
+        stackStartBtn.disabled = false;
+        updateStackControls();
+        if (stackTotal > 21) {
+          setStackStatus(`Tower overloaded at ${stackTotal}. Bet lost.`);
+          updateStackHUD();
+          scheduleStackReset();
+          return;
+        }
+        let payout = stackBet * (stackTotal / 21) * 2;
+        if (stackBalanceUsed) {
+          payout *= 0.5;
+        }
+        payout = Math.max(0, payout);
+        balance += payout;
+        updateBalance();
+        setStackStatus(`Held at ${stackTotal}. Won $${payout.toFixed(2)}.`);
+        updateStackHUD();
+        scheduleStackReset();
+      }
+
+      function balanceTower() {
+        if (!stackRunning || stackCollapsed || stackBalanceUsed || stackCards.length === 0) return;
+        stackInstability = Math.max(0, stackInstability * 0.75);
+        stackBalanceUsed = true;
+        setStackStatus('Stabilizers fired. Next payout halved.');
+        updateStackControls();
+        updateStackHUD();
+      }
+
+      function collapseTower() {
+        if (stackCollapsed) return;
+        stackCollapsed = true;
+        stackRunning = false;
+        stackStage.classList.add('collapsed');
+        stackStage.classList.remove('live');
+        stackBetInput.disabled = false;
+        stackStartBtn.disabled = false;
+        updateStackControls();
+        updateStackHUD();
+        setStackStatus('Tower collapsed! Bet lost.');
+        scheduleStackReset();
+      }
+
+      function updateStackControls() {
+        stackHitBtn.disabled = !stackRunning || stackCollapsed;
+        stackHoldBtn.disabled = !stackRunning || stackCards.length === 0 || stackCollapsed;
+        stackBalanceBtn.disabled = !stackRunning || stackBalanceUsed || stackCards.length === 0 || stackCollapsed;
+      }
+
+      function updateStackHUD() {
+        stackTotalValue.textContent = stackTotal.toString();
+        stackTotalLabel.textContent = stackTotal.toString();
+        stackInstability = Math.max(0, Math.min(100, stackInstability));
+        const instabilityText = `${Math.round(stackInstability)}%`;
+        stackInstabilityLabel.textContent = instabilityText;
+        instabilityValue.textContent = instabilityText;
+        instabilityFill.style.height = `${stackInstability}%`;
+        const wobble = Math.min(4, 0.5 + (stackInstability / 100) * 3);
+        stackArea.style.setProperty('--stack-wobble', wobble.toFixed(2));
+        const potential = stackCards.length === 0 || stackTotal > 21
+          ? 0
+          : stackBet * (stackTotal / 21) * 2 * (stackBalanceUsed ? 0.5 : 1);
+        stackPotentialEl.textContent = `$${potential.toFixed(2)}`;
+      }
+
+      function drawStackCard() {
+        const values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        const index = Math.floor(Math.random() * values.length);
+        return values[index];
+      }
+
+      function computeInstabilityGain(value) {
+        const valuePressure = (value / 21) * 35;
+        const heightPressure = stackCards.length * 5;
+        const overloadPressure = Math.max(0, stackTotal - 21) * 2.5;
+        return valuePressure + heightPressure + overloadPressure;
+      }
+
+      function scheduleStackReset() {
+        if (stackResetTimeout) {
+          clearTimeout(stackResetTimeout);
+        }
+        stackResetTimeout = setTimeout(() => {
+          stackResetTimeout = null;
+          resetStackJack(false);
+        }, settings.resetDelay);
+      }
+
+      function resetStackJack(initial) {
+        if (stackResetTimeout) {
+          clearTimeout(stackResetTimeout);
+          stackResetTimeout = null;
+        }
+        stackRunning = false;
+        stackCollapsed = false;
+        stackBet = 0;
+        stackTotal = 0;
+        stackInstability = 0;
+        stackCards = [];
+        stackBalanceUsed = false;
+        stackStage.classList.remove('live', 'collapsed');
+        stackStage.classList.add('idle');
+        stackTower.innerHTML = '';
+        stackBetInput.disabled = false;
+        stackStartBtn.disabled = false;
+        updateStackControls();
+        updateStackHUD();
+        if (initial) {
+          setStackStatus('Stack tower idle.');
+        } else {
+          setStackStatus('Stack tower cleared. Ready for another bet.');
+        }
+      }
+
+      function setStackStatus(message) {
+        if (stackStatusEl) {
+          stackStatusEl.textContent = message;
+        }
+        if (stackConsoleStatus) {
+          stackConsoleStatus.textContent = message;
         }
       }
 
