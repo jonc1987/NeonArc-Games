@@ -945,12 +945,134 @@
         flex-wrap: wrap;
       }
 
+      .card-game-title-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
       .card-game-title {
         font-family: 'Orbitron', sans-serif;
         font-size: clamp(18px, 2.4vw, 22px);
         letter-spacing: 0.22em;
         text-transform: uppercase;
         color: rgba(255, 255, 255, 0.75);
+      }
+
+      .binary-info-button {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 1px solid rgba(110, 255, 236, 0.42);
+        background: radial-gradient(circle at 30% 30%, rgba(110, 255, 236, 0.3), rgba(2, 14, 24, 0.85));
+        color: #6ef3ff;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 0 12px rgba(110, 255, 236, 0.25);
+        transition: transform 0.18s ease, box-shadow 0.2s ease, border 0.2s ease;
+      }
+
+      .binary-info-button:hover,
+      .binary-info-button:focus-visible {
+        transform: translateY(-1px);
+        border-color: rgba(110, 255, 236, 0.7);
+        box-shadow: 0 10px 24px rgba(0, 255, 236, 0.35);
+        outline: none;
+      }
+
+      .binary-info-button[aria-expanded='true'] {
+        border-color: rgba(110, 255, 236, 0.85);
+        box-shadow: 0 0 24px rgba(0, 255, 236, 0.38);
+      }
+
+      .binary-instructions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .binary-instructions-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 18px;
+        border-radius: 16px;
+        border: 1px solid rgba(110, 255, 236, 0.38);
+        background: linear-gradient(135deg, rgba(6, 22, 35, 0.9), rgba(0, 18, 28, 0.9));
+        color: #c9faff;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.45);
+        transition: transform 0.18s ease, box-shadow 0.22s ease, border 0.22s ease;
+      }
+
+      .binary-instructions-toggle:hover,
+      .binary-instructions-toggle:focus-visible {
+        transform: translateY(-2px);
+        border-color: rgba(110, 255, 236, 0.6);
+        box-shadow: 0 18px 40px rgba(0, 255, 236, 0.2);
+        outline: none;
+      }
+
+      .binary-instructions.open .binary-instructions-toggle {
+        border-color: rgba(110, 255, 236, 0.75);
+        box-shadow: 0 20px 45px rgba(0, 255, 236, 0.22);
+      }
+
+      .binary-instructions-body {
+        padding: 18px 20px;
+        border-radius: 18px;
+        background: linear-gradient(145deg, rgba(6, 20, 34, 0.92), rgba(0, 12, 20, 0.88));
+        border: 1px solid rgba(110, 255, 236, 0.24);
+        box-shadow: inset 0 0 24px rgba(0, 255, 236, 0.12);
+        font-size: 14px;
+        line-height: 1.7;
+        color: rgba(229, 248, 255, 0.88);
+      }
+
+      .binary-instructions-intro {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .binary-instructions-body h3 {
+        margin-top: 16px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: #6ef3ff;
+      }
+
+      .binary-instructions-body ol,
+      .binary-instructions-body ul {
+        margin: 0 0 12px 18px;
+        padding: 0;
+      }
+
+      .binary-instructions-body li {
+        margin-bottom: 6px;
+      }
+
+      .binary-instructions-tip {
+        margin: 0;
+        font-size: 13px;
+        color: #8cf7ff;
+      }
+
+      .binary-instructions .toggle-state {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
       }
 
       .ghost-button {
@@ -1380,7 +1502,19 @@
         <div class="card-panel" id="binaryPokerGame">
           <div class="card-game-header">
             <button class="ghost-button" id="cardBackBtn" type="button">← Back to Card Lobby</button>
-            <div class="card-game-title">Binary Poker</div>
+            <div class="card-game-title-group">
+              <div class="card-game-title">Binary Poker</div>
+              <button
+                class="binary-info-button"
+                id="binaryInfoButton"
+                type="button"
+                aria-expanded="false"
+                aria-controls="binaryInstructionsBody"
+                aria-label="Toggle Binary Poker instructions"
+              >
+                ?
+              </button>
+            </div>
           </div>
           <div class="main-layout card-layout">
             <div class="device-shell">
@@ -1394,6 +1528,43 @@
             </div>
             <aside class="control-panel card-controls">
               <h2>Binary Poker</h2>
+              <div class="binary-instructions" id="binaryInstructions">
+                <button
+                  class="binary-instructions-toggle"
+                  id="binaryInstructionsToggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="binaryInstructionsBody"
+                >
+                  <span class="toggle-label">How to Play</span>
+                  <span class="toggle-state" aria-hidden="true">▼</span>
+                </button>
+                <div class="binary-instructions-body" id="binaryInstructionsBody" hidden>
+                  <p class="binary-instructions-intro">
+                    Objective: Build the closest possible binary hand to the hidden target number.
+                  </p>
+                  <h3>Gameplay Steps</h3>
+                  <ol>
+                    <li>Enter your bet and click <strong>Deal Hand</strong>.</li>
+                    <li>You receive 5 binary cards (each with 4 bits).</li>
+                    <li>The system secretly generates a target 4-bit number (e.g., 1101).</li>
+                    <li>You may flip one bit on one of your cards to improve your match.</li>
+                    <li>Click <strong>Lock In</strong> to finalize.</li>
+                    <li>Your hand’s numerical value is compared to the target.</li>
+                    <li>Closer = bigger payout.</li>
+                  </ol>
+                  <h3>Payouts</h3>
+                  <ul>
+                    <li><strong>Exact match</strong> → 5× payout</li>
+                    <li><strong>1-bit difference</strong> → 3× payout</li>
+                    <li><strong>2-bit difference</strong> → 1.5× payout</li>
+                    <li><strong>More than 2 bits</strong> → lose the bet.</li>
+                  </ul>
+                  <p class="binary-instructions-tip">
+                    <strong>Strategy Tip:</strong> Try to read patterns — certain sequences tend to appear more often.
+                  </p>
+                </div>
+              </div>
               <div>
                 <label for="binaryBet">Bet Amount</label>
                 <input type="number" id="binaryBet" min="1" step="1" value="20" />
@@ -1512,6 +1683,10 @@
       const binaryStatusEl = document.getElementById('binaryStatus');
       const binaryActiveLabel = document.getElementById('binaryActiveLabel');
       const binaryFlipInfo = document.getElementById('binaryFlipInfo');
+      const binaryInfoButton = document.getElementById('binaryInfoButton');
+      const binaryInstructions = document.getElementById('binaryInstructions');
+      const binaryInstructionsToggle = document.getElementById('binaryInstructionsToggle');
+      const binaryInstructionsBody = document.getElementById('binaryInstructionsBody');
 
       // Rocket elements
       const betInput = document.getElementById('bet');
@@ -1588,6 +1763,7 @@
         resetMindGame(true);
         updateMindInsight();
         resetBinaryPoker(true);
+        toggleBinaryInstructions(false);
         setTitle('Rocket Line');
 
         sectionButtons.forEach((button) => {
@@ -1606,6 +1782,12 @@
           });
         });
         cardBackBtn.addEventListener('click', () => exitCardGame());
+        if (binaryInstructionsToggle) {
+          binaryInstructionsToggle.addEventListener('click', () => toggleBinaryInstructions());
+        }
+        if (binaryInfoButton) {
+          binaryInfoButton.addEventListener('click', () => toggleBinaryInstructions());
+        }
         binaryStartBtn.addEventListener('click', startBinaryPoker);
         binaryLockBtn.addEventListener('click', finishBinaryPoker);
         binaryHandEl.addEventListener('click', handleBinaryHandClick);
@@ -1786,10 +1968,29 @@
         cardLobby.classList.add('active');
         activeCardGame = null;
         resetBinaryPoker(!manual);
+        toggleBinaryInstructions(false);
         if (manual || activeSection === 'card') {
           setTitle('Card Games Lobby');
         }
         return true;
+      }
+
+      function toggleBinaryInstructions(forceOpen) {
+        if (!binaryInstructions || !binaryInstructionsToggle || !binaryInstructionsBody || !binaryInfoButton) {
+          return;
+        }
+        const shouldOpen =
+          typeof forceOpen === 'boolean'
+            ? forceOpen
+            : !binaryInstructions.classList.contains('open');
+        binaryInstructions.classList.toggle('open', shouldOpen);
+        binaryInstructionsToggle.setAttribute('aria-expanded', shouldOpen);
+        binaryInfoButton.setAttribute('aria-expanded', shouldOpen);
+        binaryInstructionsBody.hidden = !shouldOpen;
+        const toggleIcon = binaryInstructionsToggle.querySelector('.toggle-state');
+        if (toggleIcon) {
+          toggleIcon.textContent = shouldOpen ? '▲' : '▼';
+        }
       }
 
       function startBinaryPoker() {
