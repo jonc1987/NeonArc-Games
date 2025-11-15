@@ -40,12 +40,13 @@ Each game runs inside its own `<div>` container with a unified balance system an
 | **Rocket** | Classic crash-style rocket launch — cash out before it explodes. |
 | **Pulse Cash** | Rising energy waveform — overload risk grows with multiplier. |
 | **Mind Bet** | Guess when a rogue AI will “change its mind” — moods are fake, odds are real. |
+| **StackJack** | Stack cards up to 21 without collapsing your tower — blackjack meets balance physics. |
 
 ### 🃏 Card Games
 | Game | Summary |
 |------|----------|
 | **Binary Poker** | Match your 4-bit binary cards to a secret target number. Flip bits wisely! |
-| *(More Coming Soon)* | StackJack, Echo Hand, Fuse, Perception, and more will join the Card Games section. |
+| *(More Coming Soon)* | Echo Hand, Fuse, Perception, and more will join the Card Games section. |
 
 ---
 
