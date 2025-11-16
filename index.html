@@ -1081,6 +1081,14 @@
         color: rgba(255, 255, 255, 0.75);
       }
 
+      .card-game-subtitle {
+        margin-top: 6px;
+        font-size: 13px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.45);
+      }
+
       .binary-info-button {
         width: 34px;
         height: 34px;
@@ -1195,6 +1203,166 @@
         align-items: center;
         justify-content: center;
         font-size: 12px;
+      }
+
+      .echo-stage {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        padding: clamp(18px, 2.4vw, 28px);
+        background: radial-gradient(circle at 20% 20%, rgba(0, 255, 204, 0.06), rgba(0, 0, 0, 0.8));
+      }
+
+      .echo-wave-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .echo-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: clamp(12px, 2vw, 18px);
+      }
+
+      .echo-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 160px;
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px dashed rgba(110, 255, 236, 0.3);
+        color: rgba(255, 255, 255, 0.55);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+      }
+
+      .echo-card {
+        position: relative;
+        padding: 16px;
+        border-radius: 20px;
+        border: 1px solid rgba(110, 255, 236, 0.2);
+        background: linear-gradient(145deg, rgba(5, 26, 38, 0.85), rgba(3, 9, 16, 0.95));
+        box-shadow: inset 0 0 20px rgba(0, 255, 204, 0.06);
+        transition: box-shadow 0.3s ease, transform 0.3s ease, border 0.3s ease;
+      }
+
+      .echo-card.echoing {
+        border-color: rgba(110, 255, 236, 0.7);
+        box-shadow: 0 0 25px rgba(110, 255, 236, 0.4);
+        transform: translateY(-4px);
+      }
+
+      .echo-card-label {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .echo-card-value {
+        margin: 10px 0 2px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: clamp(28px, 4vw, 36px);
+        letter-spacing: 0.1em;
+        color: #6ef3ff;
+      }
+
+      .echo-card-symbol {
+        margin-left: 6px;
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .echo-card-meta {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .echo-total-readout {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 14px 18px;
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(110, 255, 236, 0.24);
+        width: fit-content;
+        box-shadow: 0 0 20px rgba(0, 255, 236, 0.12);
+      }
+
+      .echo-total-readout .label {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .echo-total-readout .value {
+        font-family: 'Orbitron', sans-serif;
+        font-size: clamp(32px, 5vw, 40px);
+        color: #6ef3ff;
+      }
+
+      .echo-total-readout .pending {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .echo-wave {
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        margin: -80px 0 0 -80px;
+        border-radius: 50%;
+        border: 2px solid rgba(110, 255, 236, 0.4);
+        opacity: 0;
+        transform: scale(0.6);
+        transition: opacity 0.25s ease, transform 1.2s ease;
+        box-shadow: 0 0 30px rgba(110, 255, 236, 0.25);
+      }
+
+      .echo-wave span {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .echo-wave.active {
+        opacity: 0.8;
+        transform: scale(1.2);
+        border-color: rgba(110, 255, 236, 0.75);
+      }
+
+      .echo-copy {
+        margin: 0 0 12px;
+        font-size: 13px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .echo-button-row {
+        gap: 12px;
+      }
+
+      .echo-draw-button {
+        display: block;
+        width: 100%;
+        margin-top: 12px;
+      }
+
+      .echo-status,
+      .echo-result {
+        min-height: 32px;
       }
 
       .ghost-button {
@@ -1854,16 +2022,16 @@
       <div class="card-games-wrapper">
         <div class="card-panel active" id="cardLobby">
           <p class="card-intro">
-            Select a NeonArc card experience. Binary Poker is live; future decks are warming up.
+            Select a NeonArc card experience. Binary Poker and Echo Hand are live; future decks are warming up.
           </p>
           <div class="card-grid">
             <button class="card-tile card-game-tile" data-game="binaryPoker" type="button">
               <span class="card-name">Binary Poker</span>
               <span class="card-meta">Live · Flip a bit</span>
             </button>
-            <button class="card-tile coming-soon" type="button" disabled>
+            <button class="card-tile card-game-tile" data-game="echoHand" type="button">
               <span class="card-name">Echo Hand</span>
-              <span class="card-meta">Coming Soon</span>
+              <span class="card-meta">Live · Time your echoes</span>
             </button>
             <button class="card-tile coming-soon" type="button" disabled>
               <span class="card-name">Fuse</span>
@@ -1877,7 +2045,7 @@
         </div>
         <div class="card-panel" id="binaryPokerGame">
           <div class="card-game-header">
-            <button class="ghost-button" id="cardBackBtn" type="button">← Back to Card Lobby</button>
+            <button class="ghost-button card-back-button" id="cardBackBtn" type="button">← Back to Card Lobby</button>
             <div class="card-game-title-group">
               <div class="card-game-title">Binary Poker</div>
               <button
@@ -1954,6 +2122,92 @@
                 <button class="cashout" id="binaryLock" disabled>Lock In</button>
               </div>
               <div class="status" id="binaryStatus">Set your wager and deal a binary hand.</div>
+            </aside>
+          </div>
+        </div>
+        <div class="card-panel" id="echoHandGame">
+          <div class="card-game-header">
+            <button class="ghost-button card-back-button" type="button">← Back to Card Lobby</button>
+            <div class="card-game-title-group">
+              <div class="card-game-title">Echo Hand</div>
+              <div class="card-game-subtitle">Live · Time your echoes</div>
+            </div>
+          </div>
+          <div class="main-layout card-layout">
+            <div class="device-shell">
+              <div class="stage idle echo-stage" id="echoStage">
+                <div class="echo-wave-layer" id="echoWaveLayer"></div>
+                <div class="echo-cards" id="echoCardsArea">
+                  <div class="echo-placeholder">Charge a hand to watch echoes rebound.</div>
+                </div>
+                <div class="echo-total-readout">
+                  <div class="label">Total</div>
+                  <div class="value" id="echoTotalValue">0</div>
+                  <div class="pending" id="echoPendingEchoes">0 echoes queued</div>
+                </div>
+              </div>
+            </div>
+            <aside class="control-panel card-controls">
+              <h2>Echo Hand</h2>
+              <div class="binary-instructions echo-instructions" id="echoInstructions">
+                <button
+                  class="binary-instructions-toggle"
+                  id="echoInstructionsToggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="echoInstructionsBody"
+                >
+                  <span class="toggle-label">How Echo Hand Works</span>
+                  <span class="toggle-state" aria-hidden="true">▼</span>
+                </button>
+                <div class="binary-instructions-body" id="echoInstructionsBody" hidden>
+                  <p class="binary-instructions-intro">
+                    Objective: Finish with a total of 21 or less after every delayed echo resolves.
+                  </p>
+                  <h3>Gameplay Loop</h3>
+                  <ol>
+                    <li>Enter your bet and click <strong>Start Hand</strong> to draw four opening cards.</li>
+                    <li>Each card shows a value (1–10) and automatically schedules an echo two turns later.</li>
+                    <li>Use <strong>Draw</strong> to add new cards—each new card pushes the echo queue forward.</li>
+                    <li>
+                      When a card’s delay expires, an Echo Wave pulses, replaying its value into your total. Waves can
+                      chain as you keep drawing.
+                    </li>
+                    <li>
+                      Hit <strong>Hold</strong> to stop drawing and let the remaining echoes resolve. If your total ever
+                      breaks 21, the round busts immediately.
+                    </li>
+                  </ol>
+                  <h3>Payouts</h3>
+                  <ul>
+                    <li><strong>Bust (total &gt; 21)</strong> → lose the wager.</li>
+                    <li>
+                      <strong>Hold without busting</strong> → payout = bet × (final total ÷ 21) × 2. Bigger totals (without
+                      busting) pay more.
+                    </li>
+                  </ul>
+                  <p class="binary-instructions-tip">
+                    <strong>Timing Tip:</strong> Track the queue label—if several echoes are stacked, holding early can
+                    prevent an overcharge.
+                  </p>
+                </div>
+              </div>
+              <p class="echo-copy">Draw carefully: each card repeats two turns later. Hold to ride out remaining waves.</p>
+              <div>
+                <label for="echoBet">Bet Amount</label>
+                <input type="number" id="echoBet" min="1" step="1" value="25" />
+              </div>
+              <div class="panel-meta">
+                <span>Turns: <strong id="echoTurnCount">0</strong></span>
+                <span>Queued: <strong id="echoQueuedLabel">0</strong></span>
+              </div>
+              <div class="button-row echo-button-row">
+                <button class="launch" id="echoStart">Start Hand</button>
+                <button class="cashout" id="echoHold" disabled>Hold</button>
+              </div>
+              <button class="launch echo-draw-button" id="echoDraw" disabled>Draw</button>
+              <div class="status echo-status" id="echoStatus">Set a wager to feel the echoes.</div>
+              <div class="status echo-result" id="echoResult">Awaiting hand.</div>
             </aside>
           </div>
         </div>
@@ -2035,6 +2289,17 @@
       let binaryFlipsLeft = 0;
       let binaryLastFlip = null;
 
+      // ---------------- Echo Hand state ----------------
+      let echoRunning = false;
+      let echoHolding = false;
+      let echoResolving = false;
+      let echoBet = 0;
+      let echoTurn = 0;
+      let echoTotal = 0;
+      let echoCards = [];
+      let echoTimers = [];
+      let echoCardId = 0;
+
       // ---------------- Elements ----------------
       const baseTitle = 'NeonArc Casino';
       const titleEl = document.getElementById('sectionTitle');
@@ -2055,10 +2320,12 @@
       const cardLobby = document.getElementById('cardLobby');
       const stackCardLink = document.getElementById('stackCardLink');
       const cardTiles = document.querySelectorAll('.card-game-tile');
-      const cardBackBtn = document.getElementById('cardBackBtn');
+      const cardBackButtons = document.querySelectorAll('.card-back-button');
       const binaryGamePanel = document.getElementById('binaryPokerGame');
+      const echoGamePanel = document.getElementById('echoHandGame');
       const cardPanels = {
         binaryPoker: binaryGamePanel,
+        echoHand: echoGamePanel,
       };
 
       const binaryStage = document.getElementById('binaryStage');
@@ -2074,6 +2341,23 @@
       const binaryInstructions = document.getElementById('binaryInstructions');
       const binaryInstructionsToggle = document.getElementById('binaryInstructionsToggle');
       const binaryInstructionsBody = document.getElementById('binaryInstructionsBody');
+
+      const echoStage = document.getElementById('echoStage');
+      const echoCardsArea = document.getElementById('echoCardsArea');
+      const echoWaveLayer = document.getElementById('echoWaveLayer');
+      const echoTotalEl = document.getElementById('echoTotalValue');
+      const echoPendingEl = document.getElementById('echoPendingEchoes');
+      const echoTurnEl = document.getElementById('echoTurnCount');
+      const echoQueueLabel = document.getElementById('echoQueuedLabel');
+      const echoBetInput = document.getElementById('echoBet');
+      const echoStartBtn = document.getElementById('echoStart');
+      const echoDrawBtn = document.getElementById('echoDraw');
+      const echoHoldBtn = document.getElementById('echoHold');
+      const echoStatusEl = document.getElementById('echoStatus');
+      const echoResultEl = document.getElementById('echoResult');
+      const echoInstructions = document.getElementById('echoInstructions');
+      const echoInstructionsToggle = document.getElementById('echoInstructionsToggle');
+      const echoInstructionsBody = document.getElementById('echoInstructionsBody');
 
       // Rocket elements
       const betInput = document.getElementById('bet');
@@ -2168,7 +2452,9 @@
         resetMindGame(true);
         updateMindInsight();
         resetBinaryPoker(true);
+        resetEchoHand(true);
         toggleBinaryInstructions(false);
+        toggleEchoInstructions(false);
         setTitle('Rocket Line');
 
         sectionButtons.forEach((button) => {
@@ -2194,9 +2480,23 @@
             stackCardLink.blur();
           });
         }
-        cardBackBtn.addEventListener('click', () => exitCardGame());
+        cardBackButtons.forEach((button) => {
+          button.addEventListener('click', () => exitCardGame());
+        });
         if (binaryInstructionsToggle) {
           binaryInstructionsToggle.addEventListener('click', () => toggleBinaryInstructions());
+        }
+        if (echoInstructionsToggle) {
+          echoInstructionsToggle.addEventListener('click', () => toggleEchoInstructions());
+        }
+        if (echoStartBtn) {
+          echoStartBtn.addEventListener('click', () => startEchoHand());
+        }
+        if (echoDrawBtn) {
+          echoDrawBtn.addEventListener('click', () => drawEchoCard());
+        }
+        if (echoHoldBtn) {
+          echoHoldBtn.addEventListener('click', () => holdEchoHand());
         }
         if (binaryInfoButton) {
           binaryInfoButton.addEventListener('click', () => toggleBinaryInstructions());
@@ -2517,6 +2817,10 @@
             setBinaryStatus('Resolve your Binary Poker hand before leaving.');
             return false;
           }
+          if (echoRunning || echoResolving) {
+            setEchoStatus('Finish the Echo Hand round before leaving.');
+            return false;
+          }
         }
 
         activeSection = sectionName;
@@ -2541,7 +2845,11 @@
             cardLobby.classList.add('active');
             Object.values(cardPanels).forEach((panel) => panel.classList.remove('active'));
           }
-          setTitle(activeCardGame === 'binaryPoker' ? 'Binary Poker' : 'Card Games Lobby');
+          const titleMap = {
+            binaryPoker: 'Binary Poker',
+            echoHand: 'Echo Hand',
+          };
+          setTitle(titleMap[activeCardGame] || 'Card Games Lobby');
         }
 
         return true;
@@ -2564,6 +2872,9 @@
         if (gameName === 'binaryPoker') {
           resetBinaryPoker(true);
           setTitle('Binary Poker');
+        } else if (gameName === 'echoHand') {
+          resetEchoHand(true);
+          setTitle('Echo Hand');
         }
       }
 
@@ -2572,11 +2883,17 @@
           setBinaryStatus('Resolve your Binary Poker hand before leaving.');
           return false;
         }
+        if (echoRunning || echoResolving) {
+          setEchoStatus('Let the echo waves finish before leaving.');
+          return false;
+        }
         Object.values(cardPanels).forEach((panel) => panel.classList.remove('active'));
         cardLobby.classList.add('active');
         activeCardGame = null;
         resetBinaryPoker(!manual);
+        resetEchoHand(!manual);
         toggleBinaryInstructions(false);
+        toggleEchoInstructions(false);
         if (manual || activeSection === 'card') {
           setTitle('Card Games Lobby');
         }
@@ -2596,6 +2913,21 @@
         binaryInfoButton.setAttribute('aria-expanded', shouldOpen);
         binaryInstructionsBody.hidden = !shouldOpen;
         const toggleIcon = binaryInstructionsToggle.querySelector('.toggle-state');
+        if (toggleIcon) {
+          toggleIcon.textContent = shouldOpen ? '▲' : '▼';
+        }
+      }
+
+      function toggleEchoInstructions(forceOpen) {
+        if (!echoInstructions || !echoInstructionsToggle || !echoInstructionsBody) {
+          return;
+        }
+        const shouldOpen =
+          typeof forceOpen === 'boolean' ? forceOpen : !echoInstructions.classList.contains('open');
+        echoInstructions.classList.toggle('open', shouldOpen);
+        echoInstructionsToggle.setAttribute('aria-expanded', shouldOpen);
+        echoInstructionsBody.hidden = !shouldOpen;
+        const toggleIcon = echoInstructionsToggle.querySelector('.toggle-state');
         if (toggleIcon) {
           toggleIcon.textContent = shouldOpen ? '▲' : '▼';
         }
@@ -2825,6 +3157,338 @@
           if (a[i] !== b[i]) distance += 1;
         }
         return distance + Math.abs(a.length - b.length);
+      }
+
+      // ---------------- Echo Hand helpers ----------------
+      function startEchoHand() {
+        if (!echoBetInput || echoRunning || echoResolving) return;
+        const wager = Math.floor(Number(echoBetInput.value));
+        if (!wager || wager <= 0) {
+          setEchoStatus('Enter a valid bet to start Echo Hand.');
+          return;
+        }
+        if (wager > balance) {
+          setEchoStatus('Insufficient balance for that wager.');
+          return;
+        }
+
+        clearEchoTimers();
+        balance -= wager;
+        updateBalance();
+
+        echoBet = wager;
+        echoRunning = true;
+        echoHolding = false;
+        echoResolving = false;
+        echoTurn = 0;
+        echoTotal = 0;
+        echoCards = [];
+        echoCardId = 0;
+        if (echoStage) {
+          echoStage.classList.remove('idle');
+          echoStage.classList.add('live');
+        }
+        if (echoWaveLayer) {
+          echoWaveLayer.innerHTML = '';
+        }
+        renderEchoCards();
+        updateEchoTotals();
+        updateEchoButtons();
+        setEchoStatus('Charging deck. Four cards incoming.');
+        if (echoResultEl) {
+          echoResultEl.textContent = 'Echo grid calibrating.';
+        }
+
+        for (let i = 0; i < 4; i += 1) {
+          scheduleEchoTimeout(() => {
+            drawEchoCard(true);
+            if (i === 3) {
+              setEchoStatus('Echo Hand live. Draw again or hold to ride the waves.');
+              checkEchoQueue();
+            }
+          }, i * 220);
+        }
+      }
+
+      function drawEchoCard(isInitial = false) {
+        if (!echoRunning || echoResolving || echoHolding) return;
+        const card = generateEchoCard();
+        echoTurn += 1;
+        card.turn = echoTurn;
+        card.echoTurn = echoTurn + card.delay;
+        card.echoResolved = false;
+        echoCards.push(card);
+        echoTotal += card.value;
+        renderEchoCards();
+        updateEchoTotals();
+        if (echoResultEl) {
+          echoResultEl.textContent = `Running total ${echoTotal}/21`;
+        }
+        const verb = isInitial ? 'dealt' : 'drawn';
+        setEchoStatus(`Card ${card.turn} ${verb}. Echo hits on turn ${card.echoTurn}.`);
+        if (echoTotal > 21) {
+          handleEchoBust('You overloaded the grid before the echoes hit.');
+          return;
+        }
+        updateEchoButtons();
+        if (!isInitial) {
+          checkEchoQueue();
+        }
+      }
+
+      function holdEchoHand() {
+        if (!echoRunning || echoHolding) return;
+        echoHolding = true;
+        setEchoStatus('Holding. Echo waves will resolve in sequence.');
+        if (echoResultEl) {
+          echoResultEl.textContent = 'Echo waves resolving...';
+        }
+        updateEchoButtons();
+        const pending = echoCards.filter((card) => !card.echoResolved);
+        if (!pending.length) {
+          finalizeEchoHold();
+          return;
+        }
+        pending.sort((a, b) => a.echoTurn - b.echoTurn);
+        resolveEchoes(pending.slice(), { afterHold: true });
+      }
+
+      function resolveEchoes(queue, options = {}) {
+        if (!queue.length) {
+          echoResolving = false;
+          updateEchoButtons();
+          if (options.afterHold) {
+            finalizeEchoHold();
+          } else if (echoRunning) {
+            setEchoStatus('Echo wave settled. Draw again or hold to finish.');
+          }
+          return;
+        }
+        echoResolving = true;
+        updateEchoButtons();
+        const [card, ...rest] = queue;
+        triggerEchoWave(card);
+        setEchoStatus(`Echo wave from Card ${card.turn} is surging...`);
+        scheduleEchoTimeout(() => {
+          echoTotal += card.value;
+          card.echoResolved = true;
+          updateEchoTotals();
+          renderEchoCards();
+          if (echoResultEl) {
+            echoResultEl.textContent = `Echo surge total ${echoTotal}/21`;
+          }
+          if (echoTotal > 21) {
+            handleEchoBust(`Echo wave from Card ${card.turn} overloaded the grid.`);
+            return;
+          }
+          resolveEchoes(rest, options);
+        }, 1500);
+      }
+
+      function checkEchoQueue() {
+        if (!echoRunning || echoResolving) return;
+        const dueCards = echoCards.filter((card) => !card.echoResolved && card.echoTurn <= echoTurn);
+        if (!dueCards.length) return;
+        dueCards.sort((a, b) => a.echoTurn - b.echoTurn);
+        resolveEchoes(dueCards.slice());
+      }
+
+      function triggerEchoWave(card) {
+        if (!echoStage || !echoWaveLayer) return;
+        const cardEl = echoCardsArea ? echoCardsArea.querySelector(`[data-card-id="${card.id}"]`) : null;
+        if (cardEl) {
+          cardEl.classList.add('echoing');
+          scheduleEchoTimeout(() => cardEl.classList.remove('echoing'), 1100);
+        }
+        const wave = document.createElement('div');
+        wave.className = 'echo-wave';
+        const label = document.createElement('span');
+        label.textContent = `+${card.value}`;
+        wave.appendChild(label);
+        const stageRect = echoStage.getBoundingClientRect();
+        let x = stageRect.width / 2;
+        let y = stageRect.height / 2;
+        if (cardEl) {
+          const cardRect = cardEl.getBoundingClientRect();
+          x = cardRect.left - stageRect.left + cardRect.width / 2;
+          y = cardRect.top - stageRect.top + cardRect.height / 2;
+        }
+        wave.style.left = `${x}px`;
+        wave.style.top = `${y}px`;
+        echoWaveLayer.appendChild(wave);
+        requestAnimationFrame(() => wave.classList.add('active'));
+        scheduleEchoTimeout(() => wave.remove(), 1600);
+      }
+
+      function finalizeEchoHold() {
+        if (!echoRunning) {
+          updateEchoButtons();
+          return;
+        }
+        echoRunning = false;
+        echoHolding = false;
+        echoResolving = false;
+        if (echoStage) {
+          echoStage.classList.remove('live');
+          echoStage.classList.add('idle');
+        }
+        const payoutRaw = echoBet * (echoTotal / 21) * 2;
+        const payout = Math.max(0, Number(payoutRaw.toFixed(2)));
+        balance += payout;
+        updateBalance();
+        setEchoStatus(`Stabilized at ${echoTotal}. Echo payout $${payout.toFixed(2)}.`);
+        if (echoResultEl) {
+          echoResultEl.textContent = `Payout $${payout.toFixed(2)} · Final ${echoTotal}/21`;
+        }
+        echoBet = 0;
+        updateEchoButtons();
+      }
+
+      function handleEchoBust(message) {
+        clearEchoTimers();
+        echoRunning = false;
+        echoHolding = false;
+        echoResolving = false;
+        if (echoStage) {
+          echoStage.classList.remove('live');
+          echoStage.classList.add('idle');
+        }
+        if (echoWaveLayer) {
+          echoWaveLayer.innerHTML = '';
+        }
+        setEchoStatus(message || 'Echo overload. Bet lost.');
+        if (echoResultEl) {
+          echoResultEl.textContent = `Bust at ${echoTotal}. Bet lost.`;
+        }
+        echoBet = 0;
+        updateEchoButtons();
+      }
+
+      function resetEchoHand(initial = false) {
+        clearEchoTimers();
+        echoRunning = false;
+        echoHolding = false;
+        echoResolving = false;
+        echoBet = 0;
+        echoTurn = 0;
+        echoTotal = 0;
+        echoCards = [];
+        echoCardId = 0;
+        if (echoStage) {
+          echoStage.classList.remove('live');
+          echoStage.classList.add('idle');
+        }
+        if (echoWaveLayer) {
+          echoWaveLayer.innerHTML = '';
+        }
+        renderEchoCards();
+        updateEchoTotals();
+        const defaultStatus = initial
+          ? 'Set a wager to feel the echoes.'
+          : 'Echo Hand reset. Ready for another charge.';
+        setEchoStatus(defaultStatus);
+        if (echoResultEl) {
+          echoResultEl.textContent = 'Awaiting hand.';
+        }
+        updateEchoButtons();
+      }
+
+      function updateEchoButtons() {
+        if (!echoStartBtn || !echoDrawBtn || !echoHoldBtn) return;
+        echoStartBtn.disabled = echoRunning || echoResolving;
+        echoDrawBtn.disabled = !echoRunning || echoHolding || echoResolving;
+        echoHoldBtn.disabled = !echoRunning || echoResolving;
+        if (echoBetInput) {
+          echoBetInput.disabled = echoRunning || echoResolving;
+        }
+      }
+
+      function renderEchoCards() {
+        if (!echoCardsArea) return;
+        echoCardsArea.innerHTML = '';
+        if (!echoCards.length) {
+          const placeholder = document.createElement('div');
+          placeholder.className = 'echo-placeholder';
+          placeholder.textContent = 'Charge a hand to watch echoes rebound.';
+          echoCardsArea.appendChild(placeholder);
+          return;
+        }
+        echoCards.forEach((card) => {
+          const cardEl = document.createElement('div');
+          cardEl.className = 'echo-card';
+          cardEl.dataset.cardId = card.id.toString();
+          const label = document.createElement('div');
+          label.className = 'echo-card-label';
+          label.textContent = `Card ${card.turn}`;
+          const value = document.createElement('div');
+          value.className = 'echo-card-value';
+          value.textContent = card.value.toString();
+          const symbol = document.createElement('span');
+          symbol.className = 'echo-card-symbol';
+          symbol.textContent = card.symbol;
+          value.appendChild(symbol);
+          const meta = document.createElement('div');
+          meta.className = 'echo-card-meta';
+          const turnsUntil = Math.max(card.echoTurn - echoTurn, 0);
+          if (card.echoResolved) {
+            meta.textContent = 'Echo released';
+          } else if (turnsUntil === 0) {
+            meta.textContent = 'Echo imminent';
+          } else {
+            meta.textContent = `Echo in ${turnsUntil} ${turnsUntil === 1 ? 'turn' : 'turns'}`;
+          }
+          cardEl.appendChild(label);
+          cardEl.appendChild(value);
+          cardEl.appendChild(meta);
+          echoCardsArea.appendChild(cardEl);
+        });
+      }
+
+      function updateEchoTotals() {
+        if (echoTotalEl) {
+          echoTotalEl.textContent = echoTotal.toString();
+        }
+        const pending = echoCards.filter((card) => !card.echoResolved).length;
+        if (echoPendingEl) {
+          const label = pending === 1 ? 'echo' : 'echoes';
+          echoPendingEl.textContent = `${pending} ${label} queued`;
+        }
+        if (echoTurnEl) {
+          echoTurnEl.textContent = echoTurn.toString();
+        }
+        if (echoQueueLabel) {
+          echoQueueLabel.textContent = pending.toString();
+        }
+      }
+
+      function generateEchoCard() {
+        const symbols = ['◆', '◇', '⬢', '✦', '✶', '✷', '★', '✪'];
+        const value = Math.floor(Math.random() * 10) + 1;
+        return {
+          id: ++echoCardId,
+          value,
+          symbol: symbols[Math.floor(Math.random() * symbols.length)],
+          delay: 2,
+        };
+      }
+
+      function setEchoStatus(message) {
+        if (echoStatusEl) {
+          echoStatusEl.textContent = message;
+        }
+      }
+
+      function scheduleEchoTimeout(callback, delay) {
+        const timer = setTimeout(() => {
+          echoTimers = echoTimers.filter((id) => id !== timer);
+          callback();
+        }, delay);
+        echoTimers.push(timer);
+      }
+
+      function clearEchoTimers() {
+        echoTimers.forEach((timer) => clearTimeout(timer));
+        echoTimers = [];
       }
 
       // ---------------- Rocket mode ----------------
