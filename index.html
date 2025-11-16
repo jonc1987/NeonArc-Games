@@ -1583,6 +1583,311 @@
         min-height: 32px;
       }
 
+      .perception-stage {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(24px, 4vw, 40px);
+        background: radial-gradient(circle at 30% 20%, rgba(0, 240, 255, 0.08), rgba(0, 0, 0, 0.75));
+        overflow: hidden;
+        aspect-ratio: auto;
+        min-height: clamp(360px, 45vw, 620px);
+      }
+
+      .perception-stage::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent, rgba(110, 255, 236, 0.08), transparent);
+        opacity: 0;
+        transform: translateX(-80%);
+      }
+
+      .perception-stage.live::after {
+        animation: perceptionShimmer 3.6s linear infinite;
+      }
+
+      .perception-stage.revealing::after {
+        opacity: 1;
+        animation: perceptionReveal 0.9s ease forwards;
+      }
+
+      .perception-card-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: clamp(16px, 3vw, 26px);
+        width: 100%;
+      }
+
+      .perception-placeholder {
+        grid-column: 1 / -1;
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.65);
+        border: 1px dashed rgba(110, 255, 236, 0.3);
+        background: rgba(0, 15, 30, 0.45);
+      }
+
+      .perception-card {
+        position: relative;
+        border-radius: 18px;
+        padding: 18px;
+        border: 1px solid rgba(110, 255, 236, 0.25);
+        background: linear-gradient(135deg, rgba(10, 30, 50, 0.8), rgba(0, 0, 0, 0.8));
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+        cursor: default;
+      }
+
+      .perception-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 30% 20%, rgba(0, 255, 204, 0.1), transparent 60%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+
+      .perception-card:hover {
+        transform: perspective(500px) rotateX(4deg) rotateY(-2deg) translateY(-4px);
+        box-shadow: 0 30px 50px rgba(0, 255, 236, 0.15);
+      }
+
+      .perception-card:hover::before {
+        opacity: 1;
+      }
+
+      .perception-card.revealed.truth {
+        border-color: rgba(110, 255, 200, 0.65);
+        box-shadow: 0 0 25px rgba(110, 255, 200, 0.35);
+      }
+
+      .perception-card.revealed.illusion {
+        border-color: rgba(255, 110, 160, 0.8);
+        box-shadow: 0 0 30px rgba(255, 60, 120, 0.35);
+        animation: illusionPulse 1.8s ease-in-out infinite;
+      }
+
+      .perception-card-inner {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 140px;
+      }
+
+      .perception-visible,
+      .perception-reality {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .perception-visible .label,
+      .perception-reality .label {
+        font-size: 11px;
+        letter-spacing: 0.25em;
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+      }
+
+      .perception-visible .value {
+        font-family: 'Orbitron', sans-serif;
+        font-size: clamp(28px, 4vw, 38px);
+        letter-spacing: 0.2em;
+      }
+
+      .perception-visible .color,
+      .perception-reality .color {
+        font-size: 14px;
+        letter-spacing: 0.3em;
+      }
+
+      .perception-reality {
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      .perception-card.revealed .perception-reality {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .perception-analysis-result {
+        font-size: 13px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.6);
+        min-height: 20px;
+      }
+
+      .perception-card.analyzed .perception-analysis-result {
+        color: #6ef3ff;
+      }
+
+      .perception-card.revealed.truth .perception-analysis-result {
+        color: #6effc7;
+      }
+
+      .perception-card.revealed.illusion .perception-analysis-result {
+        color: #ff7abf;
+      }
+
+      .perception-analyze-btn {
+        margin-top: 6px;
+        padding: 8px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(110, 255, 236, 0.35);
+        background: rgba(6, 26, 40, 0.65);
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: transform 0.2s ease, border 0.2s ease, color 0.2s ease;
+      }
+
+      .perception-analyze-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        border-color: rgba(110, 255, 236, 0.8);
+        color: #6ef3ff;
+      }
+
+      .perception-analyze-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+
+      .perception-card.scanning::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent, rgba(110, 255, 236, 0.25), transparent);
+        animation: perceptionScan 0.9s ease forwards;
+        pointer-events: none;
+      }
+
+      .perception-copy {
+        margin: 0 0 16px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .perception-instructions h3 {
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 13px;
+        color: rgba(110, 255, 236, 0.85);
+      }
+
+      .perception-instructions ol,
+      .perception-instructions ul {
+        margin: 0 0 14px 18px;
+        padding: 0;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.5;
+      }
+
+      .perception-payouts ul {
+        list-style: none;
+        margin-left: 0;
+      }
+
+      .perception-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      .perception-cost-note {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .perception-scoreboard {
+        margin-top: 16px;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(110, 255, 236, 0.25);
+        background: rgba(0, 8, 12, 0.6);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .perception-score,
+      .perception-result {
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.12em;
+        font-size: 15px;
+      }
+
+      .perception-result {
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .perception-buttons button {
+        flex: 1;
+      }
+
+      @keyframes perceptionScan {
+        0% {
+          transform: translateY(80%);
+          opacity: 0;
+        }
+        30% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+      }
+
+      @keyframes illusionPulse {
+        0% {
+          box-shadow: 0 0 20px rgba(255, 60, 120, 0.2);
+        }
+        50% {
+          box-shadow: 0 0 30px rgba(255, 60, 120, 0.5);
+        }
+        100% {
+          box-shadow: 0 0 20px rgba(255, 60, 120, 0.2);
+        }
+      }
+
+      @keyframes perceptionShimmer {
+        0% {
+          opacity: 0.4;
+          transform: translateX(-80%);
+        }
+        100% {
+          opacity: 0.4;
+          transform: translateX(80%);
+        }
+      }
+
+      @keyframes perceptionReveal {
+        0% {
+          opacity: 0;
+          transform: translateX(-40%);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(40%);
+        }
+      }
+
       .ghost-button {
         border-radius: 999px;
         border: 1px solid rgba(110, 255, 236, 0.32);
@@ -2255,9 +2560,9 @@
               <span class="card-name">FUSE — COMBINE AND CONTAIN</span>
               <span class="card-meta">Live · Reactive hybrids</span>
             </button>
-            <button class="card-tile coming-soon" type="button" disabled>
-              <span class="card-name">Perception</span>
-              <span class="card-meta">Coming Soon</span>
+            <button class="card-tile card-game-tile" data-game="perception" type="button">
+              <span class="card-name">PERCEPTION — TRUST NOTHING</span>
+              <span class="card-meta">LIVE – TRUST NOTHING</span>
             </button>
           </div>
         </div>
@@ -2516,6 +2821,69 @@
             </aside>
           </div>
         </div>
+        <div class="card-panel" id="perceptionGame">
+          <div class="card-game-header">
+            <button class="ghost-button card-back-button" type="button">← Back to Card Lobby</button>
+            <div class="card-game-title-group">
+              <div class="card-game-title">Perception</div>
+              <div class="card-game-subtitle">Live · Trust Nothing</div>
+            </div>
+          </div>
+          <div class="main-layout card-layout">
+            <div class="device-shell">
+              <div class="stage idle perception-stage" id="perceptionStage">
+                <div class="perception-card-grid" id="perceptionCardsArea">
+                  <div class="perception-placeholder">Start Perception to pull four suspicious cards.</div>
+                </div>
+              </div>
+            </div>
+            <aside class="control-panel card-controls">
+              <h2>Perception</h2>
+              <p class="perception-copy">
+                Four cards broadcast numbers and colors — but some signals lie. Spend limited scans to detect
+                illusions, then decide when to trust the spread. More truthful cards mean larger payouts.
+              </p>
+              <div class="perception-instructions">
+                <h3>How to Read the Grid</h3>
+                <ol>
+                  <li>Enter a bet and press <strong>Start Perception</strong> to draw four cards.</li>
+                  <li>
+                    Each <strong>Analyze</strong> scan (max 2) costs 10% of your wager and tells you if that card is
+                    truthful or an illusion.
+                  </li>
+                  <li>When you believe the spread, hit <strong>Trust &amp; Reveal</strong>.</li>
+                  <li>Truths add their number, illusions subtract 3. Score high to multiply your bet.</li>
+                </ol>
+                <div class="perception-payouts">
+                  <h3>Payouts</h3>
+                  <ul>
+                    <li>Score ≥ 30 → <strong>5×</strong></li>
+                    <li>Score 20–29 → <strong>3×</strong></li>
+                    <li>Score 10–19 → <strong>2×</strong></li>
+                    <li>Score &lt; 10 → Bet lost</li>
+                  </ul>
+                </div>
+              </div>
+              <div>
+                <label for="perceptionBet">Bet Amount</label>
+                <input type="number" id="perceptionBet" min="1" step="1" value="30" />
+              </div>
+              <div class="panel-meta perception-meta">
+                <span>Scans Used: <strong id="perceptionAnalyzeInfo">0 / 2</strong></span>
+                <span class="perception-cost-note">Each scan deducts 10% of your bet.</span>
+              </div>
+              <div class="button-row perception-buttons">
+                <button class="launch" id="perceptionStart">Start Perception</button>
+                <button class="cashout" id="perceptionLock" disabled>Trust &amp; Reveal</button>
+              </div>
+              <div class="perception-scoreboard">
+                <div class="perception-score" id="perceptionScore">Score: --</div>
+                <div class="perception-result" id="perceptionResult">Awaiting signal.</div>
+              </div>
+              <div class="status" id="perceptionStatus">Tune the sensors and begin.</div>
+            </aside>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -2615,6 +2983,22 @@
       let fuseCardId = 0;
       let fuseFusions = 0;
 
+      // ---------------- Perception state ----------------
+      let perceptionRunning = false;
+      let perceptionLocked = false;
+      let perceptionBet = 0;
+      let perceptionCards = [];
+      let perceptionAnalyzesUsed = 0;
+      let perceptionRevealed = false;
+      const perceptionMaxAnalyzes = 2;
+
+      const perceptionColorPalette = [
+        { name: 'Blue', color: '#6fd3ff' },
+        { name: 'Red', color: '#ff6f9f' },
+        { name: 'Green', color: '#76ffb0' },
+        { name: 'Purple', color: '#c89bff' },
+      ];
+
       const fuseSuitColors = {
         '♠': '#6ed9ff',
         '♥': '#ff5f9e',
@@ -2659,10 +3043,12 @@
       const binaryGamePanel = document.getElementById('binaryPokerGame');
       const echoGamePanel = document.getElementById('echoHandGame');
       const fuseGamePanel = document.getElementById('fuseGame');
+      const perceptionGamePanel = document.getElementById('perceptionGame');
       const cardPanels = {
         binaryPoker: binaryGamePanel,
         echoHand: echoGamePanel,
         fuse: fuseGamePanel,
+        perception: perceptionGamePanel,
       };
 
       const binaryStage = document.getElementById('binaryStage');
@@ -2704,6 +3090,16 @@
       const fuseHoldBtn = document.getElementById('fuseHold');
       const fuseStatusEl = document.getElementById('fuseStatus');
       const fuseResultEl = document.getElementById('fuseResult');
+
+      const perceptionStage = document.getElementById('perceptionStage');
+      const perceptionCardsArea = document.getElementById('perceptionCardsArea');
+      const perceptionBetInput = document.getElementById('perceptionBet');
+      const perceptionStartBtn = document.getElementById('perceptionStart');
+      const perceptionLockBtn = document.getElementById('perceptionLock');
+      const perceptionStatusEl = document.getElementById('perceptionStatus');
+      const perceptionScoreEl = document.getElementById('perceptionScore');
+      const perceptionResultEl = document.getElementById('perceptionResult');
+      const perceptionAnalyzeInfo = document.getElementById('perceptionAnalyzeInfo');
       const fuseHybridCountEl = document.getElementById('fuseHybridCount');
       const fuseInstabilityLabel = document.getElementById('fuseInstabilityLabel');
       const fuseMeterFill = document.getElementById('fuseMeterFill');
@@ -2808,6 +3204,7 @@
         resetBinaryPoker(true);
         resetEchoHand(true);
         resetFuseGame(true);
+        resetPerceptionGame(true);
         toggleBinaryInstructions(false);
         toggleEchoInstructions(false);
         toggleFuseInstructions(false);
@@ -2848,6 +3245,17 @@
         if (fuseInstructionsToggle) {
           fuseInstructionsToggle.addEventListener('click', () => toggleFuseInstructions());
         }
+        if (perceptionCardsArea) {
+          perceptionCardsArea.addEventListener('click', (event) => {
+            const analyzeBtn = event.target.closest('.perception-analyze-btn');
+            if (!analyzeBtn) return;
+            const cardEl = analyzeBtn.closest('.perception-card');
+            if (!cardEl) return;
+            const index = Number(cardEl.dataset.cardIndex);
+            if (Number.isNaN(index)) return;
+            analyzeCard(index);
+          });
+        }
         if (echoStartBtn) {
           echoStartBtn.addEventListener('click', () => startEchoHand());
         }
@@ -2871,6 +3279,12 @@
         }
         if (fuseHoldBtn) {
           fuseHoldBtn.addEventListener('click', () => holdFuseGame());
+        }
+        if (perceptionStartBtn) {
+          perceptionStartBtn.addEventListener('click', () => startPerception());
+        }
+        if (perceptionLockBtn) {
+          perceptionLockBtn.addEventListener('click', () => lockInPerception());
         }
         if (fuseCardGrid) {
           fuseCardGrid.addEventListener('click', (event) => {
@@ -3260,6 +3674,9 @@
         } else if (gameName === 'fuse') {
           resetFuseGame(true);
           setTitle('Fuse');
+        } else if (gameName === 'perception') {
+          resetPerceptionGame(true);
+          setTitle('Perception');
         }
       }
 
@@ -3276,12 +3693,17 @@
           setFuseStatus('Contain or abandon the Fuse round before leaving.');
           return false;
         }
+        if (perceptionRunning && !perceptionRevealed) {
+          setPerceptionStatus('Trust and reveal the grid before leaving.');
+          return false;
+        }
         Object.values(cardPanels).forEach((panel) => panel.classList.remove('active'));
         cardLobby.classList.add('active');
         activeCardGame = null;
         resetBinaryPoker(!manual);
         resetEchoHand(!manual);
         resetFuseGame(!manual);
+        resetPerceptionGame(!manual);
         toggleBinaryInstructions(false);
         toggleEchoInstructions(false);
         toggleFuseInstructions(false);
@@ -4276,6 +4698,301 @@
         if (fuseResultEl) {
           fuseResultEl.textContent = 'Awaiting fusion.';
         }
+      }
+
+      // ---------------- Perception mode ----------------
+      function startPerception() {
+        if (perceptionRunning) return;
+        const wager = Math.floor(Number(perceptionBetInput?.value));
+        if (!wager || wager <= 0) {
+          setPerceptionStatus('Enter a valid wager to begin.');
+          return;
+        }
+        if (wager > balance) {
+          setPerceptionStatus('Insufficient balance for that wager.');
+          return;
+        }
+
+        perceptionBet = wager;
+        balance -= perceptionBet;
+        updateBalance();
+
+        perceptionRunning = true;
+        perceptionLocked = false;
+        perceptionRevealed = false;
+        perceptionAnalyzesUsed = 0;
+        perceptionCards = Array.from({ length: 4 }, (_, index) => generatePerceptionCard(index));
+
+        if (perceptionStage) {
+          perceptionStage.classList.remove('idle', 'revealing');
+          perceptionStage.classList.add('live');
+        }
+
+        if (perceptionScoreEl) {
+          perceptionScoreEl.textContent = 'Score: --';
+        }
+        if (perceptionResultEl) {
+          perceptionResultEl.textContent = 'Scan wisely. Truthful cards pay best.';
+        }
+
+        renderPerceptionCards();
+        updatePerceptionButtons();
+        updatePerceptionAnalyzeInfo();
+        setPerceptionStatus('Signals live. Analyze up to two cards before trusting the grid.');
+      }
+
+      function analyzeCard(index) {
+        if (!perceptionRunning || perceptionLocked) {
+          setPerceptionStatus('The grid is locked. No more scans allowed.');
+          return;
+        }
+        const card = perceptionCards[index];
+        if (!card) return;
+        if (card.analyzed) {
+          setPerceptionStatus('That card has already been scanned.');
+          return;
+        }
+        if (perceptionAnalyzesUsed >= perceptionMaxAnalyzes) {
+          setPerceptionStatus('Scan limit reached. Trust or lock in.');
+          return;
+        }
+        const scanCost = Math.max(1, Math.ceil(perceptionBet * 0.1));
+        if (scanCost > balance) {
+          setPerceptionStatus('Not enough balance to fund another scan.');
+          return;
+        }
+
+        balance -= scanCost;
+        updateBalance();
+        perceptionAnalyzesUsed += 1;
+        card.analyzed = true;
+
+        renderPerceptionCards();
+        updatePerceptionAnalyzeInfo();
+
+        if (perceptionCardsArea) {
+          const cardEl = perceptionCardsArea.querySelector(`[data-card-index="${index}"]`);
+          if (cardEl) {
+            cardEl.classList.add('scanning');
+            setTimeout(() => cardEl.classList.remove('scanning'), 900);
+          }
+        }
+
+        const verdict = card.truth ? 'truthful' : 'an illusion';
+        setPerceptionStatus(`Scan ${perceptionAnalyzesUsed}/${perceptionMaxAnalyzes}: Card ${index + 1} is ${verdict}.`);
+      }
+
+      function lockInPerception() {
+        if (!perceptionRunning || perceptionLocked) {
+          setPerceptionStatus(perceptionRunning ? 'Reveal already in progress.' : 'Start a round before locking in.');
+          return;
+        }
+        perceptionLocked = true;
+        updatePerceptionButtons();
+        setPerceptionStatus('Trust locked. Revealing hidden data...');
+        if (perceptionStage) {
+          perceptionStage.classList.add('revealing');
+          perceptionStage.classList.remove('live');
+        }
+        setTimeout(() => revealTruths(), 600);
+      }
+
+      function revealTruths() {
+        if (!perceptionRunning || perceptionRevealed) return;
+        perceptionRevealed = true;
+        perceptionCards.forEach((card) => {
+          card.revealed = true;
+        });
+        renderPerceptionCards();
+
+        const score = calculatePerceptionScore();
+        let multiplier = 0;
+        if (score >= 30) {
+          multiplier = 5;
+        } else if (score >= 20) {
+          multiplier = 3;
+        } else if (score >= 10) {
+          multiplier = 2;
+        }
+
+        if (perceptionScoreEl) {
+          perceptionScoreEl.textContent = `Score: ${score}`;
+        }
+
+        let payout = 0;
+        if (multiplier > 0) {
+          payout = perceptionBet * multiplier;
+          balance += payout;
+          updateBalance();
+          setPerceptionStatus(`Score ${score}. Instinct rewarded with ${multiplier}× ($${payout.toFixed(2)}).`);
+          if (perceptionResultEl) {
+            perceptionResultEl.textContent = `Payout $${payout.toFixed(2)} (${multiplier}×).`;
+          }
+        } else {
+          setPerceptionStatus(`Score ${score}. Illusions consumed the wager.`);
+          if (perceptionResultEl) {
+            perceptionResultEl.textContent = 'Score below 10 · Bet lost.';
+          }
+        }
+
+        perceptionBet = 0;
+        perceptionRunning = false;
+        updatePerceptionButtons();
+        if (perceptionStage) {
+          perceptionStage.classList.remove('revealing');
+          perceptionStage.classList.add('idle');
+        }
+      }
+
+      function calculatePerceptionScore() {
+        return perceptionCards.reduce((total, card) => {
+          return total + (card.truth ? card.visibleValue : -3);
+        }, 0);
+      }
+
+      function renderPerceptionCards() {
+        if (!perceptionCardsArea) return;
+        perceptionCardsArea.innerHTML = '';
+        if (!perceptionCards.length) {
+          const placeholder = document.createElement('div');
+          placeholder.className = 'perception-placeholder';
+          placeholder.textContent = 'Start Perception to pull four suspicious cards.';
+          perceptionCardsArea.appendChild(placeholder);
+          return;
+        }
+
+        perceptionCards.forEach((card, index) => {
+          const cardEl = document.createElement('div');
+          cardEl.className = 'perception-card';
+          cardEl.dataset.cardIndex = index.toString();
+          if (card.revealed) {
+            cardEl.classList.add('revealed');
+            cardEl.classList.add(card.truth ? 'truth' : 'illusion');
+          } else if (card.analyzed) {
+            cardEl.classList.add('analyzed');
+          }
+          const visibleColor = getPerceptionColorHex(card.visibleColor);
+          const realColor = getPerceptionColorHex(card.realColor);
+          const analysisLabel = card.revealed || card.analyzed ? (card.truth ? 'Truthful' : 'Illusion') : 'Unverified';
+
+          cardEl.innerHTML = `
+            <div class="perception-card-inner">
+              <div class="perception-visible">
+                <span class="label">Signal</span>
+                <span class="value" style="color:${visibleColor};">${card.visibleValue}</span>
+                <span class="color" style="color:${visibleColor};">${card.visibleColor.toUpperCase()}</span>
+              </div>
+              <div class="perception-reality">
+                <span class="label">Reality</span>
+                <span class="value" style="color:${realColor};">${card.realValue}</span>
+                <span class="color" style="color:${realColor};">${card.realColor.toUpperCase()}</span>
+              </div>
+              <div class="perception-analysis-result">${analysisLabel}</div>
+            </div>
+          `;
+
+          if (!card.revealed) {
+            const analyzeBtn = document.createElement('button');
+            analyzeBtn.type = 'button';
+            analyzeBtn.className = 'perception-analyze-btn';
+            analyzeBtn.textContent = card.analyzed ? 'Scanned' : 'Analyze (−10%)';
+            analyzeBtn.disabled =
+              card.analyzed || !perceptionRunning || perceptionLocked || perceptionAnalyzesUsed >= perceptionMaxAnalyzes;
+            cardEl.appendChild(analyzeBtn);
+          }
+
+          perceptionCardsArea.appendChild(cardEl);
+        });
+      }
+
+      function resetPerceptionGame(initial = false) {
+        perceptionRunning = false;
+        perceptionLocked = false;
+        perceptionBet = 0;
+        perceptionCards = [];
+        perceptionAnalyzesUsed = 0;
+        perceptionRevealed = false;
+        if (perceptionStage) {
+          perceptionStage.classList.remove('live', 'revealing');
+          perceptionStage.classList.add('idle');
+        }
+        renderPerceptionCards();
+        updatePerceptionButtons();
+        updatePerceptionAnalyzeInfo();
+        if (perceptionScoreEl) {
+          perceptionScoreEl.textContent = 'Score: --';
+        }
+        if (perceptionResultEl) {
+          perceptionResultEl.textContent = initial ? 'Awaiting signal.' : 'Grid reset. Awaiting next scan.';
+        }
+        setPerceptionStatus(initial ? 'Tune the sensors and begin.' : 'Perception deck reset.');
+      }
+
+      function updatePerceptionButtons() {
+        if (perceptionStartBtn) {
+          perceptionStartBtn.disabled = perceptionRunning && !perceptionRevealed;
+        }
+        if (perceptionBetInput) {
+          perceptionBetInput.disabled = perceptionRunning && !perceptionRevealed;
+        }
+        if (perceptionLockBtn) {
+          perceptionLockBtn.disabled = !perceptionRunning || perceptionLocked;
+        }
+      }
+
+      function updatePerceptionAnalyzeInfo() {
+        if (perceptionAnalyzeInfo) {
+          perceptionAnalyzeInfo.textContent = `${perceptionAnalyzesUsed} / ${perceptionMaxAnalyzes}`;
+        }
+      }
+
+      function setPerceptionStatus(message) {
+        if (perceptionStatusEl) {
+          perceptionStatusEl.textContent = message;
+        }
+      }
+
+      function generatePerceptionCard(id) {
+        const visibleValue = Math.floor(Math.random() * 10) + 1;
+        const visibleColor = perceptionColorPalette[Math.floor(Math.random() * perceptionColorPalette.length)].name;
+        let realValue = visibleValue;
+        let realColor = visibleColor;
+        let truth = Math.random() < 0.55;
+        if (!truth) {
+          const lieRoll = Math.random();
+          if (lieRoll < 0.5) {
+            do {
+              realValue = Math.floor(Math.random() * 10) + 1;
+            } while (realValue === visibleValue);
+          } else if (lieRoll < 0.85) {
+            realColor = getDifferentPerceptionColor(visibleColor);
+          } else {
+            do {
+              realValue = Math.floor(Math.random() * 10) + 1;
+            } while (realValue === visibleValue);
+            realColor = getDifferentPerceptionColor(visibleColor);
+          }
+        }
+        return {
+          id,
+          visibleValue,
+          visibleColor,
+          realValue,
+          realColor,
+          truth,
+          analyzed: false,
+          revealed: false,
+        };
+      }
+
+      function getDifferentPerceptionColor(current) {
+        const options = perceptionColorPalette.map((color) => color.name).filter((name) => name !== current);
+        return options[Math.floor(Math.random() * options.length)] || current;
+      }
+
+      function getPerceptionColorHex(name) {
+        const match = perceptionColorPalette.find((entry) => entry.name === name);
+        return match ? match.color : '#6ef3ff';
       }
 
       // ---------------- Rocket mode ----------------
