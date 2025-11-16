@@ -1089,6 +1089,224 @@
         color: rgba(255, 255, 255, 0.45);
       }
 
+      .fuse-stage {
+        position: relative;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background: radial-gradient(circle at 30% 20%, rgba(0, 255, 212, 0.15), transparent 55%),
+          linear-gradient(140deg, rgba(12, 22, 45, 0.95), rgba(2, 5, 16, 0.9));
+        border: 1px solid rgba(110, 255, 239, 0.15);
+        box-shadow: inset 0 0 40px rgba(0, 255, 229, 0.08);
+      }
+
+      .fuse-stage.live {
+        animation: fusePulse 2.2s ease-in-out infinite;
+      }
+
+      .fuse-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 14px;
+      }
+
+      .fuse-card,
+      .fuse-placeholder {
+        border-radius: 18px;
+        padding: 12px;
+        min-height: 138px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(4, 12, 24, 0.7);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .fuse-placeholder {
+        grid-column: span 3;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.45);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .fuse-card {
+        cursor: pointer;
+        transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        border-color: rgba(255, 255, 255, 0.2);
+        background: radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.06), transparent 55%),
+          linear-gradient(160deg, rgba(3, 12, 24, 0.8), rgba(2, 4, 12, 0.95));
+        box-shadow: 0 0 18px rgba(0, 0, 0, 0.45), 0 0 20px rgba(0, 255, 230, 0.12);
+        --fuse-color: rgba(110, 255, 236, 0.5);
+        color: #f3fdff;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+      }
+
+      .fuse-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 20% 20%, var(--fuse-color), rgba(0, 0, 0, 0));
+        opacity: 0.35;
+        transition: opacity 0.2s ease;
+      }
+
+      .fuse-card:hover::before {
+        opacity: 0.55;
+      }
+
+      .fuse-card::after {
+        content: '';
+        position: absolute;
+        inset: 1px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        pointer-events: none;
+      }
+
+      .fuse-card .fuse-suit {
+        font-size: 28px;
+        letter-spacing: 0.2em;
+      }
+
+      .fuse-card .fuse-value {
+        font-size: 40px;
+        font-weight: 600;
+        font-family: 'Orbitron', sans-serif;
+      }
+
+      .fuse-card .fuse-tag,
+      .fuse-card .fuse-instability-label {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .fuse-card .fuse-instability-label {
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .fuse-card.selected {
+        border-color: rgba(0, 255, 230, 0.9);
+        box-shadow: 0 0 25px rgba(0, 255, 230, 0.35);
+        transform: translateY(-4px);
+      }
+
+      .fuse-card.inactive {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+
+      .fuse-card.hybrid {
+        border-color: rgba(255, 255, 255, 0.4);
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.85));
+      }
+
+      .fuse-stage.exploded .fuse-card-grid {
+        filter: blur(2px);
+      }
+
+      .fuse-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: 26px;
+        background: radial-gradient(circle, rgba(255, 98, 98, 0.35), rgba(0, 0, 0, 0.95));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        letter-spacing: 0.4em;
+        color: rgba(255, 255, 255, 0.85);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        text-transform: uppercase;
+      }
+
+      .fuse-stage.exploded .fuse-overlay {
+        opacity: 1;
+      }
+
+      .fuse-meter-shell {
+        background: rgba(1, 6, 18, 0.7);
+        border-radius: 20px;
+        padding: 12px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .fuse-meter-label {
+        font-size: 11px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .fuse-meter-bar {
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .fuse-meter-fill {
+        position: absolute;
+        inset: 0;
+        width: 0%;
+        background: linear-gradient(90deg, #00ffc8, #ff5b84);
+        box-shadow: 0 0 18px rgba(0, 255, 230, 0.4);
+        transition: width 0.25s ease;
+      }
+
+      .fuse-meter-value {
+        margin-top: 6px;
+        font-size: 12px;
+        letter-spacing: 0.24em;
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .fuse-status,
+      .fuse-result {
+        min-height: 38px;
+      }
+
+      .fuse-stage .fuse-energy-surge {
+        position: absolute;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(0, 255, 230, 0.8), rgba(0, 0, 0, 0));
+        pointer-events: none;
+        animation: fuseSurge 0.55s ease-out forwards;
+      }
+
+      @keyframes fusePulse {
+        0%,
+        100% {
+          box-shadow: inset 0 0 40px rgba(0, 255, 201, 0.15);
+        }
+        50% {
+          box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.12);
+        }
+      }
+
+      @keyframes fuseSurge {
+        from {
+          transform: scale(0.6);
+          opacity: 0.8;
+        }
+        to {
+          transform: scale(2.2);
+          opacity: 0;
+        }
+      }
+
       .binary-info-button {
         width: 34px;
         height: 34px;
@@ -2033,9 +2251,9 @@
               <span class="card-name">Echo Hand</span>
               <span class="card-meta">Live · Time your echoes</span>
             </button>
-            <button class="card-tile coming-soon" type="button" disabled>
-              <span class="card-name">Fuse</span>
-              <span class="card-meta">Coming Soon</span>
+            <button class="card-tile card-game-tile" data-game="fuse" type="button">
+              <span class="card-name">FUSE — COMBINE AND CONTAIN</span>
+              <span class="card-meta">Live · Reactive hybrids</span>
             </button>
             <button class="card-tile coming-soon" type="button" disabled>
               <span class="card-name">Perception</span>
@@ -2211,6 +2429,93 @@
             </aside>
           </div>
         </div>
+        <div class="card-panel" id="fuseGame">
+          <div class="card-game-header">
+            <button class="ghost-button card-back-button" type="button">← Back to Card Lobby</button>
+            <div class="card-game-title-group">
+              <div class="card-game-title">Fuse</div>
+              <div class="card-game-subtitle">Live · Combine and contain</div>
+            </div>
+          </div>
+          <div class="main-layout card-layout">
+            <div class="device-shell">
+              <div class="stage idle fuse-stage" id="fuseStage">
+                <div class="fuse-overlay" id="fuseOverlay">OVERLOAD</div>
+                <div class="fuse-meter-shell">
+                  <div class="fuse-meter-label">Instability Threshold</div>
+                  <div class="fuse-meter-bar">
+                    <div class="fuse-meter-fill" id="fuseMeterFill"></div>
+                  </div>
+                  <div class="fuse-meter-value" id="fuseMeterValue">0.0 / 10</div>
+                </div>
+                <div class="fuse-card-grid" id="fuseCardGrid">
+                  <div class="fuse-placeholder">Start Fuse to reveal volatile cards.</div>
+                </div>
+              </div>
+            </div>
+            <aside class="control-panel card-controls">
+              <h2>Fuse</h2>
+              <p class="fuse-copy">Select two cards to merge their power. Keep the instability below 10 or the core explodes.</p>
+              <div class="binary-instructions fuse-instructions" id="fuseInstructions">
+                <button
+                  class="binary-instructions-toggle"
+                  id="fuseInstructionsToggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="fuseInstructionsBody"
+                >
+                  <span class="toggle-label">How Fuse Works</span>
+                  <span class="toggle-state" aria-hidden="true">▼</span>
+                </button>
+                <div class="binary-instructions-body" id="fuseInstructionsBody" hidden>
+                  <p>
+                    Click <strong>Start Fuse</strong> to draw three charged cards. Select any two active cards and
+                    press <strong>Fuse Selected</strong> to combine them into a hybrid. Repeat until you're satisfied,
+                    then <strong>Hold</strong> to cash out the remaining energy.
+                  </p>
+                  <ol>
+                    <li>
+                      <strong>Prime</strong>: Enter a wager, press <em>Start Fuse</em>, and study the three glowing cards
+                      (each shows a suit and power value from 1–10).
+                    </li>
+                    <li>
+                      <strong>Select</strong>: Tap two active cards. Their outlines light up to confirm the upcoming
+                      merge. Hybrid cards remain in play and can be paired with the third card if desired.
+                    </li>
+                    <li>
+                      <strong>Fuse</strong>: Instability = (value A + value B) ÷ 2 + the suit interaction modifier. Suit
+                      effects: ♠ + ♥ = +2 · ♦ + ♣ = –1 · ♥ + ♦ = 0 · ♣ + ♠ = +1. All other pairings are neutral.
+                    </li>
+                    <li>
+                      <strong>Contain</strong>: If instability climbs above 10 the hybrid explodes and the round is
+                      lost. Otherwise the fused value is added to your total and instability meter.
+                    </li>
+                    <li>
+                      <strong>Hold</strong>: After at least one successful hybrid, press Hold to lock in
+                      <code>final score = total fused value × (1 – total instability ÷ 20)</code>. Payout = bet ×
+                      (final score ÷ 21) × 2.
+                    </li>
+                  </ol>
+                </div>
+              </div>
+              <div>
+                <label for="fuseBet">Bet Amount</label>
+                <input type="number" id="fuseBet" min="1" step="1" value="25" />
+              </div>
+              <div class="panel-meta">
+                <span>Hybrids: <strong id="fuseHybridCount">0</strong></span>
+                <span>Instability: <strong id="fuseInstabilityLabel">0.0</strong></span>
+              </div>
+              <div class="button-row">
+                <button class="launch" id="fuseStart">Start Fuse</button>
+                <button class="ghost-button" id="fuseFuseSelected" disabled>Fuse Selected</button>
+              </div>
+              <button class="cashout" id="fuseHold" disabled>Hold</button>
+              <div class="status fuse-status" id="fuseStatus">Prime a wager to begin.</div>
+              <div class="status fuse-result" id="fuseResult">Awaiting fusion.</div>
+            </aside>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -2300,6 +2605,36 @@
       let echoTimers = [];
       let echoCardId = 0;
 
+      // ---------------- Fuse state ----------------
+      let fuseRunning = false;
+      let fuseBet = 0;
+      let fuseCardsState = [];
+      let fuseSelectedCards = [];
+      let fuseTotalInstability = 0;
+      let fuseExploded = false;
+      let fuseCardId = 0;
+      let fuseFusions = 0;
+
+      const fuseSuitColors = {
+        '♠': '#6ed9ff',
+        '♥': '#ff5f9e',
+        '♦': '#ffd96a',
+        '♣': '#6effa8',
+      };
+
+      const fuseSuits = ['♠', '♥', '♦', '♣'];
+
+      const fuseSuitModifiers = {
+        '♠♥': 2,
+        '♥♠': 2,
+        '♦♣': -1,
+        '♣♦': -1,
+        '♥♦': 0,
+        '♦♥': 0,
+        '♣♠': 1,
+        '♠♣': 1,
+      };
+
       // ---------------- Elements ----------------
       const baseTitle = 'NeonArc Casino';
       const titleEl = document.getElementById('sectionTitle');
@@ -2323,9 +2658,11 @@
       const cardBackButtons = document.querySelectorAll('.card-back-button');
       const binaryGamePanel = document.getElementById('binaryPokerGame');
       const echoGamePanel = document.getElementById('echoHandGame');
+      const fuseGamePanel = document.getElementById('fuseGame');
       const cardPanels = {
         binaryPoker: binaryGamePanel,
         echoHand: echoGamePanel,
+        fuse: fuseGamePanel,
       };
 
       const binaryStage = document.getElementById('binaryStage');
@@ -2358,6 +2695,23 @@
       const echoInstructions = document.getElementById('echoInstructions');
       const echoInstructionsToggle = document.getElementById('echoInstructionsToggle');
       const echoInstructionsBody = document.getElementById('echoInstructionsBody');
+
+      const fuseStage = document.getElementById('fuseStage');
+      const fuseCardGrid = document.getElementById('fuseCardGrid');
+      const fuseBetInput = document.getElementById('fuseBet');
+      const fuseStartBtn = document.getElementById('fuseStart');
+      const fuseFuseBtn = document.getElementById('fuseFuseSelected');
+      const fuseHoldBtn = document.getElementById('fuseHold');
+      const fuseStatusEl = document.getElementById('fuseStatus');
+      const fuseResultEl = document.getElementById('fuseResult');
+      const fuseHybridCountEl = document.getElementById('fuseHybridCount');
+      const fuseInstabilityLabel = document.getElementById('fuseInstabilityLabel');
+      const fuseMeterFill = document.getElementById('fuseMeterFill');
+      const fuseMeterValue = document.getElementById('fuseMeterValue');
+      const fuseOverlay = document.getElementById('fuseOverlay');
+      const fuseInstructions = document.getElementById('fuseInstructions');
+      const fuseInstructionsToggle = document.getElementById('fuseInstructionsToggle');
+      const fuseInstructionsBody = document.getElementById('fuseInstructionsBody');
 
       // Rocket elements
       const betInput = document.getElementById('bet');
@@ -2453,8 +2807,10 @@
         updateMindInsight();
         resetBinaryPoker(true);
         resetEchoHand(true);
+        resetFuseGame(true);
         toggleBinaryInstructions(false);
         toggleEchoInstructions(false);
+        toggleFuseInstructions(false);
         setTitle('Rocket Line');
 
         sectionButtons.forEach((button) => {
@@ -2489,6 +2845,9 @@
         if (echoInstructionsToggle) {
           echoInstructionsToggle.addEventListener('click', () => toggleEchoInstructions());
         }
+        if (fuseInstructionsToggle) {
+          fuseInstructionsToggle.addEventListener('click', () => toggleFuseInstructions());
+        }
         if (echoStartBtn) {
           echoStartBtn.addEventListener('click', () => startEchoHand());
         }
@@ -2497,6 +2856,28 @@
         }
         if (echoHoldBtn) {
           echoHoldBtn.addEventListener('click', () => holdEchoHand());
+        }
+        if (fuseStartBtn) {
+          fuseStartBtn.addEventListener('click', () => startFuse());
+        }
+        if (fuseFuseBtn) {
+          fuseFuseBtn.addEventListener('click', () => {
+            if (fuseSelectedCards.length === 2) {
+              fuseCards(fuseSelectedCards[0], fuseSelectedCards[1]);
+            } else {
+              setFuseStatus('Select two active cards to merge.');
+            }
+          });
+        }
+        if (fuseHoldBtn) {
+          fuseHoldBtn.addEventListener('click', () => holdFuseGame());
+        }
+        if (fuseCardGrid) {
+          fuseCardGrid.addEventListener('click', (event) => {
+            const cardEl = event.target.closest('.fuse-card');
+            if (!cardEl) return;
+            selectCard(Number(cardEl.dataset.cardId));
+          });
         }
         if (binaryInfoButton) {
           binaryInfoButton.addEventListener('click', () => toggleBinaryInstructions());
@@ -2848,6 +3229,7 @@
           const titleMap = {
             binaryPoker: 'Binary Poker',
             echoHand: 'Echo Hand',
+            fuse: 'Fuse',
           };
           setTitle(titleMap[activeCardGame] || 'Card Games Lobby');
         }
@@ -2875,6 +3257,9 @@
         } else if (gameName === 'echoHand') {
           resetEchoHand(true);
           setTitle('Echo Hand');
+        } else if (gameName === 'fuse') {
+          resetFuseGame(true);
+          setTitle('Fuse');
         }
       }
 
@@ -2887,13 +3272,19 @@
           setEchoStatus('Let the echo waves finish before leaving.');
           return false;
         }
+        if (fuseRunning) {
+          setFuseStatus('Contain or abandon the Fuse round before leaving.');
+          return false;
+        }
         Object.values(cardPanels).forEach((panel) => panel.classList.remove('active'));
         cardLobby.classList.add('active');
         activeCardGame = null;
         resetBinaryPoker(!manual);
         resetEchoHand(!manual);
+        resetFuseGame(!manual);
         toggleBinaryInstructions(false);
         toggleEchoInstructions(false);
+        toggleFuseInstructions(false);
         if (manual || activeSection === 'card') {
           setTitle('Card Games Lobby');
         }
@@ -2928,6 +3319,21 @@
         echoInstructionsToggle.setAttribute('aria-expanded', shouldOpen);
         echoInstructionsBody.hidden = !shouldOpen;
         const toggleIcon = echoInstructionsToggle.querySelector('.toggle-state');
+        if (toggleIcon) {
+          toggleIcon.textContent = shouldOpen ? '▲' : '▼';
+        }
+      }
+
+      function toggleFuseInstructions(forceOpen) {
+        if (!fuseInstructions || !fuseInstructionsToggle || !fuseInstructionsBody) {
+          return;
+        }
+        const shouldOpen =
+          typeof forceOpen === 'boolean' ? forceOpen : !fuseInstructions.classList.contains('open');
+        fuseInstructions.classList.toggle('open', shouldOpen);
+        fuseInstructionsToggle.setAttribute('aria-expanded', shouldOpen);
+        fuseInstructionsBody.hidden = !shouldOpen;
+        const toggleIcon = fuseInstructionsToggle.querySelector('.toggle-state');
         if (toggleIcon) {
           toggleIcon.textContent = shouldOpen ? '▲' : '▼';
         }
@@ -3489,6 +3895,387 @@
       function clearEchoTimers() {
         echoTimers.forEach((timer) => clearTimeout(timer));
         echoTimers = [];
+      }
+
+      // ---------------- Fuse game helpers ----------------
+      function startFuse() {
+        if (!fuseBetInput || fuseRunning) return;
+        const wager = Math.floor(Number(fuseBetInput.value));
+        if (!wager || wager <= 0) {
+          setFuseStatus('Enter a valid bet to ignite the Fuse core.');
+          return;
+        }
+        if (wager > balance) {
+          setFuseStatus('Insufficient balance for that wager.');
+          return;
+        }
+
+        fuseBet = wager;
+        balance -= fuseBet;
+        updateBalance();
+
+        fuseRunning = true;
+        fuseExploded = false;
+        fuseFusions = 0;
+        fuseCardId = 0;
+        fuseSelectedCards = [];
+        fuseTotalInstability = 0;
+        fuseCardsState = Array.from({ length: 3 }, () => createBaseFuseCard());
+
+        if (fuseStage) {
+          fuseStage.classList.remove('idle', 'exploded');
+          fuseStage.classList.add('live');
+        }
+        if (fuseOverlay) {
+          fuseOverlay.textContent = 'OVERLOAD';
+          fuseOverlay.style.opacity = '0';
+        }
+
+        setFuseStatus('Cards charged. Select any two to merge.');
+        if (fuseResultEl) {
+          fuseResultEl.textContent = 'Instability steady at 0.0.';
+        }
+        renderFuseCards();
+        updateFuseMeter();
+        updateFuseControls();
+      }
+
+      function selectCard(cardId) {
+        if (!fuseRunning || fuseExploded) return;
+        if (!Number.isFinite(cardId)) return;
+        const card = fuseCardsState.find((entry) => entry.id === cardId);
+        if (!card || !card.active) {
+          setFuseStatus('Only active cards can be fused.');
+          return;
+        }
+
+        if (fuseSelectedCards.includes(cardId)) {
+          fuseSelectedCards = fuseSelectedCards.filter((id) => id !== cardId);
+        } else {
+          if (fuseSelectedCards.length === 2) {
+            fuseSelectedCards.shift();
+          }
+          fuseSelectedCards.push(cardId);
+        }
+
+        renderFuseCards();
+        updateFuseControls();
+
+        if (fuseSelectedCards.length === 2) {
+          const labels = fuseSelectedCards
+            .map((id) => fuseCardsState.find((entry) => entry.id === id))
+            .filter(Boolean)
+            .map((entry) => entry.suits.join(' + '));
+          setFuseStatus(`Ready to fuse ${labels.join(' & ')}.`);
+        } else {
+          setFuseStatus('Select a second card to create a hybrid.');
+        }
+      }
+
+      function fuseCards(firstId, secondId) {
+        if (!fuseRunning || fuseExploded) return;
+        if (firstId === secondId) {
+          setFuseStatus('Select two different cards to merge.');
+          return;
+        }
+        const firstCard = fuseCardsState.find((card) => card.id === firstId && card.active);
+        const secondCard = fuseCardsState.find((card) => card.id === secondId && card.active);
+        if (!firstCard || !secondCard) {
+          setFuseStatus('Inactive cards cannot be merged.');
+          return;
+        }
+
+        const instability = calculateInstability(firstCard, secondCard);
+        fuseTotalInstability += instability;
+        fuseFusions += 1;
+        fuseSelectedCards = [];
+
+        const hybrid = {
+          id: fuseCardId++,
+          suits: [...firstCard.suits, ...secondCard.suits],
+          primarySuit: firstCard.primarySuit || firstCard.suits[0],
+          value: firstCard.value + secondCard.value,
+          type: 'hybrid',
+          active: true,
+          accent: firstCard.accent,
+          secondaryAccent: secondCard.accent,
+          instability,
+        };
+
+        firstCard.active = false;
+        secondCard.active = false;
+        fuseCardsState.push(hybrid);
+
+        createFuseEnergySurge();
+        renderFuseCards();
+        updateFuseMeter();
+
+        if (instability > 10) {
+          handleFuseExplosion(instability);
+          return;
+        }
+
+        const totalHybridValue = getActiveHybridCards().reduce((sum, card) => sum + card.value, 0);
+        setFuseStatus(
+          `Hybrid stabilized at ${hybrid.value}. Instability +${instability.toFixed(1)} (total ${fuseTotalInstability.toFixed(1)}).`
+        );
+        if (fuseResultEl) {
+          fuseResultEl.textContent = `Active hybrid value ${totalHybridValue.toFixed(1)} · Instability ${fuseTotalInstability.toFixed(
+            1
+          )}`;
+        }
+
+        updateFuseControls();
+      }
+
+      function calculateInstability(cardA, cardB) {
+        const suitKey = `${cardA.primarySuit || cardA.suits[0]}${cardB.primarySuit || cardB.suits[0]}`;
+        const modifier = fuseSuitModifiers[suitKey] ?? 0;
+        const base = (cardA.value + cardB.value) / 2;
+        return base + modifier;
+      }
+
+      function holdFuseGame() {
+        if (!fuseRunning || fuseExploded) return;
+        const activeHybrids = getActiveHybridCards();
+        if (!activeHybrids.length) {
+          setFuseStatus('Create at least one hybrid before holding.');
+          return;
+        }
+
+        fuseRunning = false;
+        fuseSelectedCards = [];
+        if (fuseStage) {
+          fuseStage.classList.remove('live');
+          fuseStage.classList.add('idle');
+        }
+
+        const totalValue = activeHybrids.reduce((sum, card) => sum + card.value, 0);
+        const stabilityFactor = Math.max(0, 1 - fuseTotalInstability / 20);
+        const finalScore = Math.max(0, totalValue * stabilityFactor);
+        const payoutRaw = fuseBet * (finalScore / 21) * 2;
+        const payout = Math.max(0, Number(payoutRaw.toFixed(2)));
+        fuseBet = 0;
+
+        if (payout > 0) {
+          balance += payout;
+          updateBalance();
+        }
+
+        setFuseStatus(`Hybrids contained at ${totalValue.toFixed(1)} power. Final score ${finalScore.toFixed(1)}.`);
+        if (fuseResultEl) {
+          fuseResultEl.textContent =
+            payout > 0
+              ? `Payout $${payout.toFixed(2)} from score ${finalScore.toFixed(1)}.`
+              : `No payout · score ${finalScore.toFixed(1)} after instability.`;
+        }
+        pulseFuseOverlay('CONTAINED');
+        renderFuseCards();
+        updateFuseMeter();
+        updateFuseControls();
+      }
+
+      function pulseFuseOverlay(text) {
+        if (!fuseOverlay) return;
+        fuseOverlay.textContent = text;
+        fuseOverlay.style.opacity = '1';
+        setTimeout(() => {
+          if (!fuseExploded && fuseOverlay) {
+            fuseOverlay.style.opacity = '0';
+            fuseOverlay.textContent = 'OVERLOAD';
+          }
+        }, 900);
+      }
+
+      function handleFuseExplosion(instability) {
+        fuseExploded = true;
+        fuseRunning = false;
+        if (fuseStage) {
+          fuseStage.classList.add('exploded');
+          fuseStage.classList.remove('live');
+        }
+        if (fuseOverlay) {
+          fuseOverlay.textContent = 'OVERLOAD';
+          fuseOverlay.style.opacity = '';
+        }
+        setFuseStatus('Instability breached 10. The hybrid exploded and the bet is lost.');
+        if (fuseResultEl) {
+          fuseResultEl.textContent = `Instability ${instability.toFixed(1)} exceeded the 10-point ceiling.`;
+        }
+        fuseBet = 0;
+        fuseSelectedCards = [];
+        updateFuseControls();
+      }
+
+      function renderFuseCards() {
+        if (!fuseCardGrid) return;
+        fuseCardGrid.innerHTML = '';
+        if (!fuseCardsState.length) {
+          const placeholder = document.createElement('div');
+          placeholder.className = 'fuse-placeholder';
+          placeholder.textContent = 'Start Fuse to reveal volatile cards.';
+          fuseCardGrid.appendChild(placeholder);
+          return;
+        }
+
+        fuseCardsState.forEach((card) => {
+          const cardButton = document.createElement('button');
+          cardButton.type = 'button';
+          cardButton.className = 'fuse-card';
+          cardButton.dataset.cardId = card.id.toString();
+          if (!card.active) {
+            cardButton.classList.add('inactive');
+            cardButton.disabled = true;
+          }
+          if (card.type === 'hybrid') {
+            cardButton.classList.add('hybrid');
+          }
+          if (fuseSelectedCards.includes(card.id)) {
+            cardButton.classList.add('selected');
+          }
+
+          const accent = card.accent || '#6ef3ff';
+          cardButton.style.setProperty('--fuse-color', applyAlpha(accent, 0.55));
+          cardButton.style.borderColor = applyAlpha(accent, 0.5);
+          cardButton.style.boxShadow = `0 0 20px ${applyAlpha(accent, 0.35)}, 0 0 18px rgba(0, 0, 0, 0.4)`;
+          if (card.type === 'hybrid' && card.secondaryAccent) {
+            const gradient = `linear-gradient(150deg, ${applyAlpha(accent, 0.28)}, ${applyAlpha(
+              card.secondaryAccent,
+              0.28
+            )})`;
+            cardButton.style.background = `${gradient}, linear-gradient(170deg, rgba(3,12,24,0.85), rgba(0,0,0,0.9))`;
+          }
+
+          const suitEl = document.createElement('div');
+          suitEl.className = 'fuse-suit';
+          suitEl.textContent = card.suits.join(' + ');
+
+          const valueEl = document.createElement('div');
+          valueEl.className = 'fuse-value';
+          valueEl.textContent = card.value.toString();
+
+          const tagEl = document.createElement('div');
+          tagEl.className = 'fuse-tag';
+          tagEl.textContent = card.type === 'hybrid' ? 'Hybrid Card' : 'Base Card';
+
+          cardButton.appendChild(suitEl);
+          cardButton.appendChild(valueEl);
+          cardButton.appendChild(tagEl);
+
+          if (card.type === 'hybrid' && typeof card.instability === 'number') {
+            const detail = document.createElement('div');
+            detail.className = 'fuse-instability-label';
+            detail.textContent = `Instability +${card.instability.toFixed(1)}`;
+            cardButton.appendChild(detail);
+          }
+
+          fuseCardGrid.appendChild(cardButton);
+        });
+      }
+
+      function updateFuseMeter() {
+        if (fuseMeterFill) {
+          const percent = Math.min(100, (fuseTotalInstability / 10) * 100);
+          fuseMeterFill.style.width = `${percent}%`;
+        }
+        if (fuseMeterValue) {
+          fuseMeterValue.textContent = `${fuseTotalInstability.toFixed(1)} / 10`;
+        }
+        if (fuseInstabilityLabel) {
+          fuseInstabilityLabel.textContent = fuseTotalInstability.toFixed(1);
+        }
+        if (fuseHybridCountEl) {
+          fuseHybridCountEl.textContent = getActiveHybridCards().length.toString();
+        }
+      }
+
+      function updateFuseControls() {
+        if (fuseStartBtn) {
+          fuseStartBtn.disabled = fuseRunning;
+        }
+        if (fuseBetInput) {
+          fuseBetInput.disabled = fuseRunning;
+        }
+        if (fuseFuseBtn) {
+          fuseFuseBtn.disabled = !fuseRunning || fuseExploded || fuseSelectedCards.length !== 2;
+        }
+        if (fuseHoldBtn) {
+          fuseHoldBtn.disabled = !fuseRunning || fuseExploded || fuseFusions === 0;
+        }
+      }
+
+      function createBaseFuseCard() {
+        const suit = fuseSuits[Math.floor(Math.random() * fuseSuits.length)];
+        const value = Math.floor(Math.random() * 10) + 1;
+        const accent = fuseSuitColors[suit] || '#6ef3ff';
+        return {
+          id: fuseCardId++,
+          suits: [suit],
+          primarySuit: suit,
+          value,
+          type: 'base',
+          active: true,
+          accent,
+        };
+      }
+
+      function getActiveHybridCards() {
+        return fuseCardsState.filter((card) => card.active && card.type === 'hybrid');
+      }
+
+      function createFuseEnergySurge() {
+        if (!fuseStage) return;
+        const surge = document.createElement('div');
+        surge.className = 'fuse-energy-surge';
+        const size = Math.floor(Math.random() * 80) + 140;
+        surge.style.width = `${size}px`;
+        surge.style.height = `${size}px`;
+        surge.style.left = `calc(50% - ${size / 2}px)`;
+        surge.style.top = `calc(50% - ${size / 2}px)`;
+        fuseStage.appendChild(surge);
+        surge.addEventListener('animationend', () => surge.remove());
+      }
+
+      function applyAlpha(hex, alpha) {
+        if (!hex || !hex.startsWith('#') || hex.length < 7) {
+          return `rgba(110, 255, 236, ${alpha})`;
+        }
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      }
+
+      function setFuseStatus(message) {
+        if (fuseStatusEl) {
+          fuseStatusEl.textContent = message;
+        }
+      }
+
+      function resetFuseGame(initial = false) {
+        fuseRunning = false;
+        fuseExploded = false;
+        fuseBet = 0;
+        fuseCardsState = [];
+        fuseSelectedCards = [];
+        fuseTotalInstability = 0;
+        fuseFusions = 0;
+        fuseCardId = 0;
+        if (fuseStage) {
+          fuseStage.classList.remove('live', 'exploded');
+          fuseStage.classList.add('idle');
+        }
+        if (fuseOverlay) {
+          fuseOverlay.textContent = 'OVERLOAD';
+          fuseOverlay.style.opacity = '0';
+        }
+        renderFuseCards();
+        updateFuseMeter();
+        updateFuseControls();
+        setFuseStatus(initial ? 'Prime a wager to begin.' : 'Core reset. Ready for a fresh fuse.');
+        if (fuseResultEl) {
+          fuseResultEl.textContent = 'Awaiting fusion.';
+        }
       }
 
       // ---------------- Rocket mode ----------------
