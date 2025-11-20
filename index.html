@@ -56,91 +56,181 @@
         letter-spacing: 0.16em;
       }
 
-      .mode-switcher,
-      .section-switcher {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: rgba(6, 22, 35, 0.6);
-        border: 1px solid rgba(110, 255, 236, 0.18);
-        box-shadow: inset 0 0 18px rgba(0, 255, 204, 0.08);
-      }
-
-      .mode-button,
-      .section-button {
-        flex: 0 0 auto;
-        padding: 10px 18px;
-        border-radius: 999px;
-        border: 1px solid transparent;
-        background: rgba(12, 32, 46, 0.65);
-        color: rgba(230, 249, 255, 0.85);
-        font-size: 13px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: background 0.2s ease, transform 0.18s ease, box-shadow 0.18s ease;
-      }
-
-      .mode-button:hover,
-      .section-button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 10px 20px rgba(0, 255, 204, 0.2);
-      }
-
-      .mode-button.active,
-      .section-button.active {
-        background: linear-gradient(135deg, #00ffc8, #00aaff);
-        color: #002033;
-        box-shadow: 0 16px 30px rgba(0, 255, 222, 0.28);
-      }
-
-      .section-wrapper {
+      .lobby-system {
         display: flex;
         flex-direction: column;
-        gap: clamp(22px, 4vw, 32px);
+        gap: clamp(24px, 4vw, 36px);
       }
 
-      .section-panel {
+      .lobby-view,
+      .game-view {
         display: none;
-        flex-direction: column;
-        gap: clamp(20px, 3vw, 30px);
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
       }
 
-      .section-panel.active {
-        display: flex;
+      .lobby-view.active,
+      .game-view.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
       }
 
-      .section-heading-row {
+      .lobby-heading {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        flex-wrap: wrap;
         gap: 16px;
+        flex-wrap: wrap;
       }
 
       .section-heading {
         margin: 0;
-        font-size: clamp(20px, 3vw, 26px);
+        font-size: clamp(22px, 3.2vw, 30px);
         color: #6ef3ff;
         font-weight: 600;
         letter-spacing: 0.18em;
         text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        animation: headerPulse 3.5s ease-in-out infinite;
       }
 
-      .mode-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: clamp(18px, 3vw, 26px);
+      @keyframes headerPulse {
+        0%,
+        100% {
+          text-shadow: 0 0 10px rgba(110, 255, 236, 0.35);
+        }
+        50% {
+          text-shadow: 0 0 24px rgba(110, 255, 236, 0.8);
+        }
       }
 
-      .mode-panel {
-        display: none;
+      .category-grid,
+      .game-grid {
+        display: grid;
+        gap: clamp(18px, 3vw, 32px);
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       }
 
-      .mode-panel.active {
+      .category-panel,
+      .game-tile {
+        position: relative;
+        padding: clamp(22px, 4vw, 32px);
+        border-radius: 28px;
+        border: 1px solid rgba(110, 255, 236, 0.18);
+        background: linear-gradient(150deg, rgba(4, 16, 28, 0.85), rgba(1, 3, 10, 0.85));
+        color: rgba(234, 249, 255, 0.92);
+        letter-spacing: 0.08em;
+        text-align: left;
+        cursor: pointer;
+        transition: transform 0.45s ease, box-shadow 0.45s ease, border-color 0.45s ease;
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      .category-panel::after,
+      .game-tile::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(circle at 30% 20%, rgba(110, 255, 236, 0.25), rgba(110, 255, 236, 0));
+        opacity: 0;
+        transition: opacity 0.45s ease;
+        pointer-events: none;
+      }
+
+      .category-panel:hover,
+      .game-tile:hover {
+        transform: translateY(-6px) scale(1.01);
+        border-color: rgba(110, 255, 236, 0.45);
+        box-shadow: 0 25px 50px rgba(0, 255, 230, 0.18);
+      }
+
+      .category-panel:hover::after,
+      .game-tile:hover::after {
+        opacity: 1;
+      }
+
+      .category-label,
+      .game-title {
         display: block;
+        font-family: 'Orbitron', sans-serif;
+        font-size: clamp(18px, 2.8vw, 24px);
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      .category-status,
+      .game-status {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 0.28em;
+        color: rgba(255, 255, 255, 0.6);
+        text-transform: uppercase;
+        margin-bottom: 12px;
+      }
+
+      .game-description {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .game-grid .game-tile {
+        background: linear-gradient(150deg, rgba(5, 18, 30, 0.92), rgba(1, 4, 16, 0.92));
+      }
+
+      .game-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: clamp(16px, 3vw, 24px);
+      }
+
+      .game-heading h2 {
+        margin: 0;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: clamp(18px, 2.6vw, 24px);
+      }
+
+      .back-button,
+      .back-to-main {
+        border: 1px solid rgba(110, 255, 236, 0.35);
+        background: rgba(6, 20, 30, 0.7);
+        color: rgba(234, 249, 255, 0.9);
+        padding: 10px 18px;
+        border-radius: 999px;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+      }
+
+      .back-button:hover,
+      .back-to-main:hover {
+        background: rgba(12, 40, 60, 0.85);
+        box-shadow: 0 12px 30px rgba(0, 255, 230, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .lobby-subtitle {
+        margin: 0 0 clamp(12px, 2vw, 20px);
+        color: rgba(255, 255, 255, 0.65);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 13px;
       }
 
       .title {
@@ -961,19 +1051,12 @@
         color: #6effde;
       }
 
-      .card-games-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: clamp(20px, 3vw, 28px);
-      }
-
       .card-panel {
-        display: none;
         flex-direction: column;
         gap: clamp(18px, 3vw, 24px);
       }
 
-      .card-panel.active {
+      .card-panel.game-view.active {
         display: flex;
       }
 
@@ -983,80 +1066,6 @@
         letter-spacing: 0.14em;
         text-transform: uppercase;
         font-size: 13px;
-      }
-
-      .card-grid {
-        display: grid;
-        gap: clamp(14px, 2.5vw, 22px);
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      }
-
-      .card-tile {
-        position: relative;
-        padding: clamp(18px, 2.6vw, 26px);
-        border-radius: 18px;
-        border: 1px solid rgba(110, 255, 236, 0.16);
-        background: rgba(6, 20, 32, 0.82);
-        color: rgba(234, 249, 255, 0.88);
-        font-family: 'Orbitron', sans-serif;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease, background 0.2s ease;
-        overflow: hidden;
-      }
-
-      .card-tile::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        background: radial-gradient(circle at 30% 30%, rgba(110, 255, 236, 0.18), rgba(110, 255, 236, 0));
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        pointer-events: none;
-      }
-
-      .card-tile .card-name {
-        display: block;
-        font-size: clamp(14px, 2vw, 16px);
-        margin-bottom: 10px;
-      }
-
-      .card-tile .card-meta {
-        display: block;
-        font-size: 11px;
-        letter-spacing: 0.22em;
-        color: rgba(255, 255, 255, 0.58);
-      }
-
-      .card-tile.stackjack-link {
-        border-color: rgba(110, 255, 236, 0.4);
-        background: linear-gradient(135deg, rgba(6, 32, 44, 0.95), rgba(0, 10, 22, 0.9));
-        box-shadow: 0 16px 40px rgba(0, 255, 236, 0.15);
-      }
-
-      .card-tile.stackjack-link .card-meta {
-        color: rgba(110, 255, 236, 0.85);
-      }
-
-      .card-tile:hover:not(:disabled) {
-        transform: translateY(-4px);
-        border-color: rgba(110, 255, 236, 0.4);
-        box-shadow: 0 22px 40px rgba(0, 255, 222, 0.22);
-        background: rgba(12, 44, 60, 0.9);
-      }
-
-      .card-tile:hover:not(:disabled)::after {
-        opacity: 1;
-      }
-
-      .card-tile:disabled,
-      .card-tile.coming-soon {
-        cursor: not-allowed;
-        color: rgba(255, 255, 255, 0.35);
-        border-color: rgba(110, 255, 236, 0.08);
-        background: rgba(3, 12, 20, 0.6);
       }
 
       .card-game-header {
@@ -2327,566 +2336,606 @@
   </head>
   <body>
     <div class="app-shell">
-      <header class="top-bar">
-        <div class="title" id="sectionTitle">NeonArc Casino · Rocket Line</div>
-        <nav class="section-switcher" aria-label="Game sections">
-          <button class="section-button active" data-section="skill" type="button">Skill Games</button>
-          <button class="section-button" data-section="card" type="button">Card Games</button>
-        </nav>
-        <div class="balance">Balance: $<span id="balance">1,000.00</span></div>
-      </header>
-      <main class="section-wrapper">
-        <section class="section-panel active" id="skillGamesSection" aria-label="Skill Games">
-          <div class="section-heading-row">
-            <h2 class="section-heading">Skill Games</h2>
-            <nav class="mode-switcher" aria-label="Skill game modes">
-              <button class="mode-button active" data-mode="rocket" type="button">Rocket Mode</button>
-              <button class="mode-button" data-mode="pulse" type="button">Pulse Cash</button>
-              <button class="mode-button" data-mode="mind" type="button">Mind Bet</button>
-              <button class="mode-button" data-mode="stack" id="stackCardLink" type="button">StackJack</button>
-            </nav>
-          </div>
-          <div class="mode-wrapper">
-            <section class="mode-panel active" id="rocketMode" aria-label="Rocket Mode">
-          <div class="main-layout">
-            <div class="device-shell">
-              <div class="stage idle" id="rocketStage">
-                <div class="scroll-field"></div>
-                <div class="path-wrapper">
-                  <svg class="flight-path" viewBox="0 0 600 260" preserveAspectRatio="none">
-                    <path
-                      id="pathGuide"
-                      class="path-guide"
-                      d="M40 210 Q 260 160 540 130"
-                    ></path>
-                    <path
-                      id="pathProgress"
-                      class="path-progress"
-                      d="M40 210 Q 260 160 540 130"
-                    ></path>
-                  </svg>
-                </div>
-                <div class="track-glow" id="rocketTrackGlow"></div>
-                <ul class="history" id="history"></ul>
-                <div class="potential-readout" id="potential">Potential: $0.00</div>
-                <div class="multiplier-readout">
-                  <div id="multiplier">1.00x</div>
-                  <div id="roundResult">Enter a bet to play.</div>
-                </div>
-                <div class="horizon-line"></div>
-                <div class="rocket" id="rocket">
-                  <div class="rocket-tip"></div>
-                  <div class="rocket-body"></div>
-                  <div class="rocket-fin left"></div>
-                  <div class="rocket-fin right"></div>
-                  <div class="rocket-flame"></div>
-                </div>
-              </div>
-            </div>
-            <aside class="control-panel">
-              <h2>Controls</h2>
-              <div>
-                <label for="bet">Bet Amount</label>
-                <input type="number" id="bet" min="1" step="1" value="25" />
-              </div>
-              <div class="panel-meta">
-                <span>Risk Tier: <strong id="riskTag">Balanced</strong></span>
-                <span>Round: <strong id="roundTag">Idle</strong></span>
-              </div>
-              <div class="button-row">
-                <button class="launch" id="launchBtn">Launch</button>
-                <button class="cashout" id="cashOutBtn" disabled>Cash Out</button>
-              </div>
-              <div class="risk-copy" id="riskCopy"></div>
-              <div class="status" id="status">Rocket idling on the pad.</div>
-            </aside>
-          </div>
-        </section>
-
-        <section class="mode-panel" id="pulseMode" aria-label="Pulse Cash Mode">
-          <div class="main-layout">
-            <div class="device-shell">
-              <div class="stage idle pulse-stage" id="pulseStage">
-                <div class="scroll-field"></div>
-                <div class="pulse-track">
-                  <div class="pulse-glow" id="pulseGlow"></div>
-                  <div class="pulse-line" id="pulseLine"></div>
-                </div>
-                <ul class="history" id="pulseHistory"></ul>
-                <div class="potential-readout" id="pulsePotential">Potential: $0.00</div>
-                <div class="multiplier-readout">
-                  <div id="pulseMultiplier">1.00x</div>
-                  <div id="pulseRoundResult">Enter a bet to play.</div>
-                </div>
-              </div>
-            </div>
-            <aside class="control-panel">
-              <h2>Pulse Console</h2>
-              <div>
-                <label for="pulseBet">Bet Amount</label>
-                <input type="number" id="pulseBet" min="1" step="1" value="25" />
-              </div>
-              <div class="panel-meta">
-                <span>Risk Tier: <strong id="pulseRiskTag">Balanced</strong></span>
-                <span>Round: <strong id="pulseRoundTag">Idle</strong></span>
-              </div>
-              <div class="button-row">
-                <button class="launch" id="pulseLaunchBtn">Launch Pulse</button>
-                <button class="cashout" id="pulseCashBtn" disabled>Cash Out</button>
-              </div>
-              <div class="risk-copy" id="pulseRiskCopy"></div>
-              <div class="status" id="pulseStatus">Pulse core stable.</div>
-            </aside>
-          </div>
-        </section>
-
-        <section class="mode-panel" id="mindMode" aria-label="Mind Bet Mode">
-          <div class="main-layout">
-            <div class="device-shell">
-              <div id="mindBetGame">
-                <div class="stage idle mind-stage" id="mindStage">
+      
+<header class="top-bar">
+  <div class="title" id="sectionTitle">NeonArc Casino · Main Lobby</div>
+  <div class="balance">Balance: $<span id="balance">1,000.00</span></div>
+</header>
+<main class="lobby-system">
+  <section class="lobby-view active" id="mainLobby" aria-label="Main Lobby">
+    <div class="category-grid">
+      <button class="category-panel" id="skillCategoryButton" data-category-button="skill" type="button">
+        <span class="category-label">⚡ Skill Games</span>
+        <span class="category-status">LIVE · Precision Risk</span>
+        <p class="game-description">Ride experimental rocket lines, pulse currents, mind links, and stacking towers.</p>
+      </button>
+      <button class="category-panel" id="cardCategoryButton" data-category-button="card" type="button">
+        <span class="category-label">🃏 Card Games</span>
+        <span class="category-status">LIVE · Logic &amp; Instinct</span>
+        <p class="game-description">Decode binary decks, echo timing puzzles, volatile hybrids, and perception traps.</p>
+      </button>
+    </div>
+  </section>
+  <section class="lobby-view" id="skillGamesLobby" aria-label="Skill Games Lobby">
+    <div class="lobby-heading">
+      <h2 class="section-heading">⚡ Skill Games</h2>
+      <button class="back-to-main" type="button">← Back to Main Lobby</button>
+    </div>
+    <p class="lobby-subtitle">Select a live NeonArc skill run.</p>
+    <div class="game-grid">
+      <button class="game-tile" data-game="rocket" type="button">
+        <span class="game-title">Rocket Line</span>
+        <span class="game-status">LIVE · Ride the arc</span>
+        <p class="game-description">Launch and cash out before the arc destabilizes.</p>
+      </button>
+      <button class="game-tile" data-game="pulse" type="button">
+        <span class="game-title">Pulse Cash</span>
+        <span class="game-status">LIVE · Keep the rhythm</span>
+        <p class="game-description">Surf a traveling pulse and exit before overload.</p>
+      </button>
+      <button class="game-tile" data-game="mind" type="button">
+        <span class="game-title">Mind Bet</span>
+        <span class="game-status">LIVE · Sync the AI</span>
+        <p class="game-description">Link with the observing AI and read its mood swings.</p>
+      </button>
+      <button class="game-tile" data-game="stack" type="button">
+        <span class="game-title">StackJack</span>
+        <span class="game-status">LIVE · Balance the tower</span>
+        <p class="game-description">Stack volatile cores and steady the tower before it collapses.</p>
+      </button>
+    </div>
+  </section>
+  <section class="lobby-view" id="cardGamesLobby" aria-label="Card Games Lobby">
+    <div class="lobby-heading">
+      <h2 class="section-heading">🃏 Card Games</h2>
+      <button class="back-to-main" type="button">← Back to Main Lobby</button>
+    </div>
+    <p class="card-intro">Select a NeonArc card experience. All decks are live and pulsing.</p>
+    <div class="game-grid">
+      <button class="game-tile" data-game="binaryPoker" type="button">
+        <span class="game-title">Binary Poker</span>
+        <span class="game-status">LIVE · Flip a Bit</span>
+        <p class="game-description">Craft five-bit hands to match the hidden target string.</p>
+      </button>
+      <button class="game-tile" data-game="echoHand" type="button">
+        <span class="game-title">Echo Hand</span>
+        <span class="game-status">LIVE · Time Your Echoes</span>
+        <p class="game-description">Chain delayed cards and hold before the echo storm hits.</p>
+      </button>
+      <button class="game-tile" data-game="fuse" type="button">
+        <span class="game-title">Fuse</span>
+        <span class="game-status">LIVE · Combine and Contain</span>
+        <p class="game-description">Merge unstable hybrids while keeping the reactor sealed.</p>
+      </button>
+      <button class="game-tile" data-game="perception" type="button">
+        <span class="game-title">Perception</span>
+        <span class="game-status">LIVE · Trust Nothing</span>
+        <p class="game-description">Scan deceitful cards and decide when to trust the grid.</p>
+      </button>
+    </div>
+  </section>
+  <section class="game-view" id="rocketMode" aria-label="Rocket Line">
+  <div class="game-heading">
+    <button class="back-button" data-back-lobby="skill" type="button">← Back to Skill Lobby</button>
+    <h2>Rocket Line</h2>
+  </div>
+            <div class="main-layout">
+              <div class="device-shell">
+                <div class="stage idle" id="rocketStage">
                   <div class="scroll-field"></div>
-                  <div class="mind-glitch" id="mindGlitch"></div>
-                  <div class="ai-face" id="aiFace">
-                    <div class="ai-emotion" id="aiEmotion">😌</div>
+                  <div class="path-wrapper">
+                    <svg class="flight-path" viewBox="0 0 600 260" preserveAspectRatio="none">
+                      <path
+                        id="pathGuide"
+                        class="path-guide"
+                        d="M40 210 Q 260 160 540 130"
+                      ></path>
+                      <path
+                        id="pathProgress"
+                        class="path-progress"
+                        d="M40 210 Q 260 160 540 130"
+                      ></path>
+                    </svg>
                   </div>
-                  <div class="mind-mood" id="mindMood">AI calm and observant.</div>
-                  <ul class="history" id="mindHistory"></ul>
-                  <div class="potential-readout" id="mindPotential">Potential: $0.00</div>
+                  <div class="track-glow" id="rocketTrackGlow"></div>
+                  <ul class="history" id="history"></ul>
+                  <div class="potential-readout" id="potential">Potential: $0.00</div>
                   <div class="multiplier-readout">
-                    <div id="mindMultiplier">1.00x</div>
-                    <div id="mindRoundResult">Sync a wager to begin.</div>
+                    <div id="multiplier">1.00x</div>
+                    <div id="roundResult">Enter a bet to play.</div>
+                  </div>
+                  <div class="horizon-line"></div>
+                  <div class="rocket" id="rocket">
+                    <div class="rocket-tip"></div>
+                    <div class="rocket-body"></div>
+                    <div class="rocket-fin left"></div>
+                    <div class="rocket-fin right"></div>
+                    <div class="rocket-flame"></div>
                   </div>
                 </div>
               </div>
+              <aside class="control-panel">
+                <h2>Controls</h2>
+                <div>
+                  <label for="bet">Bet Amount</label>
+                  <input type="number" id="bet" min="1" step="1" value="25" />
+                </div>
+                <div class="panel-meta">
+                  <span>Risk Tier: <strong id="riskTag">Balanced</strong></span>
+                  <span>Round: <strong id="roundTag">Idle</strong></span>
+                </div>
+                <div class="button-row">
+                  <button class="launch" id="launchBtn">Launch</button>
+                  <button class="cashout" id="cashOutBtn" disabled>Cash Out</button>
+                </div>
+                <div class="risk-copy" id="riskCopy"></div>
+                <div class="status" id="status">Rocket idling on the pad.</div>
+              </aside>
             </div>
-            <aside class="control-panel">
-              <h2>Mind Console</h2>
-              <div>
-                <label for="mindBet">Bet Amount</label>
-                <input type="number" id="mindBet" min="1" step="1" value="25" />
-              </div>
-              <div class="panel-meta">
-                <span>Signal Read: <strong id="mindSignalTag">Calibrating</strong></span>
-                <span>Round: <strong id="mindRoundTag">Idle</strong></span>
-              </div>
-              <div class="button-row">
-                <button class="launch" id="mindStartBtn">Start Mind Bet</button>
-                <button class="cashout" id="mindCashBtn" disabled>Cash Out</button>
-              </div>
-              <div class="risk-copy" id="mindInsight"></div>
-              <div class="status" id="mindStatus">Interface standing by.</div>
-            </aside>
-          </div>
-        </section>
-        <section class="mode-panel" id="stackMode" aria-label="StackJack Mode">
-          <div class="main-layout">
-            <div class="device-shell">
-              <div class="stage idle stack-stage" id="stackStage">
-                <div class="stack-grid" id="stackJackGame">
-                  <div class="stack-column">
-                    <div class="stack-area" id="stackArea">
-                      <div class="stack-tower" id="stackTower"></div>
-                      <div class="stack-base"></div>
-                      <div class="stack-bust" id="stackBust">BUSTED!</div>
-                    </div>
-                    <div class="stack-hud">
-                      <div>
-                        Stack Total
-                        <strong id="stackTotalValue">0</strong>
-                      </div>
-                      <div>
-                        Potential
-                        <strong id="stackPotential">$0.00</strong>
-                      </div>
-                    </div>
+          </section>
+  <section class="game-view" id="pulseMode" aria-label="Pulse Cash">
+  <div class="game-heading">
+    <button class="back-button" data-back-lobby="skill" type="button">← Back to Skill Lobby</button>
+    <h2>Pulse Cash</h2>
+  </div>
+            <div class="main-layout">
+              <div class="device-shell">
+                <div class="stage idle pulse-stage" id="pulseStage">
+                  <div class="scroll-field"></div>
+                  <div class="pulse-track">
+                    <div class="pulse-glow" id="pulseGlow"></div>
+                    <div class="pulse-line" id="pulseLine"></div>
                   </div>
-                  <div class="instability-panel">
-                    <div class="instability-meter">
-                      <div class="meter-track">
-                        <div class="meter-fill" id="instabilityFill"></div>
-                      </div>
-                      <span class="instability-value" id="instabilityValue">0%</span>
-                    </div>
-                    <p>Instability builds with each hit. Balance once per round to steady the tower.</p>
+                  <ul class="history" id="pulseHistory"></ul>
+                  <div class="potential-readout" id="pulsePotential">Potential: $0.00</div>
+                  <div class="multiplier-readout">
+                    <div id="pulseMultiplier">1.00x</div>
+                    <div id="pulseRoundResult">Enter a bet to play.</div>
                   </div>
                 </div>
-                <div class="stack-status" id="stackStatus">Enter a bet to begin.</div>
               </div>
-            </div>
-            <aside class="control-panel">
-              <h2>StackJack Console</h2>
-              <div>
-                <label for="stackBet">Bet Amount</label>
-                <input type="number" id="stackBet" min="1" step="1" value="25" />
-              </div>
-              <div class="panel-meta">
-                <span>Total: <strong id="stackTotalLabel">0</strong></span>
-                <span>Instability: <strong id="stackInstabilityLabel">0%</strong></span>
-              </div>
-              <div class="button-row">
-                <button class="launch" id="stackStartBtn">Start StackJack</button>
-                <button class="ghost-button" id="stackBalanceBtn" disabled>Balance Tower</button>
-              </div>
-              <div class="button-row">
-                <button class="launch" id="stackHitBtn" disabled>Hit</button>
-                <button class="cashout" id="stackHoldBtn" disabled>Hold</button>
-              </div>
-              <div class="status" id="stackConsoleStatus">Stack tower idle.</div>
-            </aside>
-          </div>
-        </section>
-      </div>
-    </section>
-    <section class="section-panel" id="cardGamesSection" aria-label="Card Games">
-      <div class="section-heading-row">
-        <h2 class="section-heading">Card Games</h2>
-      </div>
-      <div class="card-games-wrapper">
-        <div class="card-panel active" id="cardLobby">
-          <p class="card-intro">
-            Select a NeonArc card experience. Binary Poker and Echo Hand are live; future decks are warming up.
-          </p>
-          <div class="card-grid">
-            <button class="card-tile card-game-tile" data-game="binaryPoker" type="button">
-              <span class="card-name">Binary Poker</span>
-              <span class="card-meta">Live · Flip a bit</span>
-            </button>
-            <button class="card-tile card-game-tile" data-game="echoHand" type="button">
-              <span class="card-name">Echo Hand</span>
-              <span class="card-meta">Live · Time your echoes</span>
-            </button>
-            <button class="card-tile card-game-tile" data-game="fuse" type="button">
-              <span class="card-name">FUSE — COMBINE AND CONTAIN</span>
-              <span class="card-meta">Live · Reactive hybrids</span>
-            </button>
-            <button class="card-tile card-game-tile" data-game="perception" type="button">
-              <span class="card-name">PERCEPTION — TRUST NOTHING</span>
-              <span class="card-meta">LIVE – TRUST NOTHING</span>
-            </button>
-          </div>
-        </div>
-        <div class="card-panel" id="binaryPokerGame">
-          <div class="card-game-header">
-            <button class="ghost-button card-back-button" id="cardBackBtn" type="button">← Back to Card Lobby</button>
-            <div class="card-game-title-group">
-              <div class="card-game-title">Binary Poker</div>
-              <button
-                class="binary-info-button"
-                id="binaryInfoButton"
-                type="button"
-                aria-expanded="false"
-                aria-controls="binaryInstructionsBody"
-                aria-label="Toggle Binary Poker instructions"
-              >
-                ?
-              </button>
-            </div>
-          </div>
-          <div class="main-layout card-layout">
-            <div class="device-shell">
-              <div class="stage idle binary-stage" id="binaryStage">
-                <div class="scroll-field"></div>
-                <div class="binary-hand" id="binaryHand">
-                  <div class="binary-placeholder">Deal a hand to reveal five binary cards.</div>
+              <aside class="control-panel">
+                <h2>Pulse Console</h2>
+                <div>
+                  <label for="pulseBet">Bet Amount</label>
+                  <input type="number" id="pulseBet" min="1" step="1" value="25" />
                 </div>
-                <div class="binary-target" id="binaryTarget">Target encoded. Flip a bit or lock in.</div>
-              </div>
+                <div class="panel-meta">
+                  <span>Risk Tier: <strong id="pulseRiskTag">Balanced</strong></span>
+                  <span>Round: <strong id="pulseRoundTag">Idle</strong></span>
+                </div>
+                <div class="button-row">
+                  <button class="launch" id="pulseLaunchBtn">Launch Pulse</button>
+                  <button class="cashout" id="pulseCashBtn" disabled>Cash Out</button>
+                </div>
+                <div class="risk-copy" id="pulseRiskCopy"></div>
+                <div class="status" id="pulseStatus">Pulse core stable.</div>
+              </aside>
             </div>
-            <aside class="control-panel card-controls">
-              <h2>Binary Poker</h2>
-              <div class="binary-instructions" id="binaryInstructions">
+          </section>
+  <section class="game-view" id="mindMode" aria-label="Mind Bet">
+  <div class="game-heading">
+    <button class="back-button" data-back-lobby="skill" type="button">← Back to Skill Lobby</button>
+    <h2>Mind Bet</h2>
+  </div>
+            <div class="main-layout">
+              <div class="device-shell">
+                <div id="mindBetGame">
+                  <div class="stage idle mind-stage" id="mindStage">
+                    <div class="scroll-field"></div>
+                    <div class="mind-glitch" id="mindGlitch"></div>
+                    <div class="ai-face" id="aiFace">
+                      <div class="ai-emotion" id="aiEmotion">😌</div>
+                    </div>
+                    <div class="mind-mood" id="mindMood">AI calm and observant.</div>
+                    <ul class="history" id="mindHistory"></ul>
+                    <div class="potential-readout" id="mindPotential">Potential: $0.00</div>
+                    <div class="multiplier-readout">
+                      <div id="mindMultiplier">1.00x</div>
+                      <div id="mindRoundResult">Sync a wager to begin.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <aside class="control-panel">
+                <h2>Mind Console</h2>
+                <div>
+                  <label for="mindBet">Bet Amount</label>
+                  <input type="number" id="mindBet" min="1" step="1" value="25" />
+                </div>
+                <div class="panel-meta">
+                  <span>Signal Read: <strong id="mindSignalTag">Calibrating</strong></span>
+                  <span>Round: <strong id="mindRoundTag">Idle</strong></span>
+                </div>
+                <div class="button-row">
+                  <button class="launch" id="mindStartBtn">Start Mind Bet</button>
+                  <button class="cashout" id="mindCashBtn" disabled>Cash Out</button>
+                </div>
+                <div class="risk-copy" id="mindInsight"></div>
+                <div class="status" id="mindStatus">Interface standing by.</div>
+              </aside>
+            </div>
+          </section>
+  <section class="game-view" id="stackMode" aria-label="StackJack">
+  <div class="game-heading">
+    <button class="back-button" data-back-lobby="skill" type="button">← Back to Skill Lobby</button>
+    <h2>StackJack</h2>
+  </div>
+            <div class="main-layout">
+              <div class="device-shell">
+                <div class="stage idle stack-stage" id="stackStage">
+                  <div class="stack-grid" id="stackJackGame">
+                    <div class="stack-column">
+                      <div class="stack-area" id="stackArea">
+                        <div class="stack-tower" id="stackTower"></div>
+                        <div class="stack-base"></div>
+                        <div class="stack-bust" id="stackBust">BUSTED!</div>
+                      </div>
+                      <div class="stack-hud">
+                        <div>
+                          Stack Total
+                          <strong id="stackTotalValue">0</strong>
+                        </div>
+                        <div>
+                          Potential
+                          <strong id="stackPotential">$0.00</strong>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="instability-panel">
+                      <div class="instability-meter">
+                        <div class="meter-track">
+                          <div class="meter-fill" id="instabilityFill"></div>
+                        </div>
+                        <span class="instability-value" id="instabilityValue">0%</span>
+                      </div>
+                      <p>Instability builds with each hit. Balance once per round to steady the tower.</p>
+                    </div>
+                  </div>
+                  <div class="stack-status" id="stackStatus">Enter a bet to begin.</div>
+                </div>
+              </div>
+              <aside class="control-panel">
+                <h2>StackJack Console</h2>
+                <div>
+                  <label for="stackBet">Bet Amount</label>
+                  <input type="number" id="stackBet" min="1" step="1" value="25" />
+                </div>
+                <div class="panel-meta">
+                  <span>Total: <strong id="stackTotalLabel">0</strong></span>
+                  <span>Instability: <strong id="stackInstabilityLabel">0%</strong></span>
+                </div>
+                <div class="button-row">
+                  <button class="launch" id="stackStartBtn">Start StackJack</button>
+                  <button class="ghost-button" id="stackBalanceBtn" disabled>Balance Tower</button>
+                </div>
+                <div class="button-row">
+                  <button class="launch" id="stackHitBtn" disabled>Hit</button>
+                  <button class="cashout" id="stackHoldBtn" disabled>Hold</button>
+                </div>
+                <div class="status" id="stackConsoleStatus">Stack tower idle.</div>
+              </aside>
+            </div>
+          </section>
+  <section class="game-view card-panel" id="binaryPokerGame">
+            <div class="game-heading card-game-header">
+              <button class="back-button card-back-button" data-back-lobby="card" id="cardBackBtn" type="button">← Back to Card Lobby</button>
+              <div class="card-game-title-group">
+                <div class="card-game-title">Binary Poker</div>
                 <button
-                  class="binary-instructions-toggle"
-                  id="binaryInstructionsToggle"
+                  class="binary-info-button"
+                  id="binaryInfoButton"
                   type="button"
                   aria-expanded="false"
                   aria-controls="binaryInstructionsBody"
+                  aria-label="Toggle Binary Poker instructions"
                 >
-                  <span class="toggle-label">How to Play</span>
-                  <span class="toggle-state" aria-hidden="true">▼</span>
+                  ?
                 </button>
-                <div class="binary-instructions-body" id="binaryInstructionsBody" hidden>
-                  <p class="binary-instructions-intro">
-                    Objective: Build the closest possible binary hand to the hidden target number.
-                  </p>
-                  <h3>Gameplay Steps</h3>
-                  <ol>
-                    <li>Enter your bet and click <strong>Deal Hand</strong>.</li>
-                    <li>You receive 5 binary cards (each with 4 bits).</li>
-                    <li>The system secretly generates a target 4-bit number (e.g., 1101).</li>
-                    <li>You may flip one bit on one of your cards to improve your match.</li>
-                    <li>Click <strong>Lock In</strong> to finalize.</li>
-                    <li>Your hand’s numerical value is compared to the target.</li>
-                    <li>Closer = bigger payout.</li>
-                  </ol>
-                  <h3>Payouts</h3>
-                  <ul>
-                    <li><strong>Exact match</strong> → 5× payout</li>
-                    <li><strong>1-bit difference</strong> → 3× payout</li>
-                    <li><strong>2-bit difference</strong> → 1.5× payout</li>
-                    <li><strong>More than 2 bits</strong> → lose the bet.</li>
-                  </ul>
-                  <p class="binary-instructions-tip">
-                    <strong>Strategy Tip:</strong> Try to read patterns — certain sequences tend to appear more often.
-                  </p>
-                </div>
-              </div>
-              <div>
-                <label for="binaryBet">Bet Amount</label>
-                <input type="number" id="binaryBet" min="1" step="1" value="20" />
-              </div>
-              <div class="panel-meta">
-                <span>Active Card: <strong id="binaryActiveLabel">--</strong></span>
-                <span>Flips Left: <strong id="binaryFlipInfo">1</strong></span>
-              </div>
-              <div class="button-row">
-                <button class="launch" id="binaryStart">Deal Hand</button>
-                <button class="cashout" id="binaryLock" disabled>Lock In</button>
-              </div>
-              <div class="status" id="binaryStatus">Set your wager and deal a binary hand.</div>
-            </aside>
-          </div>
-        </div>
-        <div class="card-panel" id="echoHandGame">
-          <div class="card-game-header">
-            <button class="ghost-button card-back-button" type="button">← Back to Card Lobby</button>
-            <div class="card-game-title-group">
-              <div class="card-game-title">Echo Hand</div>
-              <div class="card-game-subtitle">Live · Time your echoes</div>
-            </div>
-          </div>
-          <div class="main-layout card-layout">
-            <div class="device-shell">
-              <div class="stage idle echo-stage" id="echoStage">
-                <div class="echo-wave-layer" id="echoWaveLayer"></div>
-                <div class="echo-cards" id="echoCardsArea">
-                  <div class="echo-placeholder">Charge a hand to watch echoes rebound.</div>
-                </div>
-                <div class="echo-total-readout">
-                  <div class="label">Total</div>
-                  <div class="value" id="echoTotalValue">0</div>
-                  <div class="pending" id="echoPendingEchoes">0 echoes queued</div>
-                </div>
               </div>
             </div>
-            <aside class="control-panel card-controls">
-              <h2>Echo Hand</h2>
-              <div class="binary-instructions echo-instructions" id="echoInstructions">
-                <button
-                  class="binary-instructions-toggle"
-                  id="echoInstructionsToggle"
-                  type="button"
-                  aria-expanded="false"
-                  aria-controls="echoInstructionsBody"
-                >
-                  <span class="toggle-label">How Echo Hand Works</span>
-                  <span class="toggle-state" aria-hidden="true">▼</span>
-                </button>
-                <div class="binary-instructions-body" id="echoInstructionsBody" hidden>
-                  <p class="binary-instructions-intro">
-                    Objective: Finish with a total of 21 or less after every delayed echo resolves.
-                  </p>
-                  <h3>Gameplay Loop</h3>
-                  <ol>
-                    <li>Enter your bet and click <strong>Start Hand</strong> to draw four opening cards.</li>
-                    <li>Each card shows a value (1–10) and automatically schedules an echo two turns later.</li>
-                    <li>Use <strong>Draw</strong> to add new cards—each new card pushes the echo queue forward.</li>
-                    <li>
-                      When a card’s delay expires, an Echo Wave pulses, replaying its value into your total. Waves can
-                      chain as you keep drawing.
-                    </li>
-                    <li>
-                      Hit <strong>Hold</strong> to stop drawing and let the remaining echoes resolve. If your total ever
-                      breaks 21, the round busts immediately.
-                    </li>
-                  </ol>
-                  <h3>Payouts</h3>
-                  <ul>
-                    <li><strong>Bust (total &gt; 21)</strong> → lose the wager.</li>
-                    <li>
-                      <strong>Hold without busting</strong> → payout = bet × (final total ÷ 21) × 2. Bigger totals (without
-                      busting) pay more.
-                    </li>
-                  </ul>
-                  <p class="binary-instructions-tip">
-                    <strong>Timing Tip:</strong> Track the queue label—if several echoes are stacked, holding early can
-                    prevent an overcharge.
-                  </p>
-                </div>
-              </div>
-              <p class="echo-copy">Draw carefully: each card repeats two turns later. Hold to ride out remaining waves.</p>
-              <div>
-                <label for="echoBet">Bet Amount</label>
-                <input type="number" id="echoBet" min="1" step="1" value="25" />
-              </div>
-              <div class="panel-meta">
-                <span>Turns: <strong id="echoTurnCount">0</strong></span>
-                <span>Queued: <strong id="echoQueuedLabel">0</strong></span>
-              </div>
-              <div class="button-row echo-button-row">
-                <button class="launch" id="echoStart">Start Hand</button>
-                <button class="cashout" id="echoHold" disabled>Hold</button>
-              </div>
-              <button class="launch echo-draw-button" id="echoDraw" disabled>Draw</button>
-              <div class="status echo-status" id="echoStatus">Set a wager to feel the echoes.</div>
-              <div class="status echo-result" id="echoResult">Awaiting hand.</div>
-            </aside>
-          </div>
-        </div>
-        <div class="card-panel" id="fuseGame">
-          <div class="card-game-header">
-            <button class="ghost-button card-back-button" type="button">← Back to Card Lobby</button>
-            <div class="card-game-title-group">
-              <div class="card-game-title">Fuse</div>
-              <div class="card-game-subtitle">Live · Combine and contain</div>
-            </div>
-          </div>
-          <div class="main-layout card-layout">
-            <div class="device-shell">
-              <div class="stage idle fuse-stage" id="fuseStage">
-                <div class="fuse-overlay" id="fuseOverlay">OVERLOAD</div>
-                <div class="fuse-meter-shell">
-                  <div class="fuse-meter-label">Instability Threshold</div>
-                  <div class="fuse-meter-bar">
-                    <div class="fuse-meter-fill" id="fuseMeterFill"></div>
+            <div class="main-layout card-layout">
+              <div class="device-shell">
+                <div class="stage idle binary-stage" id="binaryStage">
+                  <div class="scroll-field"></div>
+                  <div class="binary-hand" id="binaryHand">
+                    <div class="binary-placeholder">Deal a hand to reveal five binary cards.</div>
                   </div>
-                  <div class="fuse-meter-value" id="fuseMeterValue">0.0 / 10</div>
-                </div>
-                <div class="fuse-card-grid" id="fuseCardGrid">
-                  <div class="fuse-placeholder">Start Fuse to reveal volatile cards.</div>
+                  <div class="binary-target" id="binaryTarget">Target encoded. Flip a bit or lock in.</div>
                 </div>
               </div>
+              <aside class="control-panel card-controls">
+                <h2>Binary Poker</h2>
+                <div class="binary-instructions" id="binaryInstructions">
+                  <button
+                    class="binary-instructions-toggle"
+                    id="binaryInstructionsToggle"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="binaryInstructionsBody"
+                  >
+                    <span class="toggle-label">How to Play</span>
+                    <span class="toggle-state" aria-hidden="true">▼</span>
+                  </button>
+                  <div class="binary-instructions-body" id="binaryInstructionsBody" hidden>
+                    <p class="binary-instructions-intro">
+                      Objective: Build the closest possible binary hand to the hidden target number.
+                    </p>
+                    <h3>Gameplay Steps</h3>
+                    <ol>
+                      <li>Enter your bet and click <strong>Deal Hand</strong>.</li>
+                      <li>You receive 5 binary cards (each with 4 bits).</li>
+                      <li>The system secretly generates a target 4-bit number (e.g., 1101).</li>
+                      <li>You may flip one bit on one of your cards to improve your match.</li>
+                      <li>Click <strong>Lock In</strong> to finalize.</li>
+                      <li>Your hand’s numerical value is compared to the target.</li>
+                      <li>Closer = bigger payout.</li>
+                    </ol>
+                    <h3>Payouts</h3>
+                    <ul>
+                      <li><strong>Exact match</strong> → 5× payout</li>
+                      <li><strong>1-bit difference</strong> → 3× payout</li>
+                      <li><strong>2-bit difference</strong> → 1.5× payout</li>
+                      <li><strong>More than 2 bits</strong> → lose the bet.</li>
+                    </ul>
+                    <p class="binary-instructions-tip">
+                      <strong>Strategy Tip:</strong> Try to read patterns — certain sequences tend to appear more often.
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <label for="binaryBet">Bet Amount</label>
+                  <input type="number" id="binaryBet" min="1" step="1" value="20" />
+                </div>
+                <div class="panel-meta">
+                  <span>Active Card: <strong id="binaryActiveLabel">--</strong></span>
+                  <span>Flips Left: <strong id="binaryFlipInfo">1</strong></span>
+                </div>
+                <div class="button-row">
+                  <button class="launch" id="binaryStart">Deal Hand</button>
+                  <button class="cashout" id="binaryLock" disabled>Lock In</button>
+                </div>
+                <div class="status" id="binaryStatus">Set your wager and deal a binary hand.</div>
+              </aside>
             </div>
-            <aside class="control-panel card-controls">
-              <h2>Fuse</h2>
-              <p class="fuse-copy">Select two cards to merge their power. Keep the instability below 10 or the core explodes.</p>
-              <div class="binary-instructions fuse-instructions" id="fuseInstructions">
-                <button
-                  class="binary-instructions-toggle"
-                  id="fuseInstructionsToggle"
-                  type="button"
-                  aria-expanded="false"
-                  aria-controls="fuseInstructionsBody"
-                >
-                  <span class="toggle-label">How Fuse Works</span>
-                  <span class="toggle-state" aria-hidden="true">▼</span>
-                </button>
-                <div class="binary-instructions-body" id="fuseInstructionsBody" hidden>
-                  <p>
-                    Click <strong>Start Fuse</strong> to draw three charged cards. Select any two active cards and
-                    press <strong>Fuse Selected</strong> to combine them into a hybrid. Repeat until you're satisfied,
-                    then <strong>Hold</strong> to cash out the remaining energy.
-                  </p>
+          </section>
+  <section class="game-view card-panel" id="echoHandGame">
+            <div class="game-heading card-game-header">
+              <button class="back-button card-back-button" data-back-lobby="card" type="button">← Back to Card Lobby</button>
+              <div class="card-game-title-group">
+                <div class="card-game-title">Echo Hand</div>
+                <div class="card-game-subtitle">Live · Time your echoes</div>
+              </div>
+            </div>
+            <div class="main-layout card-layout">
+              <div class="device-shell">
+                <div class="stage idle echo-stage" id="echoStage">
+                  <div class="echo-wave-layer" id="echoWaveLayer"></div>
+                  <div class="echo-cards" id="echoCardsArea">
+                    <div class="echo-placeholder">Charge a hand to watch echoes rebound.</div>
+                  </div>
+                  <div class="echo-total-readout">
+                    <div class="label">Total</div>
+                    <div class="value" id="echoTotalValue">0</div>
+                    <div class="pending" id="echoPendingEchoes">0 echoes queued</div>
+                  </div>
+                </div>
+              </div>
+              <aside class="control-panel card-controls">
+                <h2>Echo Hand</h2>
+                <div class="binary-instructions echo-instructions" id="echoInstructions">
+                  <button
+                    class="binary-instructions-toggle"
+                    id="echoInstructionsToggle"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="echoInstructionsBody"
+                  >
+                    <span class="toggle-label">How Echo Hand Works</span>
+                    <span class="toggle-state" aria-hidden="true">▼</span>
+                  </button>
+                  <div class="binary-instructions-body" id="echoInstructionsBody" hidden>
+                    <p class="binary-instructions-intro">
+                      Objective: Finish with a total of 21 or less after every delayed echo resolves.
+                    </p>
+                    <h3>Gameplay Loop</h3>
+                    <ol>
+                      <li>Enter your bet and click <strong>Start Hand</strong> to draw four opening cards.</li>
+                      <li>Each card shows a value (1–10) and automatically schedules an echo two turns later.</li>
+                      <li>Use <strong>Draw</strong> to add new cards—each new card pushes the echo queue forward.</li>
+                      <li>
+                        When a card’s delay expires, an Echo Wave pulses, replaying its value into your total. Waves can
+                        chain as you keep drawing.
+                      </li>
+                      <li>
+                        Hit <strong>Hold</strong> to stop drawing and let the remaining echoes resolve. If your total ever
+                        breaks 21, the round busts immediately.
+                      </li>
+                    </ol>
+                    <h3>Payouts</h3>
+                    <ul>
+                      <li><strong>Bust (total &gt; 21)</strong> → lose the wager.</li>
+                      <li>
+                        <strong>Hold without busting</strong> → payout = bet × (final total ÷ 21) × 2. Bigger totals (without
+                        busting) pay more.
+                      </li>
+                    </ul>
+                    <p class="binary-instructions-tip">
+                      <strong>Timing Tip:</strong> Track the queue label—if several echoes are stacked, holding early can
+                      prevent an overcharge.
+                    </p>
+                  </div>
+                </div>
+                <p class="echo-copy">Draw carefully: each card repeats two turns later. Hold to ride out remaining waves.</p>
+                <div>
+                  <label for="echoBet">Bet Amount</label>
+                  <input type="number" id="echoBet" min="1" step="1" value="25" />
+                </div>
+                <div class="panel-meta">
+                  <span>Turns: <strong id="echoTurnCount">0</strong></span>
+                  <span>Queued: <strong id="echoQueuedLabel">0</strong></span>
+                </div>
+                <div class="button-row echo-button-row">
+                  <button class="launch" id="echoStart">Start Hand</button>
+                  <button class="cashout" id="echoHold" disabled>Hold</button>
+                </div>
+                <button class="launch echo-draw-button" id="echoDraw" disabled>Draw</button>
+                <div class="status echo-status" id="echoStatus">Set a wager to feel the echoes.</div>
+                <div class="status echo-result" id="echoResult">Awaiting hand.</div>
+              </aside>
+            </div>
+          </section>
+  <section class="game-view card-panel" id="fuseGame">
+            <div class="game-heading card-game-header">
+              <button class="back-button card-back-button" data-back-lobby="card" type="button">← Back to Card Lobby</button>
+              <div class="card-game-title-group">
+                <div class="card-game-title">Fuse</div>
+                <div class="card-game-subtitle">Live · Combine and contain</div>
+              </div>
+            </div>
+            <div class="main-layout card-layout">
+              <div class="device-shell">
+                <div class="stage idle fuse-stage" id="fuseStage">
+                  <div class="fuse-overlay" id="fuseOverlay">OVERLOAD</div>
+                  <div class="fuse-meter-shell">
+                    <div class="fuse-meter-label">Instability Threshold</div>
+                    <div class="fuse-meter-bar">
+                      <div class="fuse-meter-fill" id="fuseMeterFill"></div>
+                    </div>
+                    <div class="fuse-meter-value" id="fuseMeterValue">0.0 / 10</div>
+                  </div>
+                  <div class="fuse-card-grid" id="fuseCardGrid">
+                    <div class="fuse-placeholder">Start Fuse to reveal volatile cards.</div>
+                  </div>
+                </div>
+              </div>
+              <aside class="control-panel card-controls">
+                <h2>Fuse</h2>
+                <p class="fuse-copy">Select two cards to merge their power. Keep the instability below 10 or the core explodes.</p>
+                <div class="binary-instructions fuse-instructions" id="fuseInstructions">
+                  <button
+                    class="binary-instructions-toggle"
+                    id="fuseInstructionsToggle"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="fuseInstructionsBody"
+                  >
+                    <span class="toggle-label">How Fuse Works</span>
+                    <span class="toggle-state" aria-hidden="true">▼</span>
+                  </button>
+                  <div class="binary-instructions-body" id="fuseInstructionsBody" hidden>
+                    <p>
+                      Click <strong>Start Fuse</strong> to draw three charged cards. Select any two active cards and
+                      press <strong>Fuse Selected</strong> to combine them into a hybrid. Repeat until you're satisfied,
+                      then <strong>Hold</strong> to cash out the remaining energy.
+                    </p>
+                    <ol>
+                      <li>
+                        <strong>Prime</strong>: Enter a wager, press <em>Start Fuse</em>, and study the three glowing cards
+                        (each shows a suit and power value from 1–10).
+                      </li>
+                      <li>
+                        <strong>Select</strong>: Tap two active cards. Their outlines light up to confirm the upcoming
+                        merge. Hybrid cards remain in play and can be paired with the third card if desired.
+                      </li>
+                      <li>
+                        <strong>Fuse</strong>: Instability = (value A + value B) ÷ 2 + the suit interaction modifier. Suit
+                        effects: ♠ + ♥ = +2 · ♦ + ♣ = –1 · ♥ + ♦ = 0 · ♣ + ♠ = +1. All other pairings are neutral.
+                      </li>
+                      <li>
+                        <strong>Contain</strong>: If instability climbs above 10 the hybrid explodes and the round is
+                        lost. Otherwise the fused value is added to your total and instability meter.
+                      </li>
+                      <li>
+                        <strong>Hold</strong>: After at least one successful hybrid, press Hold to lock in
+                        <code>final score = total fused value × (1 – total instability ÷ 20)</code>. Payout = bet ×
+                        (final score ÷ 21) × 2.
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+                <div>
+                  <label for="fuseBet">Bet Amount</label>
+                  <input type="number" id="fuseBet" min="1" step="1" value="25" />
+                </div>
+                <div class="panel-meta">
+                  <span>Hybrids: <strong id="fuseHybridCount">0</strong></span>
+                  <span>Instability: <strong id="fuseInstabilityLabel">0.0</strong></span>
+                </div>
+                <div class="button-row">
+                  <button class="launch" id="fuseStart">Start Fuse</button>
+                  <button class="ghost-button" id="fuseFuseSelected" disabled>Fuse Selected</button>
+                </div>
+                <button class="cashout" id="fuseHold" disabled>Hold</button>
+                <div class="status fuse-status" id="fuseStatus">Prime a wager to begin.</div>
+                <div class="status fuse-result" id="fuseResult">Awaiting fusion.</div>
+              </aside>
+            </div>
+          </section>
+  <section class="game-view card-panel" id="perceptionGame">
+            <div class="game-heading card-game-header">
+              <button class="back-button card-back-button" data-back-lobby="card" type="button">← Back to Card Lobby</button>
+              <div class="card-game-title-group">
+                <div class="card-game-title">Perception</div>
+                <div class="card-game-subtitle">Live · Trust Nothing</div>
+              </div>
+            </div>
+            <div class="main-layout card-layout">
+              <div class="device-shell">
+                <div class="stage idle perception-stage" id="perceptionStage">
+                  <div class="perception-card-grid" id="perceptionCardsArea">
+                    <div class="perception-placeholder">Start Perception to pull four suspicious cards.</div>
+                  </div>
+                </div>
+              </div>
+              <aside class="control-panel card-controls">
+                <h2>Perception</h2>
+                <p class="perception-copy">
+                  Four cards broadcast numbers and colors — but some signals lie. Spend limited scans to detect
+                  illusions, then decide when to trust the spread. More truthful cards mean larger payouts.
+                </p>
+                <div class="perception-instructions">
+                  <h3>How to Read the Grid</h3>
                   <ol>
+                    <li>Enter a bet and press <strong>Start Perception</strong> to draw four cards.</li>
                     <li>
-                      <strong>Prime</strong>: Enter a wager, press <em>Start Fuse</em>, and study the three glowing cards
-                      (each shows a suit and power value from 1–10).
+                      Each <strong>Analyze</strong> scan (max 2) costs 10% of your wager and tells you if that card is
+                      truthful or an illusion.
                     </li>
-                    <li>
-                      <strong>Select</strong>: Tap two active cards. Their outlines light up to confirm the upcoming
-                      merge. Hybrid cards remain in play and can be paired with the third card if desired.
-                    </li>
-                    <li>
-                      <strong>Fuse</strong>: Instability = (value A + value B) ÷ 2 + the suit interaction modifier. Suit
-                      effects: ♠ + ♥ = +2 · ♦ + ♣ = –1 · ♥ + ♦ = 0 · ♣ + ♠ = +1. All other pairings are neutral.
-                    </li>
-                    <li>
-                      <strong>Contain</strong>: If instability climbs above 10 the hybrid explodes and the round is
-                      lost. Otherwise the fused value is added to your total and instability meter.
-                    </li>
-                    <li>
-                      <strong>Hold</strong>: After at least one successful hybrid, press Hold to lock in
-                      <code>final score = total fused value × (1 – total instability ÷ 20)</code>. Payout = bet ×
-                      (final score ÷ 21) × 2.
-                    </li>
+                    <li>When you believe the spread, hit <strong>Trust &amp; Reveal</strong>.</li>
+                    <li>Truths add their number, illusions subtract 3. Score high to multiply your bet.</li>
                   </ol>
+                  <div class="perception-payouts">
+                    <h3>Payouts</h3>
+                    <ul>
+                      <li>Score ≥ 30 → <strong>5×</strong></li>
+                      <li>Score 20–29 → <strong>3×</strong></li>
+                      <li>Score 10–19 → <strong>2×</strong></li>
+                      <li>Score &lt; 10 → Bet lost</li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <label for="fuseBet">Bet Amount</label>
-                <input type="number" id="fuseBet" min="1" step="1" value="25" />
-              </div>
-              <div class="panel-meta">
-                <span>Hybrids: <strong id="fuseHybridCount">0</strong></span>
-                <span>Instability: <strong id="fuseInstabilityLabel">0.0</strong></span>
-              </div>
-              <div class="button-row">
-                <button class="launch" id="fuseStart">Start Fuse</button>
-                <button class="ghost-button" id="fuseFuseSelected" disabled>Fuse Selected</button>
-              </div>
-              <button class="cashout" id="fuseHold" disabled>Hold</button>
-              <div class="status fuse-status" id="fuseStatus">Prime a wager to begin.</div>
-              <div class="status fuse-result" id="fuseResult">Awaiting fusion.</div>
-            </aside>
-          </div>
-        </div>
-        <div class="card-panel" id="perceptionGame">
-          <div class="card-game-header">
-            <button class="ghost-button card-back-button" type="button">← Back to Card Lobby</button>
-            <div class="card-game-title-group">
-              <div class="card-game-title">Perception</div>
-              <div class="card-game-subtitle">Live · Trust Nothing</div>
+                <div>
+                  <label for="perceptionBet">Bet Amount</label>
+                  <input type="number" id="perceptionBet" min="1" step="1" value="30" />
+                </div>
+                <div class="panel-meta perception-meta">
+                  <span>Scans Used: <strong id="perceptionAnalyzeInfo">0 / 2</strong></span>
+                  <span class="perception-cost-note">Each scan deducts 10% of your bet.</span>
+                </div>
+                <div class="button-row perception-buttons">
+                  <button class="launch" id="perceptionStart">Start Perception</button>
+                  <button class="cashout" id="perceptionLock" disabled>Trust &amp; Reveal</button>
+                </div>
+                <div class="perception-scoreboard">
+                  <div class="perception-score" id="perceptionScore">Score: --</div>
+                  <div class="perception-result" id="perceptionResult">Awaiting signal.</div>
+                </div>
+                <div class="status" id="perceptionStatus">Tune the sensors and begin.</div>
+              </aside>
             </div>
-          </div>
-          <div class="main-layout card-layout">
-            <div class="device-shell">
-              <div class="stage idle perception-stage" id="perceptionStage">
-                <div class="perception-card-grid" id="perceptionCardsArea">
-                  <div class="perception-placeholder">Start Perception to pull four suspicious cards.</div>
-                </div>
-              </div>
-            </div>
-            <aside class="control-panel card-controls">
-              <h2>Perception</h2>
-              <p class="perception-copy">
-                Four cards broadcast numbers and colors — but some signals lie. Spend limited scans to detect
-                illusions, then decide when to trust the spread. More truthful cards mean larger payouts.
-              </p>
-              <div class="perception-instructions">
-                <h3>How to Read the Grid</h3>
-                <ol>
-                  <li>Enter a bet and press <strong>Start Perception</strong> to draw four cards.</li>
-                  <li>
-                    Each <strong>Analyze</strong> scan (max 2) costs 10% of your wager and tells you if that card is
-                    truthful or an illusion.
-                  </li>
-                  <li>When you believe the spread, hit <strong>Trust &amp; Reveal</strong>.</li>
-                  <li>Truths add their number, illusions subtract 3. Score high to multiply your bet.</li>
-                </ol>
-                <div class="perception-payouts">
-                  <h3>Payouts</h3>
-                  <ul>
-                    <li>Score ≥ 30 → <strong>5×</strong></li>
-                    <li>Score 20–29 → <strong>3×</strong></li>
-                    <li>Score 10–19 → <strong>2×</strong></li>
-                    <li>Score &lt; 10 → Bet lost</li>
-                  </ul>
-                </div>
-              </div>
-              <div>
-                <label for="perceptionBet">Bet Amount</label>
-                <input type="number" id="perceptionBet" min="1" step="1" value="30" />
-              </div>
-              <div class="panel-meta perception-meta">
-                <span>Scans Used: <strong id="perceptionAnalyzeInfo">0 / 2</strong></span>
-                <span class="perception-cost-note">Each scan deducts 10% of your bet.</span>
-              </div>
-              <div class="button-row perception-buttons">
-                <button class="launch" id="perceptionStart">Start Perception</button>
-                <button class="cashout" id="perceptionLock" disabled>Trust &amp; Reveal</button>
-              </div>
-              <div class="perception-scoreboard">
-                <div class="perception-score" id="perceptionScore">Score: --</div>
-                <div class="perception-result" id="perceptionResult">Awaiting signal.</div>
-              </div>
-              <div class="status" id="perceptionStatus">Tune the sensors and begin.</div>
-            </aside>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
+          </section>
+</main>
 </div>
 
     <script>
@@ -2949,8 +2998,8 @@
       let stackResetTimeout = null;
 
       let pathLength = 1;
-      let activeMode = 'rocket';
-      let activeSection = 'skill';
+      let activeMode = null;
+      let activeCategory = null;
       let activeCardGame = null;
 
       // ---------------- Binary Poker state ----------------
@@ -3023,23 +3072,21 @@
       const baseTitle = 'NeonArc Casino';
       const titleEl = document.getElementById('sectionTitle');
       const balanceEl = document.getElementById('balance');
-      const sectionButtons = document.querySelectorAll('.section-button');
-      const modeButtons = document.querySelectorAll('.mode-button');
-      const sections = {
-        skill: document.getElementById('skillGamesSection'),
-        card: document.getElementById('cardGamesSection'),
+      const lobbyViews = {
+        main: document.getElementById('mainLobby'),
+        skill: document.getElementById('skillGamesLobby'),
+        card: document.getElementById('cardGamesLobby'),
       };
-      const panels = {
+      const skillPanels = {
         rocket: document.getElementById('rocketMode'),
         pulse: document.getElementById('pulseMode'),
         mind: document.getElementById('mindMode'),
         stack: document.getElementById('stackMode'),
       };
-
-      const cardLobby = document.getElementById('cardLobby');
-      const stackCardLink = document.getElementById('stackCardLink');
-      const cardTiles = document.querySelectorAll('.card-game-tile');
-      const cardBackButtons = document.querySelectorAll('.card-back-button');
+      const categoryButtons = document.querySelectorAll('[data-category-button]');
+      const lobbyTiles = document.querySelectorAll('.game-tile');
+      const backToMainButtons = document.querySelectorAll('.back-to-main');
+      const backButtons = document.querySelectorAll('[data-back-lobby]');
       const binaryGamePanel = document.getElementById('binaryPokerGame');
       const echoGamePanel = document.getElementById('echoHandGame');
       const fuseGamePanel = document.getElementById('fuseGame');
@@ -3050,6 +3097,13 @@
         fuse: fuseGamePanel,
         perception: perceptionGamePanel,
       };
+      const viewRegistry = [
+        lobbyViews.main,
+        lobbyViews.skill,
+        lobbyViews.card,
+        ...Object.values(skillPanels),
+        ...Object.values(cardPanels),
+      ];
 
       const binaryStage = document.getElementById('binaryStage');
       const binaryHandEl = document.getElementById('binaryHand');
@@ -3208,33 +3262,28 @@
         toggleBinaryInstructions(false);
         toggleEchoInstructions(false);
         toggleFuseInstructions(false);
-        setTitle('Rocket Line');
+        showView(lobbyViews.main);
+        setTitle('Main Lobby');
 
-        sectionButtons.forEach((button) => {
-          button.addEventListener('click', () => switchSection(button.dataset.section));
+        categoryButtons.forEach((button) => {
+          button.addEventListener('click', () => enterCategory(button.dataset.categoryButton));
         });
-        modeButtons.forEach((button) => {
-          button.addEventListener('click', () => switchMode(button.dataset.mode));
-        });
-        cardTiles.forEach((tile) => {
+        lobbyTiles.forEach((tile) => {
           if (tile.disabled) return;
-          tile.addEventListener('click', () => {
-            if (activeSection !== 'card') {
-              switchSection('card');
-            }
-            enterCardGame(tile.dataset.game);
-          });
+          tile.addEventListener('click', () => enterGame(tile.dataset.game));
         });
-        if (stackCardLink) {
-          stackCardLink.addEventListener('click', () => {
-            const switched = activeSection === 'skill' ? true : switchSection('skill');
-            if (switched === false) return;
-            switchMode('stack');
-            stackCardLink.blur();
+        backToMainButtons.forEach((button) => {
+          button.addEventListener('click', () => backToMainLobby());
+        });
+        backButtons.forEach((button) => {
+          button.addEventListener('click', () => {
+            const target = button.dataset.backLobby;
+            if (target === 'skill') {
+              exitSkillGame();
+            } else if (target === 'card') {
+              exitCardGame();
+            }
           });
-        }
-        cardBackButtons.forEach((button) => {
-          button.addEventListener('click', () => exitCardGame());
         });
         if (binaryInstructionsToggle) {
           binaryInstructionsToggle.addEventListener('click', () => toggleBinaryInstructions());
@@ -3323,50 +3372,150 @@
         });
       }
 
-      function switchMode(mode) {
-        if (mode === activeMode) return;
-        if (mindRunning && mode !== 'mind') {
-          setMindStatus('Stay focused—cash out or ride the thought to the end.');
-          return;
-        }
-        if (mode === 'pulse' && inFlight) {
-          setStatus('Finish the rocket round before switching modes.');
-          return;
-        }
-        if (mode === 'rocket' && pulseRunning) {
-          setPulseStatus('Stabilize this pulse before changing modes.');
-          return;
-        }
-        if (mode === 'mind') {
-          if (inFlight) {
-            setStatus('Finish the rocket round before linking with the mind.');
-            return;
+      function hideAllViews() {
+        viewRegistry.forEach((view) => {
+          if (view) {
+            view.classList.remove('active');
           }
-          if (pulseRunning) {
-            setPulseStatus('Calm the pulse before opening the mind link.');
-            return;
-          }
-        }
-        if (stackRunning && mode !== 'stack') {
-          setStackStatus('Ride out the StackJack round before switching modes.');
-          return;
-        }
+        });
+      }
 
+      function showView(view) {
+        if (!view) return;
+        hideAllViews();
+        view.classList.add('active');
+      }
+
+      function enterCategory(category) {
+        if (category === 'skill') {
+          if (activeCardGame) {
+            const left = exitCardGame(false);
+            if (!left) return false;
+          }
+          activeCategory = 'skill';
+          setTitle('Skill Games Lobby');
+          showView(lobbyViews.skill);
+          return true;
+        }
+        if (category === 'card') {
+          if (activeMode) {
+            const left = exitSkillGame(false);
+            if (!left) return false;
+          }
+          activeCategory = 'card';
+          setTitle('Card Games Lobby');
+          showView(lobbyViews.card);
+          return true;
+        }
+        if (category === 'main') {
+          backToMainLobby();
+          return true;
+        }
+        return false;
+      }
+
+      function enterGame(gameName) {
+        if (!gameName) return;
+        if (skillPanels[gameName]) {
+          enterSkillGame(gameName);
+          return;
+        }
+        if (cardPanels[gameName]) {
+          enterCardGame(gameName);
+        }
+      }
+
+      function enterSkillGame(mode) {
+        const switched = enterCategory('skill');
+        if (switched === false) return;
+        if (activeMode && activeMode !== mode) {
+          if (!canLeaveSkillGame()) {
+            return;
+          }
+        }
+        const targetPanel = skillPanels[mode];
+        if (!targetPanel) return;
+        if (activeMode === mode && targetPanel.classList.contains('active')) {
+          return;
+        }
         activeMode = mode;
-        Object.entries(panels).forEach(([key, panel]) => {
-          panel.classList.toggle('active', key === mode);
-        });
-        modeButtons.forEach((button) => {
-          button.classList.toggle('active', button.dataset.mode === mode);
-        });
+        activeCategory = 'skill';
+        showView(targetPanel);
         const titles = {
           rocket: 'Rocket Line',
           pulse: 'Pulse Cash',
           mind: 'Mind Bet',
           stack: 'StackJack',
         };
-        if (activeSection === 'skill') {
-          setTitle(titles[mode] || 'Skill Games');
+        setTitle(titles[mode] || 'Skill Games');
+      }
+
+      function canLeaveSkillGame() {
+        if (activeMode === 'mind' && mindRunning) {
+          setMindStatus('Stay focused—cash out or ride the thought to the end.');
+          return false;
+        }
+        if (activeMode === 'pulse' && pulseRunning) {
+          setPulseStatus('Stabilize this pulse before changing modes.');
+          return false;
+        }
+        if (activeMode === 'rocket' && inFlight) {
+          setStatus('Finish the rocket round before changing modes.');
+          return false;
+        }
+        if (activeMode === 'stack' && stackRunning) {
+          setStackStatus('Ride out the StackJack round before switching modes.');
+          return false;
+        }
+        return true;
+      }
+
+      function exitSkillGame(manual = true) {
+        if (!activeMode) {
+          if (manual) {
+            activeCategory = 'skill';
+            showView(lobbyViews.skill);
+            setTitle('Skill Games Lobby');
+          }
+          return true;
+        }
+        if (!canLeaveSkillGame()) {
+          return false;
+        }
+        const panel = skillPanels[activeMode];
+        if (panel) {
+          panel.classList.remove('active');
+        }
+        activeMode = null;
+        if (manual) {
+          activeCategory = 'skill';
+          showView(lobbyViews.skill);
+          setTitle('Skill Games Lobby');
+        }
+        return true;
+      }
+
+      function backToMainLobby() {
+        if (activeMode) {
+          const leftSkill = exitSkillGame(false);
+          if (!leftSkill) return;
+        }
+        if (activeCardGame) {
+          const leftCard = exitCardGame(false);
+          if (!leftCard) return;
+        }
+        activeCategory = null;
+        activeMode = null;
+        activeCardGame = null;
+        showView(lobbyViews.main);
+        setTitle('Main Lobby');
+      }
+
+      function exitGame() {
+        if (activeCategory === 'skill') {
+          exitSkillGame();
+        } else if (activeCategory === 'card') {
+          exitCardGame();
         }
       }
 
@@ -3591,80 +3740,22 @@
         titleEl.textContent = suffix ? `${baseTitle} · ${suffix}` : baseTitle;
       }
 
-      function switchSection(sectionName) {
-        if (!sections[sectionName]) return false;
-        if (sectionName === activeSection) return true;
-        if (sectionName === 'card') {
-          if (inFlight) {
-            setStatus('Finish the rocket round before changing sections.');
-            return false;
-          }
-          if (pulseRunning) {
-            setPulseStatus('Stabilize this pulse before changing sections.');
-            return false;
-          }
-          if (mindRunning) {
-            setMindStatus('Resolve the mind link before changing sections.');
-            return false;
-          }
-        } else if (sectionName === 'skill') {
-          if (binaryRunning) {
-            setBinaryStatus('Resolve your Binary Poker hand before leaving.');
-            return false;
-          }
-          if (echoRunning || echoResolving) {
-            setEchoStatus('Finish the Echo Hand round before leaving.');
-            return false;
-          }
-        }
-
-        activeSection = sectionName;
-        Object.entries(sections).forEach(([key, panel]) => {
-          panel.classList.toggle('active', key === sectionName);
-        });
-        sectionButtons.forEach((button) => {
-          button.classList.toggle('active', button.dataset.section === sectionName);
-        });
-
-        if (sectionName === 'skill') {
-          exitCardGame(false);
-          const titles = {
-            rocket: 'Rocket Line',
-            pulse: 'Pulse Cash',
-            mind: 'Mind Bet',
-            stack: 'StackJack',
-          };
-          setTitle(titles[activeMode] || 'Skill Games');
-        } else if (sectionName === 'card') {
-          if (!activeCardGame) {
-            cardLobby.classList.add('active');
-            Object.values(cardPanels).forEach((panel) => panel.classList.remove('active'));
-          }
-          const titleMap = {
-            binaryPoker: 'Binary Poker',
-            echoHand: 'Echo Hand',
-            fuse: 'Fuse',
-          };
-          setTitle(titleMap[activeCardGame] || 'Card Games Lobby');
-        }
-
-        return true;
-      }
-
       function enterCardGame(gameName) {
         if (!gameName) return;
-        if (activeSection !== 'card') {
-          const switched = switchSection('card');
-          if (!switched) return;
+        const switched = enterCategory('card');
+        if (switched === false) return;
+        if (activeCardGame && activeCardGame !== gameName) {
+          const left = exitCardGame(false);
+          if (!left) return;
         }
-        if (gameName === activeCardGame) return;
-        cardLobby.classList.remove('active');
-        Object.values(cardPanels).forEach((panel) => panel.classList.remove('active'));
         const targetPanel = cardPanels[gameName];
-        if (targetPanel) {
-          targetPanel.classList.add('active');
+        if (!targetPanel) return;
+        if (activeCardGame === gameName && targetPanel.classList.contains('active')) {
+          return;
         }
+        activeCategory = 'card';
         activeCardGame = gameName;
+        showView(targetPanel);
         if (gameName === 'binaryPoker') {
           resetBinaryPoker(true);
           setTitle('Binary Poker');
@@ -3698,7 +3789,6 @@
           return false;
         }
         Object.values(cardPanels).forEach((panel) => panel.classList.remove('active'));
-        cardLobby.classList.add('active');
         activeCardGame = null;
         resetBinaryPoker(!manual);
         resetEchoHand(!manual);
@@ -3707,7 +3797,9 @@
         toggleBinaryInstructions(false);
         toggleEchoInstructions(false);
         toggleFuseInstructions(false);
-        if (manual || activeSection === 'card') {
+        if (manual) {
+          activeCategory = 'card';
+          showView(lobbyViews.card);
           setTitle('Card Games Lobby');
         }
         return true;
