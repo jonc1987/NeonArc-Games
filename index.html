@@ -37,6 +37,47 @@
         background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140"%3E%3Ccircle cx="12" cy="18" r="1" fill="rgba(255,255,255,0.35)"/%3E%3Ccircle cx="88" cy="60" r="1" fill="rgba(255,255,255,0.35)"/%3E%3Ccircle cx="120" cy="18" r="1" fill="rgba(255,255,255,0.25)"/%3E%3Ccircle cx="60" cy="120" r="1" fill="rgba(255,255,255,0.2)"/%3E%3C/svg%3E');
         opacity: 0.4;
         pointer-events: none;
+        animation: starSlide 32s linear infinite alternate;
+      }
+
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(circle at 12% 18%, rgba(110, 243, 255, 0.08), transparent 38%),
+          radial-gradient(circle at 82% 68%, rgba(255, 110, 230, 0.08), transparent 32%);
+        mix-blend-mode: screen;
+        filter: blur(12px);
+        opacity: 0.6;
+        animation: auroraPulse 18s ease-in-out infinite alternate;
+      }
+
+      @keyframes starSlide {
+        0% {
+          transform: translate3d(0, 0, 0);
+        }
+        50% {
+          transform: translate3d(-24px, -18px, 0);
+        }
+        100% {
+          transform: translate3d(16px, 22px, 0);
+        }
+      }
+
+      @keyframes auroraPulse {
+        0% {
+          opacity: 0.4;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.72;
+          transform: scale(1.06);
+        }
+        100% {
+          opacity: 0.52;
+          transform: scale(1.02);
+        }
       }
 
       .app-shell {
@@ -383,9 +424,10 @@
         letter-spacing: 0.08em;
         text-align: left;
         cursor: pointer;
-        transition: transform 0.45s ease, box-shadow 0.45s ease, border-color 0.45s ease;
+        transition: transform 0.45s ease, box-shadow 0.45s ease, border-color 0.45s ease, filter 0.45s ease;
         overflow: hidden;
         isolation: isolate;
+        animation: floatRise 10s ease-in-out infinite;
       }
 
       .category-panel::after,
@@ -400,16 +442,63 @@
         pointer-events: none;
       }
 
+      .category-panel::before,
+      .game-tile::before {
+        content: '';
+        position: absolute;
+        inset: -60% -20% auto;
+        height: 120%;
+        background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+        opacity: 0;
+        transform: translateX(-40%);
+        animation: shimmerSweep 9s ease-in-out infinite;
+        pointer-events: none;
+      }
+
       .category-panel:hover,
       .game-tile:hover {
         transform: translateY(-6px) scale(1.01);
         border-color: rgba(110, 255, 236, 0.45);
         box-shadow: 0 25px 50px rgba(0, 255, 230, 0.18);
+        filter: drop-shadow(0 0 12px rgba(110, 255, 236, 0.22));
       }
 
       .category-panel:hover::after,
       .game-tile:hover::after {
         opacity: 1;
+      }
+
+      .category-panel:hover::before,
+      .game-tile:hover::before {
+        opacity: 1;
+      }
+
+      @keyframes floatRise {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+
+      @keyframes shimmerSweep {
+        0% {
+          transform: translateX(-65%);
+          opacity: 0;
+        }
+        40% {
+          opacity: 0.55;
+        }
+        55% {
+          transform: translateX(140%);
+          opacity: 0.25;
+        }
+        100% {
+          transform: translateX(180%);
+          opacity: 0;
+        }
       }
 
       .category-label,
@@ -2544,6 +2633,41 @@
         font-size: 13px;
       }
 
+      @media (max-width: 768px) {
+        .floating-controls {
+          position: fixed;
+          inset: auto 0 18px;
+          justify-content: center;
+        }
+
+        .app-shell {
+          gap: 16px;
+        }
+
+        .top-bar {
+          justify-content: center;
+          text-align: center;
+        }
+
+        .balance,
+        .title {
+          width: 100%;
+          text-align: center;
+        }
+
+        .category-grid,
+        .game-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .category-panel,
+        .game-tile {
+          padding: 18px;
+          border-radius: 22px;
+        }
+      }
+
       @media (max-width: 960px) {
         .main-layout {
           grid-template-columns: 1fr;
@@ -2592,7 +2716,7 @@
     </style>
   </head>
   <body>
-    <audio id="lobbyMusic" src="/assets/audio/ambient-loop.mp3" loop></audio>
+    <audio id="lobbyMusic" src="audio.mp3" preload="auto" loop></audio>
     <div class="floating-controls">
       <button class="sound-toggle active" id="soundToggle" type="button" aria-label="Toggle ambient sound">🔊</button>
     </div>
@@ -3315,6 +3439,7 @@
       let ambientReady = false;
       let ambientTarget = 0.3;
       let ambientFadeFrame = null;
+      let ambientPrimed = false;
 
       // ---------------- Rocket state ----------------
       let currentBet = 0;
@@ -3642,6 +3767,10 @@
         refreshAmbientVolume(lobbyViews.main);
         ensureAmbientPlaying();
 
+        ['pointerdown', 'keydown', 'touchstart'].forEach((event) => {
+          document.addEventListener(event, primeAmbientAudioOnce, { once: true });
+        });
+
         if (soundToggle) {
           soundToggle.addEventListener('click', toggleSound);
         }
@@ -3782,6 +3911,12 @@
         ambientAudio.volume = ambientTarget;
         ambientAudio.play().catch(() => {});
         ambientReady = true;
+        ambientPrimed = true;
+      }
+
+      function primeAmbientAudioOnce() {
+        if (ambientPrimed) return;
+        ensureAmbientPlaying();
       }
 
       function fadeToVolume(targetVolume, pauseWhenDone = false) {
