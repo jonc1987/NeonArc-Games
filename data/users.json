@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": "bbf2f06d-a804-47da-9db8-738c25b717d3",
+    "username": "blahd",
+    "password": "$2b$10$B2roi502zVWcdXT18RPGpek0e4zkgZkMyAvscLI8GvFrDGa/fsE2O",
+    "balance": 1000,
+    "joinedAt": "2025-11-23T19:41:09.554Z",
+    "lastActivity": "2025-11-23T19:41:09.554Z"
+  }
+]
