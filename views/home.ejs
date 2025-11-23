@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeonArc Casino · Home</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins:wght@400;500;600&display=swap');
+      :root {
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        background: radial-gradient(circle at 12% 18%, rgba(110, 243, 255, 0.08), transparent 30%),
+          radial-gradient(circle at 80% 60%, rgba(255, 110, 230, 0.12), transparent 30%),
+          #030712;
+        color: #e8f6ff;
+      }
+      header {
+        padding: 28px clamp(18px, 4vw, 48px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+      }
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .brand h1 {
+        margin: 0;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.18em;
+      }
+      .brand p {
+        margin: 0;
+        color: #9eb4d6;
+      }
+      nav {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        border: 1px solid rgba(110, 243, 255, 0.35);
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.12), rgba(255, 110, 230, 0.08));
+        color: #e8f6ff;
+        padding: 10px 16px;
+        border-radius: 999px;
+        text-decoration: none;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+      .pill:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        border-color: rgba(110, 243, 255, 0.65);
+      }
+      main {
+        padding: 10px clamp(18px, 4vw, 48px) 48px;
+        display: grid;
+        gap: 24px;
+      }
+      .hero {
+        display: grid;
+        gap: 16px;
+        padding: clamp(18px, 3vw, 28px);
+        border-radius: 24px;
+        border: 1px solid rgba(110, 243, 255, 0.2);
+        background: linear-gradient(135deg, rgba(8, 18, 32, 0.9), rgba(6, 10, 24, 0.92));
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+      }
+      .hero h2 {
+        margin: 0;
+        font-size: clamp(26px, 5vw, 34px);
+        letter-spacing: 0.12em;
+      }
+      .hero p {
+        margin: 0;
+        color: #c1d4f4;
+      }
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+      }
+      .card {
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+      }
+      .card h3 {
+        margin-top: 0;
+      }
+      .card p {
+        margin-bottom: 6px;
+        color: #c7d6f0;
+      }
+      footer {
+        padding: 18px clamp(18px, 4vw, 48px) 32px;
+        color: #9eb4d6;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <h1>NeonArc Casino</h1>
+        <p>Precision-built games, tailored to every pilot.</p>
+      </div>
+      <nav>
+        <a class="pill" href="/login">Login</a>
+        <a class="pill" href="/register">Register</a>
+        <a class="pill" href="/app">Enter Casino</a>
+      </nav>
+    </header>
+    <main>
+      <section class="hero">
+        <h2>Welcome to the luminous strip.</h2>
+        <p>
+          NeonArc Casino is built for modern play: bespoke skill games, reactive lobbies, and a
+          management console that keeps everything transparent. Your view adapts to your mood—VIP, standard,
+          or limited preview—so every visit feels intentional.
+        </p>
+        <div class="cta-row">
+          <a class="pill" href="/app">Play the live games</a>
+          <a class="pill" href="/register">Create an account</a>
+        </div>
+      </section>
+      <section class="card-grid">
+        <article class="card">
+          <h3>Tailored game paths</h3>
+          <p>Profile-driven recommendations keep your favorite modes front-and-center.</p>
+          <p>Switch to VIP focus or a limited preview with one click.</p>
+        </article>
+        <article class="card">
+          <h3>Fresh bankroll rules</h3>
+          <p>New pilots start lean, encouraging progression through wins and missions.</p>
+          <p>Admins can add or remove funds instantly for support cases.</p>
+        </article>
+        <article class="card">
+          <h3>Transparent management</h3>
+          <p>Secure dashboards show balances, cash outs, and player-facing notes at a glance.</p>
+          <p>Operate with confidence—no hidden levers.</p>
+        </article>
+      </section>
+    </main>
+    <footer>Need a custom setup? Contact ops and we will tune your lobby.</footer>
+  </body>
+</html>

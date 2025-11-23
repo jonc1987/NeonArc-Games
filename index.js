@@ -38,6 +38,18 @@ app.use('/api', require('./routes/cashouts'));
 app.use('/api/admin', require('./routes/admin'));
 
 app.get('/', (req, res) => {
+  res.render('home');
+});
+
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+app.get('/app', (req, res) => {
   res.render('index');
 });
 

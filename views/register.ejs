@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register · NeonArc Casino</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;500&display=swap');
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Poppins', system-ui, sans-serif;
+        background: radial-gradient(circle at 24% 22%, rgba(110, 243, 255, 0.08), transparent 32%),
+          radial-gradient(circle at 70% 64%, rgba(255, 110, 230, 0.12), transparent 30%),
+          #030712;
+        color: #eaf6ff;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+      .panel {
+        width: min(520px, 100%);
+        padding: clamp(18px, 3vw, 28px);
+        border-radius: 24px;
+        border: 1px solid rgba(110, 243, 255, 0.2);
+        background: linear-gradient(140deg, rgba(8, 18, 32, 0.95), rgba(6, 12, 22, 0.92));
+        box-shadow: 0 26px 70px rgba(0, 0, 0, 0.5);
+        display: grid;
+        gap: 18px;
+      }
+      h1 {
+        margin: 0;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.18em;
+      }
+      p {
+        margin: 0;
+        color: #c2d5f3;
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+        color: #8fb7d6;
+      }
+      input {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        color: #eaf6ff;
+      }
+      button,
+      a.button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(110, 243, 255, 0.35);
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.18), rgba(255, 110, 230, 0.14));
+        color: #eaf6ff;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+      button:hover,
+      a.button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+        border-color: rgba(110, 243, 255, 0.65);
+      }
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .status {
+        color: #9cc9e7;
+        font-size: 14px;
+        min-height: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <div>
+        <h1>Register</h1>
+        <p>Start with a lean bankroll and build your own NeonArc journey.</p>
+      </div>
+      <form id="registerForm">
+        <div>
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" autocomplete="username" required />
+        </div>
+        <div>
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="new-password" required minlength="6" />
+        </div>
+        <div class="actions">
+          <button type="submit">Create account</button>
+          <a class="button" href="/login">Back to Login</a>
+          <a class="button" href="/app">Enter Casino</a>
+        </div>
+      </form>
+      <div class="status" id="status">Minimum 6 characters for passwords.</div>
+    </div>
+    <script>
+      const form = document.getElementById('registerForm');
+      const statusEl = document.getElementById('status');
+      form?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const data = new FormData(form);
+        const username = data.get('username')?.toString().trim();
+        const password = data.get('password')?.toString().trim();
+        if (!username || !password) {
+          statusEl.textContent = 'Username and password are required.';
+          statusEl.style.color = '#ff9bb3';
+          return;
+        }
+        statusEl.textContent = 'Creating your profile...';
+        statusEl.style.color = '#9cc9e7';
+        try {
+          const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            statusEl.textContent = payload.error || 'Unable to register right now.';
+            statusEl.style.color = '#ff9bb3';
+            return;
+          }
+          statusEl.textContent = `Welcome, ${payload.user?.username || 'pilot'}. Starting with $${
+            payload.user?.balance ?? 0
+          } ready.`;
+          setTimeout(() => (window.location.href = '/app'), 650);
+        } catch (error) {
+          console.error('Registration failed', error);
+          statusEl.textContent = 'Server unavailable.';
+          statusEl.style.color = '#ff9bb3';
+        }
+      });
+    </script>
+  </body>
+</html>
