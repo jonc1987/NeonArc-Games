@@ -1,5 +1,5 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const { createUser, findUser, updateUserBalance, markUserActivity } = require('../utils/userStorage');
 
