@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeonArc Management</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #0b1220;
+        color: #e8edf4;
+      }
+      h1 {
+        margin-bottom: 6px;
+      }
+      .page-subtitle {
+        margin-top: 0;
+        color: #9fb1ca;
+      }
+      .grid {
+        display: grid;
+        gap: 20px;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+      }
+      .card h2 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 18px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      th {
+        cursor: pointer;
+        color: #c5d3ea;
+        user-select: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .search-box {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.03);
+        color: #e8edf4;
+        min-width: 220px;
+      }
+      .meta {
+        color: #8fa2c1;
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      .cashout-item {
+        padding: 10px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 8px;
+      }
+      .cashout-empty {
+        color: #8fa2c1;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Management Dashboard</h1>
+      <p class="page-subtitle">Secure view for administrators only.</p>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <div class="controls">
+          <input class="search-box" type="search" id="userSearch" placeholder="Search by username or ID" />
+          <div class="meta" id="userCount"></div>
+        </div>
+        <div class="table-wrapper">
+          <table aria-label="User overview">
+            <thead>
+              <tr>
+                <th data-sort="username">Username ▾</th>
+                <th data-sort="id">User ID</th>
+                <th data-sort="balance">Balance</th>
+                <th data-sort="joinedAt">Join Date</th>
+                <th data-sort="lastActivity">Last Activity</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Pending Cash Outs</h2>
+        <div id="cashoutList"></div>
+      </div>
+    </section>
+
+    <script>
+      const users = <%- JSON.stringify(users || []) %>;
+      const cashouts = <%- JSON.stringify(cashouts || []) %>;
+
+      const userTableBody = document.getElementById('userTableBody');
+      const searchInput = document.getElementById('userSearch');
+      const userCount = document.getElementById('userCount');
+      const cashoutList = document.getElementById('cashoutList');
+
+      let currentSort = { key: 'username', direction: 'asc' };
+
+      function formatDate(value) {
+        if (!value) return '—';
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) return '—';
+        return parsed.toLocaleString();
+      }
+
+      function formatCurrency(value) {
+        return `$${Number(value || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`;
+      }
+
+      function renderUsers(list) {
+        if (!userTableBody) return;
+        userTableBody.innerHTML = '';
+        list.forEach((user) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${user.username || '—'}</td>
+            <td>${user.id || '—'}</td>
+            <td>${formatCurrency(user.balance)}</td>
+            <td>${formatDate(user.joinedAt)}</td>
+            <td>${formatDate(user.lastActivity)}</td>
+          `;
+          userTableBody.appendChild(row);
+        });
+        if (userCount) {
+          userCount.textContent = `${list.length} user${list.length === 1 ? '' : 's'} shown`;
+        }
+      }
+
+      function sortUsers(list, key, direction = 'asc') {
+        const sorted = [...list].sort((a, b) => {
+          const first = a?.[key] || '';
+          const second = b?.[key] || '';
+          if (key === 'balance') {
+            return direction === 'asc' ? first - second : second - first;
+          }
+          if (key === 'joinedAt' || key === 'lastActivity') {
+            const firstTime = new Date(first).getTime();
+            const secondTime = new Date(second).getTime();
+            return direction === 'asc' ? firstTime - secondTime : secondTime - firstTime;
+          }
+          const firstVal = first.toString().toLowerCase();
+          const secondVal = second.toString().toLowerCase();
+          if (firstVal < secondVal) return direction === 'asc' ? -1 : 1;
+          if (firstVal > secondVal) return direction === 'asc' ? 1 : -1;
+          return 0;
+        });
+        return sorted;
+      }
+
+      function applyFilters() {
+        const query = searchInput?.value?.trim().toLowerCase();
+        let list = [...users];
+
+        if (query) {
+          list = list.filter((user) => {
+            return (
+              user.username?.toLowerCase().includes(query) ||
+              user.id?.toLowerCase().includes(query)
+            );
+          });
+        }
+
+        const sorted = sortUsers(list, currentSort.key, currentSort.direction);
+        renderUsers(sorted);
+      }
+
+      function renderCashouts() {
+        if (!cashoutList) return;
+        cashoutList.innerHTML = '';
+        if (!cashouts.length) {
+          const empty = document.createElement('p');
+          empty.className = 'cashout-empty';
+          empty.textContent = 'No pending cash outs.';
+          cashoutList.appendChild(empty);
+          return;
+        }
+        cashouts.forEach((entry) => {
+          const item = document.createElement('div');
+          item.className = 'cashout-item';
+          item.textContent = `User ${entry.username} requested ${formatCurrency(entry.amount)} on ${formatDate(
+            entry.requestedAt,
+          )} — please confirm payout manually.`;
+          cashoutList.appendChild(item);
+        });
+      }
+
+      document.querySelectorAll('th[data-sort]').forEach((header) => {
+        header.addEventListener('click', () => {
+          const key = header.dataset.sort;
+          if (currentSort.key === key) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+          } else {
+            currentSort = { key, direction: 'asc' };
+          }
+          document.querySelectorAll('th[data-sort]').forEach((h) => {
+            h.textContent = h.textContent.replace(/[\s▾▴]+$/, '').trim();
+            if (h.dataset.sort === currentSort.key) {
+              h.textContent = `${h.textContent} ${currentSort.direction === 'asc' ? '▾' : '▴'}`;
+            }
+          });
+          applyFilters();
+        });
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+      }
+
+      renderCashouts();
+      applyFilters();
+    </script>
+  </body>
+</html>

@@ -3072,7 +3072,7 @@
           </div>
           <div class="account-actions">
             <button class="account-action" id="claimBonusBtn" type="button">Claim Bonus (+$50)</button>
-            <button class="account-action" id="depositBtn" type="button">Deposit $250</button>
+            <button class="account-action" id="cashOutBtn" type="button">Cash Out</button>
             <button class="account-action secondary" id="refreshAccountBtn" type="button">Refresh Account</button>
           </div>
           <div class="account-card">
@@ -3822,7 +3822,7 @@
       const showRegisterBtn = document.getElementById('showRegister');
       const logoutBtn = document.getElementById('logoutBtn');
       const claimBonusBtn = document.getElementById('claimBonusBtn');
-      const depositBtn = document.getElementById('depositBtn');
+      const cashOutBtn = document.getElementById('cashOutBtn');
       const refreshAccountBtn = document.getElementById('refreshAccountBtn');
       const ambientAudio = document.getElementById('lobbyMusic');
       const soundToggle = document.getElementById('soundToggle');
@@ -4085,8 +4085,8 @@
         if (claimBonusBtn) {
           claimBonusBtn.addEventListener('click', () => handleBalanceAction(50, 'Bonus claimed!'));
         }
-        if (depositBtn) {
-          depositBtn.addEventListener('click', () => handleBalanceAction(250, 'Deposit applied.'));
+        if (cashOutBtn) {
+          cashOutBtn.addEventListener('click', () => requestCashOut());
         }
         if (spinWheelBtn) {
           spinWheelBtn.addEventListener('click', () => spinDailyWheel());
@@ -4225,6 +4225,9 @@
         });
         if (logoutBtn) {
           logoutBtn.classList.toggle('hidden', !loggedIn);
+        }
+        if (cashOutBtn) {
+          cashOutBtn.classList.toggle('hidden', !loggedIn);
         }
         if (authPanel) {
           authPanel.classList.toggle('authenticated', loggedIn);
@@ -4436,6 +4439,63 @@
           if (!account) return;
           setAccountStatus(`${successMessage} New balance: ${formatCurrency(account.balance)}.`);
         });
+      }
+
+      async function requestCashOut() {
+        if (!requireActiveSession()) return;
+        const input = prompt('How much would you like to cash out?');
+        if (input === null) return;
+
+        const parsed = Number(input);
+        const amount = Math.floor(parsed * 100) / 100;
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+          alert('Enter a valid cash-out amount.');
+          return;
+        }
+
+        if (amount > Number(balance || 0)) {
+          alert('Requested amount exceeds your available balance.');
+          return;
+        }
+
+        try {
+          setAccountStatus('Submitting cash-out request...');
+          const response = await fetch('/api/cashout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: accountData?.id, amount }),
+          });
+
+          const payload = await response.json().catch(() => ({}));
+
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return;
+          }
+
+          if (!response.ok) {
+            setAccountStatus(payload.error || 'Unable to submit cash-out request.', true);
+            alert(payload.error || 'Unable to submit cash-out request.');
+            return;
+          }
+
+          if (payload?.user) {
+            applyAccountData(payload.user);
+          } else if (accountData) {
+            balance = Math.max(0, Number(balance || 0) - amount);
+            accountData.balance = balance;
+            updateBalance(false);
+          }
+
+          alert('Cash-out request submitted. Please allow manual review.');
+          setAccountStatus('Cash-out request recorded and awaiting manual review.');
+        } catch (error) {
+          console.error('Cash-out request failed', error);
+          setAccountStatus('Could not submit cash-out request.', true);
+          alert('Could not submit cash-out request.');
+        }
       }
 
       async function refreshAccountFromServer() {
