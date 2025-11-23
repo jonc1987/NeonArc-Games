@@ -20,7 +20,11 @@ app.use('/api/daily-wheel', require('./routes/dailyWheel'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
 
 app.get('/', (req, res) => {
-  res.render('index', { title: 'NeonArc Casino' });
+  res.render('index');
+});
+
+app.get('/confirm', (req, res) => {
+  res.render('confirm');
 });
 
 const PORT = process.env.PORT || 3000;
