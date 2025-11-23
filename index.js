@@ -18,6 +18,7 @@ app.use('/api/vault', require('./routes/vault'));
 app.use('/api/shop', require('./routes/shop'));
 app.use('/api/daily-wheel', require('./routes/dailyWheel'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
+app.use('/api', require('./routes/account'));
 
 app.get('/', (req, res) => {
   res.render('index');
