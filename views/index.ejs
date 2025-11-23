@@ -248,6 +248,35 @@
         transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
       }
 
+      .account-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 12px 0;
+      }
+
+      .account-action {
+        border-radius: 12px;
+        border: 1px solid rgba(110, 243, 255, 0.3);
+        background: rgba(110, 243, 255, 0.08);
+        color: rgba(234, 249, 255, 0.92);
+        padding: 10px 14px;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+
+      .account-action:hover {
+        transform: translateY(-1px);
+        border-color: rgba(110, 243, 255, 0.6);
+        box-shadow: 0 12px 22px rgba(0, 255, 230, 0.12);
+      }
+
+      .account-action.secondary {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.18);
+      }
+
       .account-page.active {
         display: block;
         opacity: 1;
@@ -2816,23 +2845,31 @@
       <div class="account-content" id="accountPageContainer">
         <div class="account-page accent-blue active" id="profilePage">
           <h2>Profile</h2>
-          <p>Username: <strong>NeonPilot</strong></p>
+          <p>Username: <strong id="profileUsername">Loading...</strong></p>
           <div class="account-meta">
             <div class="account-card">
               <div class="label">Total Balance</div>
               <div class="value" id="profileBalance">$1,000.00</div>
             </div>
             <div class="account-card">
-              <div class="label">Lifetime Rounds</div>
-              <div class="value">1,245</div>
+              <div class="label">Join Date</div>
+              <div class="value" id="profileJoinDate">--</div>
             </div>
             <div class="account-card">
-              <div class="label">Win Rate</div>
-              <div class="value">57%</div>
+              <div class="label">Account ID</div>
+              <div class="value" id="profileAccountId">--</div>
             </div>
           </div>
-          <p class="api-note">// TODO: Fetch data once Node.js backend is connected</p>
-          <p class="api-note">// Endpoint: GET /api/profile</p>
+          <div class="account-actions">
+            <button class="account-action" id="claimBonusBtn" type="button">Claim Bonus (+$50)</button>
+            <button class="account-action" id="depositBtn" type="button">Deposit $250</button>
+            <button class="account-action secondary" id="refreshAccountBtn" type="button">Refresh Account</button>
+          </div>
+          <div class="account-card">
+            <div class="label">Transaction History</div>
+            <div class="value" id="transactionPlaceholder">Coming soon — transactions will appear here.</div>
+          </div>
+          <p class="api-note" id="accountStatus">Initializing account...</p>
         </div>
         <div class="account-page accent-gold" id="vaultPage">
           <h2>Vault</h2>
@@ -3434,6 +3471,9 @@
 
       // ---------------- Shared state ----------------
       let balance = settings.startingBalance;
+      let accountData = null;
+      let accountId = null;
+      let balanceSyncInFlight = false;
       const historyItems = [];
       let soundOn = true;
       let ambientReady = false;
@@ -3556,6 +3596,14 @@
       const titleEl = document.getElementById('sectionTitle');
       const balanceEl = document.getElementById('balance');
       const profileBalanceEl = document.getElementById('profileBalance');
+      const profileUsernameEl = document.getElementById('profileUsername');
+      const profileJoinDateEl = document.getElementById('profileJoinDate');
+      const profileAccountIdEl = document.getElementById('profileAccountId');
+      const transactionPlaceholderEl = document.getElementById('transactionPlaceholder');
+      const accountStatusEl = document.getElementById('accountStatus');
+      const claimBonusBtn = document.getElementById('claimBonusBtn');
+      const depositBtn = document.getElementById('depositBtn');
+      const refreshAccountBtn = document.getElementById('refreshAccountBtn');
       const ambientAudio = document.getElementById('lobbyMusic');
       const soundToggle = document.getElementById('soundToggle');
       const openAccountHubBtn = document.getElementById('openAccountHub');
@@ -3735,7 +3783,7 @@
         init();
       }
 
-      function init() {
+      async function init() {
         pathLength = pathProgress.getTotalLength();
         pathProgress.style.strokeDasharray = pathLength;
         pathProgress.style.strokeDashoffset = pathLength;
@@ -3746,7 +3794,8 @@
         rocketSprite.style.left = `${settings.rocketArc.floorX}%`;
         rocketSprite.style.bottom = `${settings.rocketArc.floorY}%`;
         rocketSprite.style.transform = 'translate(-50%, 0) rotate(-6deg)';
-        updateBalance();
+        await initializeAccount();
+        updateBalance(false);
         updateRiskMessaging();
         populateHistory();
         roundTag.textContent = 'Idle';
@@ -3779,6 +3828,15 @@
         }
         if (accountBackToLobbyBtn) {
           accountBackToLobbyBtn.addEventListener('click', () => backToMainLobby());
+        }
+        if (claimBonusBtn) {
+          claimBonusBtn.addEventListener('click', () => handleBalanceAction(50, 'Bonus claimed!'));
+        }
+        if (depositBtn) {
+          depositBtn.addEventListener('click', () => handleBalanceAction(250, 'Deposit applied.'));
+        }
+        if (refreshAccountBtn) {
+          refreshAccountBtn.addEventListener('click', () => refreshAccountFromServer());
         }
         accountNavButtons.forEach((button) => {
           const target = button.dataset.accountTarget;
@@ -3887,7 +3945,162 @@
       }
 
       // ---------------- Shared helpers ----------------
-      function updateBalance() {
+      function setAccountStatus(message, isError = false) {
+        if (!accountStatusEl) return;
+        accountStatusEl.textContent = message;
+        accountStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(234, 249, 255, 0.72)';
+      }
+
+      function renderAccountDetails() {
+        if (profileUsernameEl) {
+          profileUsernameEl.textContent = accountData?.username || 'Guest Pilot';
+        }
+        if (profileJoinDateEl) {
+          const joinDate = accountData?.joinedAt ? new Date(accountData.joinedAt) : null;
+          profileJoinDateEl.textContent = joinDate ? joinDate.toLocaleDateString() : '--';
+        }
+        if (profileAccountIdEl) {
+          profileAccountIdEl.textContent = accountData?.id || '--';
+        }
+        if (transactionPlaceholderEl) {
+          transactionPlaceholderEl.textContent = accountData ? 'No transactions yet — stay tuned.' : 'Loading account history...';
+        }
+      }
+
+      async function initializeAccount() {
+        setAccountStatus('Connecting to account...');
+        const storedId = localStorage.getItem('neonarcAccountId');
+        if (storedId) {
+          const existing = await fetchAccountById(storedId);
+          if (existing) {
+            applyAccountData(existing, true);
+            setAccountStatus('Account loaded.');
+            return;
+          }
+          localStorage.removeItem('neonarcAccountId');
+        }
+
+        const created = await registerAccount();
+        if (created) {
+          applyAccountData(created);
+          setAccountStatus('New account created with $1,000 balance.');
+        } else {
+          setAccountStatus('Unable to initialize account. Please try again.', true);
+        }
+      }
+
+      async function fetchAccountById(id) {
+        try {
+          const response = await fetch(`/api/account/${id}`);
+          if (!response.ok) return null;
+          const payload = await response.json();
+          return payload?.account || null;
+        } catch (error) {
+          console.error('Failed to load account', error);
+          return null;
+        }
+      }
+
+      async function registerAccount() {
+        try {
+          const username = `Pilot-${Math.floor(1000 + Math.random() * 9000)}`;
+          const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username }),
+          });
+          if (!response.ok) return null;
+          const payload = await response.json();
+          return payload?.account || null;
+        } catch (error) {
+          console.error('Failed to register account', error);
+          return null;
+        }
+      }
+
+      function applyAccountData(account, skipLocalSave = false) {
+        if (!account) return;
+        accountData = account;
+        accountId = account.id;
+        if (!skipLocalSave && accountId) {
+          localStorage.setItem('neonarcAccountId', accountId);
+        }
+        balance = account.balance;
+        renderAccountDetails();
+        updateBalance(false);
+      }
+
+      async function updateAccountBalance(delta) {
+        if (!accountId) return null;
+        try {
+          setAccountStatus('Updating balance...');
+          const response = await fetch(`/api/update-balance/${accountId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ delta }),
+          });
+          if (!response.ok) {
+            setAccountStatus('Balance update failed.', true);
+            return null;
+          }
+          const payload = await response.json();
+          if (payload?.account) {
+            applyAccountData(payload.account, true);
+            setAccountStatus('Balance synced.');
+            return payload.account;
+          }
+          setAccountStatus('Balance update failed.', true);
+          return null;
+        } catch (error) {
+          console.error('Failed to update balance', error);
+          setAccountStatus('Could not reach the account service.', true);
+          return null;
+        }
+      }
+
+      function handleBalanceAction(delta, successMessage) {
+        updateAccountBalance(delta).then((account) => {
+          if (!account) return;
+          setAccountStatus(`${successMessage} New balance: $${account.balance.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}.`);
+        });
+      }
+
+      async function refreshAccountFromServer() {
+        if (!accountId) return;
+        const latest = await fetchAccountById(accountId);
+        if (latest) {
+          applyAccountData(latest, true);
+          setAccountStatus('Account refreshed.');
+        } else {
+          setAccountStatus('Unable to refresh account.', true);
+        }
+      }
+
+      async function persistBalanceDelta(delta) {
+        if (!accountId || balanceSyncInFlight || delta === 0) return;
+        balanceSyncInFlight = true;
+        try {
+          const response = await fetch(`/api/update-balance/${accountId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ delta }),
+          });
+          if (!response.ok) return;
+          const payload = await response.json();
+          if (payload?.account) {
+            applyAccountData(payload.account, true);
+          }
+        } catch (error) {
+          console.error('Failed to sync balance', error);
+        } finally {
+          balanceSyncInFlight = false;
+        }
+      }
+
+      function updateBalance(sync = true) {
         balanceEl.textContent = balance.toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
@@ -3897,6 +4110,13 @@
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}`;
+        }
+
+        if (sync && accountData?.balance !== undefined) {
+          const delta = Number((balance - accountData.balance).toFixed(2));
+          if (delta !== 0) {
+            persistBalanceDelta(delta);
+          }
         }
       }
 
