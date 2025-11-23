@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeonArc Management</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #0b1220;
+        color: #e8edf4;
+      }
+      h1 {
+        margin-bottom: 6px;
+      }
+      .page-subtitle {
+        margin-top: 0;
+        color: #9fb1ca;
+      }
+      .grid {
+        display: grid;
+        gap: 20px;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+      }
+      .card h2 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 18px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      th {
+        cursor: pointer;
+        color: #c5d3ea;
+        user-select: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .search-box {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.03);
+        color: #e8edf4;
+        min-width: 220px;
+      }
+      .meta {
+        color: #8fa2c1;
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      .cashout-item {
+        padding: 10px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 8px;
+      }
+      .cashout-empty {
+        color: #8fa2c1;
+      }
+      .user-panel {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .field-label {
+        display: block;
+        font-size: 14px;
+        color: #9fb1ca;
+        margin-bottom: 4px;
+      }
+      .input,
+      .textarea,
+      .select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.05);
+        color: #e8edf4;
+      }
+      .inline-form {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .button {
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.18), rgba(255, 110, 230, 0.14));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #e8edf4;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .button:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+      }
+      .muted {
+        color: #8fa2c1;
+        font-size: 14px;
+      }
+      .row-selected td {
+        background: rgba(110, 243, 255, 0.08);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        color: #0b1220;
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.9), rgba(255, 110, 230, 0.8));
+      }
+      .user-panel h3 {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Management Dashboard</h1>
+      <p class="page-subtitle">Secure view for administrators only.</p>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <div class="controls">
+          <input class="search-box" type="search" id="userSearch" placeholder="Search by username or ID" />
+          <div class="meta" id="userCount"></div>
+        </div>
+        <div class="table-wrapper">
+          <table aria-label="User overview">
+            <thead>
+              <tr>
+                <th data-sort="username">Username ▾</th>
+                <th data-sort="id">User ID</th>
+                <th data-sort="balance">Balance</th>
+                <th data-sort="joinedAt">Join Date</th>
+                <th data-sort="lastActivity">Last Activity</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="user-panel" id="userControls">
+          <div class="meta" id="selectedUserLabel">Select a user to manage balance and visibility.</div>
+          <div class="inline-form">
+            <div style="flex: 1 1 180px; min-width: 160px;">
+              <label class="field-label" for="creditAmount">Add balance</label>
+              <input class="input" type="number" step="0.01" min="0" id="creditAmount" placeholder="$0.00" />
+            </div>
+            <div style="align-self: flex-end;">
+              <button class="button" type="button" id="creditBtn" disabled>Apply Credit</button>
+            </div>
+          </div>
+          <div>
+            <label class="field-label" for="viewModeSelect">What this user sees</label>
+            <select class="select" id="viewModeSelect" disabled>
+              <option value="standard">Standard experience</option>
+              <option value="vip">VIP focus</option>
+              <option value="limited">Limited/preview view</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="dashboardNote">User-facing note</label>
+            <textarea
+              class="textarea"
+              rows="3"
+              id="dashboardNote"
+              maxlength="240"
+              placeholder="Optional dashboard note the user will see in their profile."
+              disabled
+            ></textarea>
+          </div>
+          <div class="inline-form" style="justify-content: space-between; align-items: center;">
+            <button class="button" type="button" id="saveDisplayBtn" disabled>Save View Preferences</button>
+            <span class="badge" id="viewModeBadge">Awaiting selection</span>
+          </div>
+          <p class="muted" id="controlStatus">Choose a user from the table to enable controls.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Pending Cash Outs</h2>
+        <div id="cashoutList"></div>
+      </div>
+    </section>
+
+    <script>
+      let users = <%- JSON.stringify(users || []) %>;
+      const cashouts = <%- JSON.stringify(cashouts || []) %>;
+
+      const userTableBody = document.getElementById('userTableBody');
+      const searchInput = document.getElementById('userSearch');
+      const userCount = document.getElementById('userCount');
+      const cashoutList = document.getElementById('cashoutList');
+      const creditInput = document.getElementById('creditAmount');
+      const creditBtn = document.getElementById('creditBtn');
+      const viewModeSelect = document.getElementById('viewModeSelect');
+      const dashboardNoteInput = document.getElementById('dashboardNote');
+      const saveDisplayBtn = document.getElementById('saveDisplayBtn');
+      const selectedUserLabel = document.getElementById('selectedUserLabel');
+      const controlStatus = document.getElementById('controlStatus');
+      const viewModeBadge = document.getElementById('viewModeBadge');
+
+      const adminKey = new URLSearchParams(window.location.search).get('key') || '';
+
+      let currentSort = { key: 'username', direction: 'asc' };
+      let selectedUserId = null;
+
+      function formatDate(value) {
+        if (!value) return '—';
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) return '—';
+        return parsed.toLocaleString();
+      }
+
+      function formatCurrency(value) {
+        return `$${Number(value || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`;
+      }
+
+      function renderUsers(list) {
+        if (!userTableBody) return;
+        userTableBody.innerHTML = '';
+        list.forEach((user) => {
+          const row = document.createElement('tr');
+          row.dataset.userId = user.id;
+          if (user.id === selectedUserId) {
+            row.classList.add('row-selected');
+          }
+          row.innerHTML = `
+            <td>${user.username || '—'}</td>
+            <td>${user.id || '—'}</td>
+            <td>${formatCurrency(user.balance)}</td>
+            <td>${formatDate(user.joinedAt)}</td>
+            <td>${formatDate(user.lastActivity)}</td>
+          `;
+          row.addEventListener('click', () => selectUser(user));
+          userTableBody.appendChild(row);
+        });
+        if (userCount) {
+          userCount.textContent = `${list.length} user${list.length === 1 ? '' : 's'} shown`;
+        }
+      }
+
+      function sortUsers(list, key, direction = 'asc') {
+        const sorted = [...list].sort((a, b) => {
+          const first = a?.[key] || '';
+          const second = b?.[key] || '';
+          if (key === 'balance') {
+            return direction === 'asc' ? first - second : second - first;
+          }
+          if (key === 'joinedAt' || key === 'lastActivity') {
+            const firstTime = new Date(first).getTime();
+            const secondTime = new Date(second).getTime();
+            return direction === 'asc' ? firstTime - secondTime : secondTime - firstTime;
+          }
+          const firstVal = first.toString().toLowerCase();
+          const secondVal = second.toString().toLowerCase();
+          if (firstVal < secondVal) return direction === 'asc' ? -1 : 1;
+          if (firstVal > secondVal) return direction === 'asc' ? 1 : -1;
+          return 0;
+        });
+        return sorted;
+      }
+
+      function applyFilters() {
+        const query = searchInput?.value?.trim().toLowerCase();
+        let list = [...users];
+
+        if (query) {
+          list = list.filter((user) => {
+            return (
+              user.username?.toLowerCase().includes(query) ||
+              user.id?.toLowerCase().includes(query)
+            );
+          });
+        }
+
+        const sorted = sortUsers(list, currentSort.key, currentSort.direction);
+        renderUsers(sorted);
+        syncSelectionControls();
+      }
+
+      function renderCashouts() {
+        if (!cashoutList) return;
+        cashoutList.innerHTML = '';
+        if (!cashouts.length) {
+          const empty = document.createElement('p');
+          empty.className = 'cashout-empty';
+          empty.textContent = 'No pending cash outs.';
+          cashoutList.appendChild(empty);
+          return;
+        }
+        cashouts.forEach((entry) => {
+          const item = document.createElement('div');
+          item.className = 'cashout-item';
+          item.textContent = `User ${entry.username} requested ${formatCurrency(entry.amount)} on ${formatDate(
+            entry.requestedAt,
+          )} — please confirm payout manually.`;
+          cashoutList.appendChild(item);
+        });
+      }
+
+      function setControlStatus(message, isError = false) {
+        if (!controlStatus) return;
+        controlStatus.textContent = message;
+        controlStatus.style.color = isError ? '#ff9bb3' : '#8fa2c1';
+      }
+
+      function syncSelectionControls() {
+        const selectedUser = users.find((user) => user.id === selectedUserId) || null;
+        const hasSelection = Boolean(selectedUser);
+        [creditBtn, viewModeSelect, dashboardNoteInput, saveDisplayBtn].forEach((el) => {
+          if (el) el.disabled = !hasSelection || !adminKey;
+        });
+        if (creditInput) creditInput.disabled = !hasSelection;
+
+        if (!hasSelection) {
+          if (selectedUserLabel) selectedUserLabel.textContent = 'Select a user to manage balance and visibility.';
+          if (viewModeBadge) viewModeBadge.textContent = adminKey ? 'Awaiting selection' : 'Admin key missing';
+          setControlStatus(adminKey ? 'Choose a user from the table to enable controls.' : 'Admin key missing from request.', !adminKey);
+          return;
+        }
+
+        if (selectedUserLabel)
+          selectedUserLabel.textContent = `Editing ${selectedUser.username} (${selectedUser.id})`;
+        if (viewModeSelect) viewModeSelect.value = selectedUser.viewMode || 'standard';
+        if (dashboardNoteInput)
+          dashboardNoteInput.value = selectedUser.dashboardNote || '';
+        if (viewModeBadge)
+          viewModeBadge.textContent = `${selectedUser.viewMode || 'standard'} view`.replace(/\b\w/g, (m) => m.toUpperCase());
+        setControlStatus('Adjust balance or change what this user sees.');
+      }
+
+      function selectUser(user) {
+        selectedUserId = user?.id || null;
+        syncSelectionControls();
+        applyFilters();
+      }
+
+      async function applyCredit() {
+        const selectedUser = users.find((user) => user.id === selectedUserId);
+        if (!selectedUser || !adminKey) return;
+        const amount = Number(creditInput?.value);
+        if (!Number.isFinite(amount) || amount <= 0) {
+          setControlStatus('Enter a positive amount to credit.', true);
+          return;
+        }
+
+        try {
+          setControlStatus('Submitting credit...');
+          const response = await fetch('/api/admin/credit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({ userId: selectedUser.id, amount }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setControlStatus(payload.error || 'Unable to credit balance.', true);
+            return;
+          }
+          const updatedUser = payload.user;
+          if (updatedUser) {
+            users = users.map((user) => (user.id === updatedUser.id ? updatedUser : user));
+            selectedUserId = updatedUser.id;
+            setControlStatus('Balance updated.');
+            applyFilters();
+          }
+        } catch (error) {
+          console.error('Failed to credit user', error);
+          setControlStatus('Unable to credit balance right now.', true);
+        }
+      }
+
+      async function saveDisplayPreferences() {
+        const selectedUser = users.find((user) => user.id === selectedUserId);
+        if (!selectedUser || !adminKey) return;
+        const viewMode = viewModeSelect?.value || 'standard';
+        const dashboardNote = dashboardNoteInput?.value || '';
+
+        try {
+          setControlStatus('Saving view preferences...');
+          const response = await fetch('/api/admin/display', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({ userId: selectedUser.id, viewMode, dashboardNote }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setControlStatus(payload.error || 'Unable to update view.', true);
+            return;
+          }
+          const updatedUser = payload.user;
+          if (updatedUser) {
+            users = users.map((user) => (user.id === updatedUser.id ? updatedUser : user));
+            selectedUserId = updatedUser.id;
+            setControlStatus('User view updated.');
+            applyFilters();
+          }
+        } catch (error) {
+          console.error('Failed to update view preferences', error);
+          setControlStatus('Unable to save view preferences right now.', true);
+        }
+      }
+
+      document.querySelectorAll('th[data-sort]').forEach((header) => {
+        header.addEventListener('click', () => {
+          const key = header.dataset.sort;
+          if (currentSort.key === key) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+          } else {
+            currentSort = { key, direction: 'asc' };
+          }
+          document.querySelectorAll('th[data-sort]').forEach((h) => {
+            h.textContent = h.textContent.replace(/[\s▾▴]+$/, '').trim();
+            if (h.dataset.sort === currentSort.key) {
+              h.textContent = `${h.textContent} ${currentSort.direction === 'asc' ? '▾' : '▴'}`;
+            }
+          });
+          applyFilters();
+        });
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+      }
+
+      if (creditBtn) {
+        creditBtn.addEventListener('click', applyCredit);
+      }
+
+      if (saveDisplayBtn) {
+        saveDisplayBtn.addEventListener('click', saveDisplayPreferences);
+      }
+
+      renderCashouts();
+      applyFilters();
+      syncSelectionControls();
+    </script>
+  </body>
+</html>

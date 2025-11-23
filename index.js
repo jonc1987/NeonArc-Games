@@ -3,7 +3,7 @@ const path = require('path');
 const session = require('express-session');
 const cors = require('cors');
 require('dotenv').config();
-const { ensureDataFile } = require('./utils/userStorage');
+const { ensureDataFile, getUsers, getCashouts } = require('./utils/userStorage');
 
 const app = express();
 
@@ -34,6 +34,8 @@ app.use('/api/shop', require('./routes/shop'));
 app.use('/api/daily-wheel', require('./routes/dailyWheel'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
 app.use('/api', require('./routes/account'));
+app.use('/api', require('./routes/cashouts'));
+app.use('/api/admin', require('./routes/admin'));
 
 app.get('/', (req, res) => {
   res.render('index');
@@ -41,6 +43,20 @@ app.get('/', (req, res) => {
 
 app.get('/confirm', (req, res) => {
   res.render('confirm');
+});
+
+app.get('/management', (req, res) => {
+  const providedKey = req.query?.key;
+  const adminKey = process.env.ADMIN_KEY;
+
+  if (!adminKey || providedKey !== adminKey) {
+    return res.status(403).send('Access Denied');
+  }
+
+  const users = getUsers();
+  const cashouts = getCashouts();
+
+  return res.render('management', { users, cashouts });
 });
 
 const PORT = process.env.PORT || 3000;

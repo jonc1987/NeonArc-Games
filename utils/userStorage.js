@@ -4,6 +4,7 @@ const { randomUUID } = require('crypto');
 
 const dataDir = path.join(__dirname, '..', 'data');
 const usersFile = path.join(dataDir, 'users.json');
+const cashoutsFile = path.join(dataDir, 'cashouts.json');
 
 function ensureDataFile() {
   if (!fs.existsSync(dataDir)) {
@@ -11,6 +12,9 @@ function ensureDataFile() {
   }
   if (!fs.existsSync(usersFile)) {
     fs.writeFileSync(usersFile, '[]', 'utf8');
+  }
+  if (!fs.existsSync(cashoutsFile)) {
+    fs.writeFileSync(cashoutsFile, '[]', 'utf8');
   }
 }
 
@@ -30,10 +34,32 @@ function saveUsers(users) {
   fs.writeFileSync(usersFile, JSON.stringify(users, null, 2), 'utf8');
 }
 
+function getCashouts() {
+  ensureDataFile();
+  try {
+    const raw = fs.readFileSync(cashoutsFile, 'utf8');
+    return JSON.parse(raw);
+  } catch (error) {
+    console.error('Failed to read cashouts file', error);
+    return [];
+  }
+}
+
+function saveCashouts(cashouts) {
+  ensureDataFile();
+  fs.writeFileSync(cashoutsFile, JSON.stringify(cashouts, null, 2), 'utf8');
+}
+
 function findUser(username) {
   const normalized = username?.toString().trim().toLowerCase();
   if (!normalized) return null;
   return getUsers().find((user) => user.username.toLowerCase() === normalized) || null;
+}
+
+function findUserById(id) {
+  const normalized = id?.toString().trim();
+  if (!normalized) return null;
+  return getUsers().find((user) => user.id === normalized) || null;
 }
 
 function createUser(username, passwordHash, balance = 1000) {
@@ -46,33 +72,31 @@ function createUser(username, passwordHash, balance = 1000) {
   if (duplicate) {
     throw new Error('Username already exists');
   }
+  const nowIso = new Date().toISOString();
   const newUser = {
     id: randomUUID(),
     username: normalized,
     password: passwordHash,
     balance: Number(balance) || 0,
-    joinedAt: new Date().toISOString(),
+    joinedAt: nowIso,
+    lastActivity: nowIso,
+    viewMode: 'standard',
+    dashboardNote: '',
   };
   users.push(newUser);
   saveUsers(users);
   return newUser;
 }
 
-function updateUserBalance(username, delta, { allowNegative = false } = {}) {
+function markUserActivity(username) {
   const normalized = username?.toString().trim().toLowerCase();
-  if (!normalized || !Number.isFinite(Number(delta))) {
-    return null;
-  }
+  if (!normalized) return null;
 
   const users = getUsers();
   let updatedUser = null;
-
   const updatedUsers = users.map((user) => {
     if (user.username.toLowerCase() === normalized) {
-      const startingBalance = Number(user.balance || 0);
-      const nextBalance = startingBalance + Number(delta);
-      const balance = allowNegative ? nextBalance : Math.max(0, nextBalance);
-      updatedUser = { ...user, balance };
+      updatedUser = { ...user, lastActivity: new Date().toISOString() };
       return updatedUser;
     }
     return user;
@@ -85,11 +109,111 @@ function updateUserBalance(username, delta, { allowNegative = false } = {}) {
   return updatedUser;
 }
 
+function updateUserBalance(username, delta, { allowNegative = false } = {}) {
+  const normalized = username?.toString().trim().toLowerCase();
+  if (!normalized || !Number.isFinite(Number(delta))) {
+    return null;
+  }
+
+  return updateUserBalanceById(
+    getUsers().find((user) => user.username.toLowerCase() === normalized)?.id,
+    delta,
+    { allowNegative },
+  );
+}
+
+function updateUserBalanceById(id, delta, { allowNegative = false } = {}) {
+  const normalized = id?.toString().trim();
+  if (!normalized || !Number.isFinite(Number(delta))) {
+    return null;
+  }
+
+  const users = getUsers();
+  let updatedUser = null;
+
+  const updatedUsers = users.map((user) => {
+    if (user.id === normalized) {
+      const startingBalance = Number(user.balance || 0);
+      const nextBalance = startingBalance + Number(delta);
+      const balance = allowNegative ? nextBalance : Math.max(0, nextBalance);
+      updatedUser = { ...user, balance, lastActivity: new Date().toISOString() };
+      return updatedUser;
+    }
+    return user;
+  });
+
+  if (updatedUser) {
+    saveUsers(updatedUsers);
+  }
+
+  return updatedUser;
+}
+
+function setUserDisplayPreferences(id, { viewMode, dashboardNote }) {
+  const normalizedId = id?.toString().trim();
+  if (!normalizedId) return null;
+
+  const allowedModes = new Set(['standard', 'vip', 'limited']);
+  const safeMode = allowedModes.has(viewMode) ? viewMode : 'standard';
+  const safeNote = dashboardNote?.toString().trim().slice(0, 240) || '';
+
+  const users = getUsers();
+  let updatedUser = null;
+
+  const updatedUsers = users.map((user) => {
+    if (user.id === normalizedId) {
+      updatedUser = {
+        ...user,
+        viewMode: safeMode,
+        dashboardNote: safeNote,
+        lastActivity: new Date().toISOString(),
+      };
+      return updatedUser;
+    }
+    return user;
+  });
+
+  if (updatedUser) {
+    saveUsers(updatedUsers);
+  }
+
+  return updatedUser;
+}
+
+function addCashout({ id, username, amount }) {
+  ensureDataFile();
+  const sanitizedId = id?.toString().trim();
+  const sanitizedUsername = username?.toString().trim();
+  const numericAmount = Number(amount);
+
+  if (!sanitizedId || !sanitizedUsername || !Number.isFinite(numericAmount)) {
+    throw new Error('Invalid cashout details');
+  }
+
+  const cashouts = getCashouts();
+  const newCashout = {
+    id: sanitizedId,
+    username: sanitizedUsername,
+    amount: numericAmount,
+    requestedAt: new Date().toISOString(),
+  };
+  cashouts.push(newCashout);
+  saveCashouts(cashouts);
+  return newCashout;
+}
+
 module.exports = {
   getUsers,
   saveUsers,
   findUser,
+  findUserById,
   createUser,
   ensureDataFile,
   updateUserBalance,
+  updateUserBalanceById,
+  getCashouts,
+  saveCashouts,
+  addCashout,
+  markUserActivity,
+  setUserDisplayPreferences,
 };
