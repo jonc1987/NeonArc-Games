@@ -340,6 +340,10 @@
         flex-wrap: wrap;
       }
 
+      .hidden {
+        display: none !important;
+      }
+
       .auth-form {
         display: none;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -348,6 +352,10 @@
 
       .auth-form.active {
         display: grid;
+      }
+
+      .auth-panel.authenticated .auth-form {
+        display: none;
       }
 
       .auth-input {
@@ -369,11 +377,6 @@
         border-color: rgba(110, 243, 255, 0.45);
       }
 
-      .accent-gold {
-        box-shadow: 0 10px 30px rgba(255, 214, 102, 0.22);
-        border-color: rgba(255, 214, 102, 0.6);
-      }
-
       .accent-pink {
         box-shadow: 0 10px 30px rgba(255, 140, 220, 0.25);
         border-color: rgba(255, 140, 220, 0.55);
@@ -389,15 +392,104 @@
         border-color: rgba(184, 155, 255, 0.55);
       }
 
-      .daily-wheel-placeholder {
-        margin-top: 16px;
+      .glow-wheel {
+        position: relative;
+        width: min(360px, 100%);
+        aspect-ratio: 1 / 1;
+        margin: 10px auto 24px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 50%, rgba(110, 243, 255, 0.18), rgba(0, 6, 12, 0.9));
+        border: 1px solid rgba(110, 243, 255, 0.28);
+        box-shadow: 0 0 30px rgba(110, 243, 255, 0.2), 0 0 80px rgba(255, 110, 230, 0.14);
+        overflow: hidden;
+      }
+
+      .glow-wheel-inner {
+        position: absolute;
+        inset: 12px;
+        border-radius: 50%;
+        background: conic-gradient(
+          from 0deg,
+          rgba(110, 243, 255, 0.6) 0deg,
+          rgba(255, 110, 230, 0.6) 72deg,
+          rgba(255, 220, 120, 0.6) 144deg,
+          rgba(110, 255, 190, 0.65) 216deg,
+          rgba(140, 160, 255, 0.6) 288deg,
+          rgba(110, 243, 255, 0.6) 360deg
+        );
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.45);
+        transition: transform 2.2s cubic-bezier(0.19, 1, 0.22, 1);
+      }
+
+      .glow-wheel-spokes {
+        position: absolute;
+        inset: 10px;
+        border-radius: 50%;
+        background: repeating-conic-gradient(
+          from 0deg,
+          rgba(0, 10, 20, 0.02) 0deg,
+          rgba(0, 10, 20, 0.02) 6deg,
+          rgba(255, 255, 255, 0.1) 6deg,
+          rgba(255, 255, 255, 0.1) 7deg
+        );
+        pointer-events: none;
+      }
+
+      .glow-wheel-center {
+        position: absolute;
+        inset: 32%;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.72));
+        border: 1px solid rgba(110, 243, 255, 0.6);
         display: grid;
         place-items: center;
-        height: 200px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.75));
-        border: 1px dashed rgba(110, 243, 255, 0.35);
-        box-shadow: inset 0 0 40px rgba(110, 243, 255, 0.18);
+        color: #eaf9ff;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        box-shadow: 0 0 20px rgba(110, 243, 255, 0.36), inset 0 0 12px rgba(255, 110, 230, 0.18);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .glow-wheel-pointer {
+        position: absolute;
+        top: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 16px solid rgba(255, 255, 255, 0.85);
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+      }
+
+      .glow-wheel-labels {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        pointer-events: none;
+      }
+
+      .glow-wheel-labels span {
+        position: absolute;
+        font-size: 12px;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(0, 8, 16, 0.7);
+        font-weight: 600;
+      }
+
+      .glow-wheel.spinning .glow-wheel-inner {
+        transform: rotate(1220deg);
+      }
+
+      .glow-wheel.rewarded .glow-wheel-center {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(110, 243, 255, 0.5), inset 0 0 18px rgba(255, 214, 102, 0.4);
       }
 
       .leaderboard-table {
@@ -422,7 +514,6 @@
         background: rgba(255, 255, 255, 0.04);
       }
 
-      .vault-history,
       .shop-inventory {
         list-style: none;
         padding: 0;
@@ -432,7 +523,6 @@
         gap: 8px;
       }
 
-      .vault-history li,
       .shop-inventory li {
         padding: 10px 12px;
         border-radius: 12px;
@@ -444,33 +534,22 @@
         gap: 12px;
       }
 
-      .vault-entry-meta {
+      .shop-item-details {
         display: flex;
         flex-direction: column;
         gap: 4px;
         color: rgba(234, 249, 255, 0.75);
       }
 
-      .vault-entry-subtext,
       .shop-item-meta {
         font-size: 13px;
         color: rgba(234, 249, 255, 0.6);
         letter-spacing: 0.04em;
       }
 
-      .vault-amount,
       .shop-price {
         font-weight: 700;
         letter-spacing: 0.08em;
-      }
-
-      .vault-amount.deposit,
-      .vault-amount.transfer {
-        color: #6ef3ff;
-      }
-
-      .vault-amount.withdrawal {
-        color: #ff9bb3;
       }
 
       .shop-item-title {
@@ -2968,7 +3047,6 @@
       <aside class="account-nav">
         <h3>Account Pages</h3>
         <button class="account-nav-button active" data-account-target="profilePage" type="button">Profile</button>
-        <button class="account-nav-button" data-account-target="vaultPage" type="button">Vault</button>
         <button class="account-nav-button" data-account-target="dailyWheelPage" type="button">Daily Wheel</button>
         <button class="account-nav-button" data-account-target="shopPage" type="button">Shop</button>
         <button class="account-nav-button" data-account-target="leaderboardPage" type="button">Leaderboard</button>
@@ -3003,29 +3081,22 @@
           </div>
           <p class="api-note" id="accountStatus">Initializing account...</p>
         </div>
-        <div class="account-page accent-gold" id="vaultPage">
-          <h2>Vault</h2>
-          <p>Stored credits and secure transactions will appear here.</p>
-          <div class="account-meta">
-            <div class="account-card">
-              <div class="label">Current Vault Credits</div>
-              <div class="value" id="vaultCredits">--</div>
-            </div>
-            <div class="account-card">
-              <div class="label">Withdrawal Queue</div>
-              <div class="value" id="vaultQueue">--</div>
-            </div>
-          </div>
-          <div class="account-card">
-            <div class="label">Vault Ledger</div>
-            <ul class="vault-history" id="vaultHistory"></ul>
-          </div>
-          <p class="api-note" id="vaultStatus">Vault is loading...</p>
-        </div>
         <div class="account-page accent-green" id="dailyWheelPage">
           <h2>Daily Wheel</h2>
           <p>Spin the neon wheel each day for rewards.</p>
-          <div class="daily-wheel-placeholder">Glowing Spinner — Coming Soon</div>
+          <div class="glow-wheel" id="glowWheel">
+            <div class="glow-wheel-inner"></div>
+            <div class="glow-wheel-spokes"></div>
+            <div class="glow-wheel-labels">
+              <span style="transform: rotate(0deg) translateY(-46%);">+10</span>
+              <span style="transform: rotate(72deg) translateY(-46%);">+25</span>
+              <span style="transform: rotate(144deg) translateY(-46%);">+50</span>
+              <span style="transform: rotate(216deg) translateY(-46%);">+100</span>
+              <span style="transform: rotate(288deg) translateY(-46%);">Jackpot</span>
+            </div>
+            <div class="glow-wheel-center"><span>Ready</span></div>
+            <div class="glow-wheel-pointer"></div>
+          </div>
           <div class="account-actions">
             <button class="account-action" id="spinWheelBtn" type="button">Spin Now</button>
             <button class="account-action secondary" id="checkWheelBtn" type="button">Check Status</button>
@@ -3621,6 +3692,7 @@
       let ambientTarget = 0.3;
       let ambientFadeFrame = null;
       let ambientPrimed = false;
+      let glowWheelSpinTimer = null;
 
       // ---------------- Rocket state ----------------
       let currentBet = 0;
@@ -3778,12 +3850,9 @@
       const accountPageContainer = document.getElementById('accountPageContainer');
       const accountBackToLobbyBtn = document.getElementById('accountBackToLobby');
       const accountNavButtons = document.querySelectorAll('.account-nav-button');
-      const vaultCreditsEl = document.getElementById('vaultCredits');
-      const vaultQueueEl = document.getElementById('vaultQueue');
-      const vaultHistoryEl = document.getElementById('vaultHistory');
-      const vaultStatusEl = document.getElementById('vaultStatus');
       const spinWheelBtn = document.getElementById('spinWheelBtn');
       const checkWheelBtn = document.getElementById('checkWheelBtn');
+      const glowWheel = document.getElementById('glowWheel');
       const dailyWheelRewardEl = document.getElementById('dailyWheelReward');
       const dailyWheelStatusEl = document.getElementById('dailyWheelStatus');
       const shopInventoryEl = document.getElementById('shopInventory');
@@ -3798,7 +3867,6 @@
       };
       const accountPages = {
         profilePage: document.getElementById('profilePage'),
-        vaultPage: document.getElementById('vaultPage'),
         dailyWheelPage: document.getElementById('dailyWheelPage'),
         shopPage: document.getElementById('shopPage'),
         leaderboardPage: document.getElementById('leaderboardPage'),
@@ -4148,6 +4216,26 @@
         authStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(234, 249, 255, 0.72)';
       }
 
+      function updateAuthVisibility() {
+        const loggedIn = Boolean(accountData);
+        [showLoginBtn, showRegisterBtn].forEach((btn) => {
+          if (btn) {
+            btn.classList.toggle('hidden', loggedIn);
+          }
+        });
+        if (logoutBtn) {
+          logoutBtn.classList.toggle('hidden', !loggedIn);
+        }
+        if (authPanel) {
+          authPanel.classList.toggle('authenticated', loggedIn);
+        }
+        if (loggedIn) {
+          closeAuthForms();
+        } else {
+          toggleAuthForm(null);
+        }
+      }
+
       function formatCurrency(value) {
         return `$${Number(value || 0).toLocaleString(undefined, {
           minimumFractionDigits: 2,
@@ -4212,6 +4300,7 @@
         balance = Number(account.balance || 0);
         renderAccountDetails();
         updateBalance(false);
+        updateAuthVisibility();
         if (openAccountHubBtn) {
           openAccountHubBtn.disabled = false;
           openAccountHubBtn.textContent = 'Account Hub';
@@ -4223,6 +4312,7 @@
         balance = 0;
         renderAccountDetails();
         updateBalance(false);
+        updateAuthVisibility();
         if (openAccountHubBtn) {
           openAccountHubBtn.disabled = true;
           openAccountHubBtn.textContent = 'Login Required';
@@ -4237,10 +4327,12 @@
           applyAccountData(existing);
           setAccountStatus('Session active. Welcome back.');
           setAuthStatus(`Logged in as ${existing.username}.`);
+          updateAuthVisibility();
           return;
         }
         clearAccountData();
         setAuthStatus('Login or register to begin.');
+        updateAuthVisibility();
       }
 
       function requireActiveSession() {
@@ -4357,92 +4449,40 @@
         }
       }
 
-      function renderVaultHistory(history = []) {
-        if (!vaultHistoryEl) return;
-        vaultHistoryEl.innerHTML = '';
-        if (!history.length) {
-          const empty = document.createElement('li');
-          empty.textContent = 'No vault ledger entries yet.';
-          vaultHistoryEl.appendChild(empty);
-          return;
+      function setGlowWheelLabel(text) {
+        if (!glowWheel) return;
+        const label = glowWheel.querySelector('.glow-wheel-center span');
+        if (label) {
+          label.textContent = text;
         }
-
-        history
-          .slice()
-          .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))
-          .forEach((entry) => {
-            const item = document.createElement('li');
-            const meta = document.createElement('div');
-            meta.className = 'vault-entry-meta';
-
-            const title = document.createElement('div');
-            title.textContent = entry.description || 'Vault activity';
-            const subtext = document.createElement('div');
-            subtext.className = 'vault-entry-subtext';
-            const when = entry.timestamp ? new Date(entry.timestamp).toLocaleString() : 'Recent';
-            subtext.textContent = `${entry.type || 'transfer'} · ${when}`;
-            meta.appendChild(title);
-            meta.appendChild(subtext);
-
-            const amount = document.createElement('span');
-            amount.className = `vault-amount ${entry.type || 'transfer'}`;
-            const signed = entry.type === 'withdrawal' ? -Math.abs(Number(entry.amount || 0)) : Number(entry.amount || 0);
-            amount.textContent = formatCurrency(signed);
-
-            item.appendChild(meta);
-            item.appendChild(amount);
-            vaultHistoryEl.appendChild(item);
-          });
       }
 
-      async function loadVault() {
-        if (!requireActiveSession()) return;
-        if (vaultStatusEl) {
-          vaultStatusEl.textContent = 'Loading vault...';
-          vaultStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
+      function stopGlowWheelSpin() {
+        if (!glowWheel) return;
+        if (glowWheelSpinTimer) {
+          clearTimeout(glowWheelSpinTimer);
+          glowWheelSpinTimer = null;
         }
-        try {
-          const response = await fetch('/api/vault');
-          if (response.status === 401) {
-            clearAccountData('Session expired. Please log in again.', true);
-            setAuthStatus('Session expired. Please log in again.', true);
-            return;
+        glowWheel.classList.remove('spinning');
+      }
+
+      function triggerGlowWheelSpin(duration = 2400) {
+        if (!glowWheel) return;
+        stopGlowWheelSpin();
+        glowWheel.classList.add('spinning');
+        glowWheelSpinTimer = setTimeout(stopGlowWheelSpin, duration);
+      }
+
+      function celebrateGlowWheel(labelText) {
+        if (!glowWheel) return;
+        stopGlowWheelSpin();
+        glowWheel.classList.add('rewarded');
+        setGlowWheelLabel(labelText || 'Win!');
+        setTimeout(() => {
+          if (glowWheel) {
+            glowWheel.classList.remove('rewarded');
           }
-          if (!response.ok) {
-            if (vaultStatusEl) {
-              vaultStatusEl.textContent = 'Unable to load vault data.';
-              vaultStatusEl.style.color = '#ff9bb3';
-            }
-            return;
-          }
-          const payload = await response.json();
-          const { vault } = payload || {};
-          if (!vault) {
-            if (vaultStatusEl) {
-              vaultStatusEl.textContent = 'Vault unavailable.';
-              vaultStatusEl.style.color = '#ff9bb3';
-            }
-            return;
-          }
-          if (vaultCreditsEl) {
-            vaultCreditsEl.textContent = formatCurrency(vault.credits);
-          }
-          if (vaultQueueEl) {
-            const pending = vault.withdrawalQueue ?? 0;
-            vaultQueueEl.textContent = `${pending} pending`;
-          }
-          renderVaultHistory(vault.history || []);
-          if (vaultStatusEl) {
-            vaultStatusEl.textContent = 'Vault synced.';
-            vaultStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
-          }
-        } catch (error) {
-          console.error('Failed to load vault', error);
-          if (vaultStatusEl) {
-            vaultStatusEl.textContent = 'Could not reach the vault service.';
-            vaultStatusEl.style.color = '#ff9bb3';
-          }
-        }
+        }, 1200);
       }
 
       function updateDailyWheelUI(data) {
@@ -4463,10 +4503,18 @@
           }
           dailyWheelStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
         }
+        if (data?.lastReward !== undefined && data?.lastReward !== null) {
+          setGlowWheelLabel(formatCurrency(data.lastReward));
+        } else if (data?.nextEligibleAt) {
+          setGlowWheelLabel('Locked');
+        } else {
+          setGlowWheelLabel('Ready');
+        }
       }
 
       async function refreshDailyWheelStatus() {
         if (!requireActiveSession()) return;
+        setGlowWheelLabel('Checking');
         if (dailyWheelStatusEl) {
           dailyWheelStatusEl.textContent = 'Checking availability...';
           dailyWheelStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
@@ -4489,6 +4537,7 @@
           updateDailyWheelUI(payload);
         } catch (error) {
           console.error('Failed to load daily wheel', error);
+          setGlowWheelLabel('Error');
           if (dailyWheelStatusEl) {
             dailyWheelStatusEl.textContent = 'Could not reach the wheel service.';
             dailyWheelStatusEl.style.color = '#ff9bb3';
@@ -4498,6 +4547,8 @@
 
       async function spinDailyWheel() {
         if (!requireActiveSession()) return;
+        triggerGlowWheelSpin();
+        setGlowWheelLabel('Spinning');
         if (dailyWheelStatusEl) {
           dailyWheelStatusEl.textContent = 'Spinning...';
           dailyWheelStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
@@ -4507,11 +4558,13 @@
           if (response.status === 401) {
             clearAccountData('Session expired. Please log in again.', true);
             setAuthStatus('Session expired. Please log in again.', true);
+            stopGlowWheelSpin();
             return;
           }
           if (response.status === 429) {
             const payload = await response.json();
             updateDailyWheelUI(payload);
+            stopGlowWheelSpin();
             if (dailyWheelStatusEl) {
               const nextWindow = payload?.nextEligibleAt
                 ? new Date(payload.nextEligibleAt).toLocaleString()
@@ -4519,13 +4572,16 @@
               dailyWheelStatusEl.textContent = `Already spun. Next spin after ${nextWindow}.`;
               dailyWheelStatusEl.style.color = '#ff9bb3';
             }
+            setGlowWheelLabel('Locked');
             return;
           }
           if (!response.ok) {
+            stopGlowWheelSpin();
             if (dailyWheelStatusEl) {
               dailyWheelStatusEl.textContent = 'Spin failed.';
               dailyWheelStatusEl.style.color = '#ff9bb3';
             }
+            setGlowWheelLabel('Retry');
             return;
           }
           const payload = await response.json();
@@ -4536,13 +4592,16 @@
           if (dailyWheelStatusEl) {
             dailyWheelStatusEl.textContent = `Wheel awarded ${formatCurrency(payload?.reward)}.`;
           }
+          celebrateGlowWheel(formatCurrency(payload?.reward));
           await refreshAccountFromServer();
         } catch (error) {
           console.error('Failed to spin daily wheel', error);
+          stopGlowWheelSpin();
           if (dailyWheelStatusEl) {
             dailyWheelStatusEl.textContent = 'Could not spin the wheel.';
             dailyWheelStatusEl.style.color = '#ff9bb3';
           }
+          setGlowWheelLabel('Error');
         }
       }
 
@@ -4559,7 +4618,7 @@
         items.forEach((item) => {
           const li = document.createElement('li');
           const details = document.createElement('div');
-          details.className = 'vault-entry-meta';
+          details.className = 'shop-item-details';
 
           const title = document.createElement('div');
           title.className = 'shop-item-title';
@@ -4820,9 +4879,6 @@
         accountPages[pageId].classList.add('active');
 
         switch (pageId) {
-          case 'vaultPage':
-            loadVault();
-            break;
           case 'dailyWheelPage':
             refreshDailyWheelStatus();
             break;
