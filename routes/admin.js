@@ -53,6 +53,25 @@ router.post('/credit', (req, res) => {
   return res.json({ user: publicUser(refreshed) });
 });
 
+router.post('/debit', (req, res) => {
+  const { userId } = req.body || {};
+  const amount = sanitizeAmount(req.body?.amount);
+
+  if (!userId || !amount || amount <= 0) {
+    return res.status(400).json({ error: 'A positive amount is required.' });
+  }
+
+  const user = findUserById(userId);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  const updatedUser = updateUserBalanceById(userId, -amount, { allowNegative: false });
+  const refreshed = markUserActivity(user.username) || updatedUser;
+
+  return res.json({ user: publicUser(refreshed) });
+});
+
 router.post('/display', (req, res) => {
   const { userId, viewMode, dashboardNote } = req.body || {};
   if (!userId) {

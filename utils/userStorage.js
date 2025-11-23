@@ -62,7 +62,7 @@ function findUserById(id) {
   return getUsers().find((user) => user.id === normalized) || null;
 }
 
-function createUser(username, passwordHash, balance = 1000) {
+function createUser(username, passwordHash, balance = 250) {
   const users = getUsers();
   const normalized = username?.toString().trim();
   if (!normalized) {

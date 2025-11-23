@@ -193,6 +193,15 @@
               <button class="button" type="button" id="creditBtn" disabled>Apply Credit</button>
             </div>
           </div>
+          <div class="inline-form">
+            <div style="flex: 1 1 180px; min-width: 160px;">
+              <label class="field-label" for="debitAmount">Remove balance</label>
+              <input class="input" type="number" step="0.01" min="0" id="debitAmount" placeholder="$0.00" />
+            </div>
+            <div style="align-self: flex-end;">
+              <button class="button" type="button" id="debitBtn" disabled>Apply Debit</button>
+            </div>
+          </div>
           <div>
             <label class="field-label" for="viewModeSelect">What this user sees</label>
             <select class="select" id="viewModeSelect" disabled>
@@ -236,6 +245,8 @@
       const cashoutList = document.getElementById('cashoutList');
       const creditInput = document.getElementById('creditAmount');
       const creditBtn = document.getElementById('creditBtn');
+      const debitInput = document.getElementById('debitAmount');
+      const debitBtn = document.getElementById('debitBtn');
       const viewModeSelect = document.getElementById('viewModeSelect');
       const dashboardNoteInput = document.getElementById('dashboardNote');
       const saveDisplayBtn = document.getElementById('saveDisplayBtn');
@@ -354,10 +365,11 @@
       function syncSelectionControls() {
         const selectedUser = users.find((user) => user.id === selectedUserId) || null;
         const hasSelection = Boolean(selectedUser);
-        [creditBtn, viewModeSelect, dashboardNoteInput, saveDisplayBtn].forEach((el) => {
+        [creditBtn, debitBtn, viewModeSelect, dashboardNoteInput, saveDisplayBtn].forEach((el) => {
           if (el) el.disabled = !hasSelection || !adminKey;
         });
         if (creditInput) creditInput.disabled = !hasSelection;
+        if (debitInput) debitInput.disabled = !hasSelection;
 
         if (!hasSelection) {
           if (selectedUserLabel) selectedUserLabel.textContent = 'Select a user to manage balance and visibility.';
@@ -416,6 +428,40 @@
         }
       }
 
+      async function applyDebit() {
+        const selectedUser = users.find((user) => user.id === selectedUserId);
+        if (!selectedUser || !adminKey) return;
+        const amount = Number(debitInput?.value);
+        if (!Number.isFinite(amount) || amount <= 0) {
+          setControlStatus('Enter a positive amount to debit.', true);
+          return;
+        }
+
+        try {
+          setControlStatus('Submitting debit...');
+          const response = await fetch('/api/admin/debit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({ userId: selectedUser.id, amount }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setControlStatus(payload.error || 'Unable to debit balance.', true);
+            return;
+          }
+          const updatedUser = payload.user;
+          if (updatedUser) {
+            users = users.map((user) => (user.id === updatedUser.id ? updatedUser : user));
+            selectedUserId = updatedUser.id;
+            setControlStatus('Balance reduced.');
+            applyFilters();
+          }
+        } catch (error) {
+          console.error('Failed to debit user', error);
+          setControlStatus('Unable to debit balance right now.', true);
+        }
+      }
+
       async function saveDisplayPreferences() {
         const selectedUser = users.find((user) => user.id === selectedUserId);
         if (!selectedUser || !adminKey) return;
@@ -471,6 +517,10 @@
 
       if (creditBtn) {
         creditBtn.addEventListener('click', applyCredit);
+      }
+
+      if (debitBtn) {
+        debitBtn.addEventListener('click', applyDebit);
       }
 
       if (saveDisplayBtn) {

@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
 
   try {
     const hash = await bcrypt.hash(password, 10);
-    const user = createUser(username, hash, 1000);
+    const user = createUser(username, hash);
     req.session.user = { username: user.username };
     return res.status(201).json({ user: publicUser(user) });
   } catch (error) {

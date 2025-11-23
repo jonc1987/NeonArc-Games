@@ -329,6 +329,30 @@
         color: rgba(234, 249, 255, 0.76);
       }
 
+      .personalized-list {
+        list-style: none;
+        padding-left: 0;
+        margin: 10px 0 0;
+        display: grid;
+        gap: 6px;
+      }
+
+      .personalized-list li {
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(110, 243, 255, 0.16);
+        background: rgba(110, 243, 255, 0.05);
+        color: rgba(234, 249, 255, 0.9);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .personalized-list strong {
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.1em;
+      }
+
       .view-badge {
         display: inline-flex;
         align-items: center;
@@ -3100,7 +3124,7 @@
           <div class="account-meta">
             <div class="account-card">
               <div class="label">Total Balance</div>
-              <div class="value" id="profileBalance">$1,000.00</div>
+              <div class="value" id="profileBalance">$0.00</div>
             </div>
             <div class="account-card">
               <div class="label">Join Date</div>
@@ -3112,7 +3136,6 @@
             </div>
           </div>
           <div class="account-actions">
-            <button class="account-action" id="claimBonusBtn" type="button">Claim Bonus (+$50)</button>
             <button class="account-action" id="cashOutBtn" type="button">Cash Out</button>
             <button class="account-action secondary" id="refreshAccountBtn" type="button">Refresh Account</button>
           </div>
@@ -3120,6 +3143,11 @@
             <div class="label">Experience Mode</div>
             <div class="value"><span class="view-badge" id="viewModeDisplay" data-mode="standard">Standard</span></div>
             <p class="view-note" id="viewNote">Default experience enabled. Your lobby shows all content.</p>
+          </div>
+          <div class="account-card" id="personalizedCard">
+            <div class="label" id="personalizedTitle">Personalized track</div>
+            <p class="view-note" id="personalizedCopy">Unlock recommendations by logging in.</p>
+            <ul class="personalized-list" id="personalizedRecommendations"></ul>
           </div>
           <div class="account-card">
             <div class="label">Transaction History</div>
@@ -3867,11 +3895,13 @@
       const showLoginBtn = document.getElementById('showLogin');
       const showRegisterBtn = document.getElementById('showRegister');
       const logoutBtn = document.getElementById('logoutBtn');
-      const claimBonusBtn = document.getElementById('claimBonusBtn');
       const cashOutBtn = document.getElementById('cashOutBtn');
       const refreshAccountBtn = document.getElementById('refreshAccountBtn');
       const viewModeDisplay = document.getElementById('viewModeDisplay');
       const viewNote = document.getElementById('viewNote');
+      const personalizedTitle = document.getElementById('personalizedTitle');
+      const personalizedCopy = document.getElementById('personalizedCopy');
+      const personalizedList = document.getElementById('personalizedRecommendations');
       const ambientAudio = document.getElementById('lobbyMusic');
       const soundToggle = document.getElementById('soundToggle');
       const openAccountHubBtn = document.getElementById('openAccountHub');
@@ -4132,9 +4162,6 @@
         if (logoutBtn) {
           logoutBtn.addEventListener('click', handleLogout);
         }
-        if (claimBonusBtn) {
-          claimBonusBtn.addEventListener('click', () => handleBalanceAction(50, 'Bonus claimed!'));
-        }
         if (cashOutBtn) {
           cashOutBtn.addEventListener('click', () => requestCashOut());
         }
@@ -4335,6 +4362,47 @@
         }
       }
 
+      function renderPersonalizedRecommendations(account) {
+        const mode = account?.viewMode || 'standard';
+        const note = account?.dashboardNote?.trim();
+        const recommendationPool = {
+          standard: [
+            { title: 'Rocket Line', copy: 'Balance risk and reward with safer takeoffs.' },
+            { title: 'Binary Poker', copy: 'Tinker with bits to beat the target pattern.' },
+          ],
+          vip: [
+            { title: 'Mind Bet', copy: 'Sync with the AI for high-volatility swings.' },
+            { title: 'Pulse Cash', copy: 'Ride aggressive pulses with fast cash outs.' },
+          ],
+          limited: [
+            { title: 'Echo Hand', copy: 'Learn the cadence before moving to bigger pots.' },
+            { title: 'StackJack', copy: 'Practice steady stacking with capped risk.' },
+          ],
+        };
+
+        const selected = recommendationPool[mode] || recommendationPool.standard;
+        if (personalizedTitle) {
+          personalizedTitle.textContent = `Personalized track · ${mode === 'vip' ? 'VIP focus' : mode === 'limited' ? 'Preview' : 'Balanced'}`;
+        }
+        if (personalizedCopy) {
+          personalizedCopy.textContent =
+            note ||
+            (mode === 'vip'
+              ? 'We stacked high-volatility games and bigger multipliers for you.'
+              : mode === 'limited'
+                ? 'Preview mode: lighter stakes with a focus on learning the flows.'
+                : 'Balanced mode: a mix of skill, rhythm, and card control.');
+        }
+        if (personalizedList) {
+          personalizedList.innerHTML = '';
+          selected.forEach((item) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${item.title}</strong><span>${item.copy}</span>`;
+            personalizedList.appendChild(li);
+          });
+        }
+      }
+
       function applyViewPreferences(account) {
         const mode = account?.viewMode || 'standard';
         const note = account?.dashboardNote?.trim();
@@ -4362,6 +4430,8 @@
           btn.disabled = limited;
           btn.setAttribute('aria-disabled', limited ? 'true' : 'false');
         });
+
+        renderPersonalizedRecommendations(account);
       }
 
       async function fetchSessionAccount() {
@@ -4459,7 +4529,7 @@
             setAuthStatus(
               mode === 'login'
                 ? `Welcome back, ${payload.user.username}.`
-                : 'Account created with a $1,000 balance.',
+                : 'Account created with a $250 starting balance.',
             );
             setAccountStatus('Account ready.');
             closeAuthForms();
@@ -4513,15 +4583,6 @@
           return null;
         }
       }
-
-      function handleBalanceAction(delta, successMessage) {
-        if (!requireActiveSession()) return;
-        updateAccountBalance(delta).then((account) => {
-          if (!account) return;
-          setAccountStatus(`${successMessage} New balance: ${formatCurrency(account.balance)}.`);
-        });
-      }
-
       async function requestCashOut() {
         if (!requireActiveSession()) return;
         const input = prompt('How much would you like to cash out?');
