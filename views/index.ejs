@@ -324,6 +324,46 @@
         color: #6ef3ff;
       }
 
+      .auth-panel {
+        margin: 0 0 12px;
+        padding: 12px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(110, 243, 255, 0.16);
+        background: rgba(255, 255, 255, 0.03);
+        display: grid;
+        gap: 10px;
+      }
+
+      .auth-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .auth-form {
+        display: none;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+      }
+
+      .auth-form.active {
+        display: grid;
+      }
+
+      .auth-input {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(110, 243, 255, 0.25);
+        background: rgba(0, 0, 0, 0.35);
+        color: rgba(234, 249, 255, 0.92);
+      }
+
+      .auth-buttons {
+        display: flex;
+        gap: 10px;
+        grid-column: 1 / -1;
+      }
+
       .accent-blue {
         box-shadow: 0 10px 30px rgba(110, 243, 255, 0.22);
         border-color: rgba(110, 243, 255, 0.45);
@@ -380,6 +420,74 @@
         letter-spacing: 0.18em;
         color: rgba(255, 255, 255, 0.7);
         background: rgba(255, 255, 255, 0.04);
+      }
+
+      .vault-history,
+      .shop-inventory {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .vault-history li,
+      .shop-inventory li {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(110, 243, 255, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .vault-entry-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        color: rgba(234, 249, 255, 0.75);
+      }
+
+      .vault-entry-subtext,
+      .shop-item-meta {
+        font-size: 13px;
+        color: rgba(234, 249, 255, 0.6);
+        letter-spacing: 0.04em;
+      }
+
+      .vault-amount,
+      .shop-price {
+        font-weight: 700;
+        letter-spacing: 0.08em;
+      }
+
+      .vault-amount.deposit,
+      .vault-amount.transfer {
+        color: #6ef3ff;
+      }
+
+      .vault-amount.withdrawal {
+        color: #ff9bb3;
+      }
+
+      .shop-item-title {
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        color: rgba(234, 249, 255, 0.9);
+      }
+
+      .shop-badge {
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        background: rgba(110, 243, 255, 0.14);
+        border: 1px solid rgba(110, 243, 255, 0.28);
+        color: #6ef3ff;
       }
 
       .api-note {
@@ -2758,6 +2866,30 @@
 <nav class="account-cta">
   <button class="account-button" id="openAccountHub" type="button">Account Hub</button>
 </nav>
+<section class="auth-panel" id="authPanel">
+  <div class="auth-actions">
+    <button class="account-action" id="showLogin" type="button">Login</button>
+    <button class="account-action" id="showRegister" type="button">Register</button>
+    <button class="account-action secondary" id="logoutBtn" type="button">Logout</button>
+  </div>
+  <form class="auth-form" id="loginForm">
+    <input class="auth-input" type="text" name="username" autocomplete="username" placeholder="Username" required />
+    <input class="auth-input" type="password" name="password" autocomplete="current-password" placeholder="Password" required />
+    <div class="auth-buttons">
+      <button class="account-action" type="submit">Submit Login</button>
+      <button class="account-action secondary" data-auth-cancel type="button">Cancel</button>
+    </div>
+  </form>
+  <form class="auth-form" id="registerForm">
+    <input class="auth-input" type="text" name="username" autocomplete="username" placeholder="Create a username" required />
+    <input class="auth-input" type="password" name="password" autocomplete="new-password" placeholder="Create a password" required />
+    <div class="auth-buttons">
+      <button class="account-action" type="submit">Create Account</button>
+      <button class="account-action secondary" data-auth-cancel type="button">Cancel</button>
+    </div>
+  </form>
+  <p class="api-note" id="authStatus">Login or register to access the account hub.</p>
+</section>
 <main class="lobby-system">
   <section class="lobby-view active" id="mainLobby" aria-label="Main Lobby">
     <div class="category-grid">
@@ -2874,23 +3006,35 @@
         <div class="account-page accent-gold" id="vaultPage">
           <h2>Vault</h2>
           <p>Stored credits and secure transactions will appear here.</p>
-          <ul>
-            <li>Current Vault Credits: <strong>12,450</strong></li>
-            <li>Withdrawal Queue: <strong>3 pending</strong></li>
-          </ul>
-          <p class="api-note">// TODO: Fetch vault ledger after Node.js routes are live</p>
-          <p class="api-note">// Endpoint: GET /api/vault</p>
-          <div class="account-card">
-            <div class="label">Transaction History Placeholder</div>
-            <div class="value">Loading...</div>
+          <div class="account-meta">
+            <div class="account-card">
+              <div class="label">Current Vault Credits</div>
+              <div class="value" id="vaultCredits">--</div>
+            </div>
+            <div class="account-card">
+              <div class="label">Withdrawal Queue</div>
+              <div class="value" id="vaultQueue">--</div>
+            </div>
           </div>
+          <div class="account-card">
+            <div class="label">Vault Ledger</div>
+            <ul class="vault-history" id="vaultHistory"></ul>
+          </div>
+          <p class="api-note" id="vaultStatus">Vault is loading...</p>
         </div>
         <div class="account-page accent-green" id="dailyWheelPage">
           <h2>Daily Wheel</h2>
           <p>Spin the neon wheel each day for rewards.</p>
           <div class="daily-wheel-placeholder">Glowing Spinner — Coming Soon</div>
-          <p class="api-note">// TODO: Connect spin logic to Node.js service</p>
-          <p class="api-note">// Endpoint: POST /api/daily-wheel</p>
+          <div class="account-actions">
+            <button class="account-action" id="spinWheelBtn" type="button">Spin Now</button>
+            <button class="account-action secondary" id="checkWheelBtn" type="button">Check Status</button>
+          </div>
+          <div class="account-card">
+            <div class="label">Last Reward</div>
+            <div class="value" id="dailyWheelReward">--</div>
+          </div>
+          <p class="api-note" id="dailyWheelStatus">Daily wheel is ready.</p>
         </div>
         <div class="account-page accent-pink" id="shopPage">
           <h2>Shop</h2>
@@ -2899,26 +3043,24 @@
             <div class="label">Featured Upgrade</div>
             <div class="value">Aurora Deck Skin</div>
           </div>
-          <p class="api-note">// TODO: Load store inventory from backend</p>
-          <p class="api-note">// Endpoint: GET /api/shop</p>
+          <div class="account-card">
+            <div class="label">Store Inventory</div>
+            <ul class="shop-inventory" id="shopInventory"></ul>
+          </div>
+          <p class="api-note" id="shopStatus">Loading shop inventory...</p>
         </div>
         <div class="account-page accent-purple" id="leaderboardPage">
           <h2>Leaderboard</h2>
-          <p>Static sample rankings before live data flows in.</p>
+          <p>Live rankings sorted by current account balances.</p>
           <table class="leaderboard-table">
             <thead>
-              <tr><th>Rank</th><th>Player</th><th>Total Wins</th><th>Streak</th></tr>
+              <tr><th>Rank</th><th>Player</th><th>Balance</th><th>Joined</th></tr>
             </thead>
             <tbody>
-              <tr><td>1</td><td>NeonPilot</td><td>2,140</td><td>W5</td></tr>
-              <tr><td>2</td><td>PulseMage</td><td>1,980</td><td>W3</td></tr>
-              <tr><td>3</td><td>CardOracle</td><td>1,640</td><td>W2</td></tr>
-              <tr><td>4</td><td>ByteBandit</td><td>1,220</td><td>L1</td></tr>
-              <tr><td>5</td><td>VaultGhost</td><td>960</td><td>W1</td></tr>
+              <tr><td colspan="4">Loading leaderboard...</td></tr>
             </tbody>
           </table>
-          <p class="api-note">// TODO: Replace with live leaderboard feed</p>
-          <p class="api-note">// Endpoint: GET /api/leaderboard</p>
+          <p class="api-note" id="leaderboardStatus">Fetching leaderboard...</p>
         </div>
       </div>
     </div>
@@ -3470,9 +3612,8 @@
       };
 
       // ---------------- Shared state ----------------
-      let balance = settings.startingBalance;
+      let balance = 0;
       let accountData = null;
-      let accountId = null;
       let balanceSyncInFlight = false;
       const historyItems = [];
       let soundOn = true;
@@ -3601,6 +3742,13 @@
       const profileAccountIdEl = document.getElementById('profileAccountId');
       const transactionPlaceholderEl = document.getElementById('transactionPlaceholder');
       const accountStatusEl = document.getElementById('accountStatus');
+      const authStatusEl = document.getElementById('authStatus');
+      const authPanel = document.getElementById('authPanel');
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const showLoginBtn = document.getElementById('showLogin');
+      const showRegisterBtn = document.getElementById('showRegister');
+      const logoutBtn = document.getElementById('logoutBtn');
       const claimBonusBtn = document.getElementById('claimBonusBtn');
       const depositBtn = document.getElementById('depositBtn');
       const refreshAccountBtn = document.getElementById('refreshAccountBtn');
@@ -3630,6 +3778,18 @@
       const accountPageContainer = document.getElementById('accountPageContainer');
       const accountBackToLobbyBtn = document.getElementById('accountBackToLobby');
       const accountNavButtons = document.querySelectorAll('.account-nav-button');
+      const vaultCreditsEl = document.getElementById('vaultCredits');
+      const vaultQueueEl = document.getElementById('vaultQueue');
+      const vaultHistoryEl = document.getElementById('vaultHistory');
+      const vaultStatusEl = document.getElementById('vaultStatus');
+      const spinWheelBtn = document.getElementById('spinWheelBtn');
+      const checkWheelBtn = document.getElementById('checkWheelBtn');
+      const dailyWheelRewardEl = document.getElementById('dailyWheelReward');
+      const dailyWheelStatusEl = document.getElementById('dailyWheelStatus');
+      const shopInventoryEl = document.getElementById('shopInventory');
+      const shopStatusEl = document.getElementById('shopStatus');
+      const leaderboardStatusEl = document.getElementById('leaderboardStatus');
+      const leaderboardBodyEl = document.querySelector('#leaderboardPage tbody');
       const cardPanels = {
         binaryPoker: binaryGamePanel,
         echoHand: echoGamePanel,
@@ -3824,16 +3984,47 @@
           soundToggle.addEventListener('click', toggleSound);
         }
         if (openAccountHubBtn) {
-          openAccountHubBtn.addEventListener('click', () => openAccountHub());
+          openAccountHubBtn.addEventListener('click', () => {
+            if (!accountData) {
+              setAccountStatus('Login to access the account hub.', true);
+              toggleAuthForm('login');
+              return;
+            }
+            openAccountHub();
+          });
         }
         if (accountBackToLobbyBtn) {
           accountBackToLobbyBtn.addEventListener('click', () => backToMainLobby());
+        }
+        if (showLoginBtn) {
+          showLoginBtn.addEventListener('click', () => toggleAuthForm('login'));
+        }
+        if (showRegisterBtn) {
+          showRegisterBtn.addEventListener('click', () => toggleAuthForm('register'));
+        }
+        document.querySelectorAll('[data-auth-cancel]').forEach((button) => {
+          button.addEventListener('click', closeAuthForms);
+        });
+        if (loginForm) {
+          loginForm.addEventListener('submit', (event) => submitAuthForm(event, 'login'));
+        }
+        if (registerForm) {
+          registerForm.addEventListener('submit', (event) => submitAuthForm(event, 'register'));
+        }
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', handleLogout);
         }
         if (claimBonusBtn) {
           claimBonusBtn.addEventListener('click', () => handleBalanceAction(50, 'Bonus claimed!'));
         }
         if (depositBtn) {
           depositBtn.addEventListener('click', () => handleBalanceAction(250, 'Deposit applied.'));
+        }
+        if (spinWheelBtn) {
+          spinWheelBtn.addEventListener('click', () => spinDailyWheel());
+        }
+        if (checkWheelBtn) {
+          checkWheelBtn.addEventListener('click', () => refreshDailyWheelStatus());
         }
         if (refreshAccountBtn) {
           refreshAccountBtn.addEventListener('click', () => refreshAccountFromServer());
@@ -3951,6 +4142,40 @@
         accountStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(234, 249, 255, 0.72)';
       }
 
+      function setAuthStatus(message, isError = false) {
+        if (!authStatusEl) return;
+        authStatusEl.textContent = message;
+        authStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(234, 249, 255, 0.72)';
+      }
+
+      function formatCurrency(value) {
+        return `$${Number(value || 0).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`;
+      }
+
+      function formatDate(value) {
+        if (!value) return '--';
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) return '--';
+        return parsed.toLocaleDateString();
+      }
+
+      function toggleAuthForm(mode) {
+        if (!authPanel) return;
+        const showLogin = mode === 'login';
+        const showRegister = mode === 'register';
+        if (loginForm) loginForm.classList.toggle('active', showLogin);
+        if (registerForm) registerForm.classList.toggle('active', showRegister);
+      }
+
+      function closeAuthForms() {
+        if (loginForm) loginForm.reset();
+        if (registerForm) registerForm.reset();
+        toggleAuthForm(null);
+      }
+
       function renderAccountDetails() {
         if (profileUsernameEl) {
           profileUsernameEl.textContent = accountData?.username || 'Guest Pilot';
@@ -3963,91 +4188,146 @@
           profileAccountIdEl.textContent = accountData?.id || '--';
         }
         if (transactionPlaceholderEl) {
-          transactionPlaceholderEl.textContent = accountData ? 'No transactions yet — stay tuned.' : 'Loading account history...';
+          transactionPlaceholderEl.textContent = accountData
+            ? 'No transactions yet — stay tuned.'
+            : 'Login to load your transaction history.';
         }
       }
 
-      async function initializeAccount() {
-        setAccountStatus('Connecting to account...');
-        const storedId = localStorage.getItem('neonarcAccountId');
-        if (storedId) {
-          const existing = await fetchAccountById(storedId);
-          if (existing) {
-            applyAccountData(existing, true);
-            setAccountStatus('Account loaded.');
-            return;
-          }
-          localStorage.removeItem('neonarcAccountId');
-        }
-
-        const created = await registerAccount();
-        if (created) {
-          applyAccountData(created);
-          setAccountStatus('New account created with $1,000 balance.');
-        } else {
-          setAccountStatus('Unable to initialize account. Please try again.', true);
-        }
-      }
-
-      async function fetchAccountById(id) {
+      async function fetchSessionAccount() {
         try {
-          const response = await fetch(`/api/account/${id}`);
+          const response = await fetch('/api/account');
           if (!response.ok) return null;
           const payload = await response.json();
-          return payload?.account || null;
+          return payload?.user || null;
         } catch (error) {
           console.error('Failed to load account', error);
           return null;
         }
       }
 
-      async function registerAccount() {
-        try {
-          const username = `Pilot-${Math.floor(1000 + Math.random() * 9000)}`;
-          const response = await fetch('/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username }),
-          });
-          if (!response.ok) return null;
-          const payload = await response.json();
-          return payload?.account || null;
-        } catch (error) {
-          console.error('Failed to register account', error);
-          return null;
+      function applyAccountData(account) {
+        if (!account) return;
+        accountData = account;
+        balance = Number(account.balance || 0);
+        renderAccountDetails();
+        updateBalance(false);
+        if (openAccountHubBtn) {
+          openAccountHubBtn.disabled = false;
+          openAccountHubBtn.textContent = 'Account Hub';
         }
       }
 
-      function applyAccountData(account, skipLocalSave = false) {
-        if (!account) return;
-        accountData = account;
-        accountId = account.id;
-        if (!skipLocalSave && accountId) {
-          localStorage.setItem('neonarcAccountId', accountId);
-        }
-        balance = account.balance;
+      function clearAccountData(message = 'Login or register to access the account hub.', isError = false) {
+        accountData = null;
+        balance = 0;
         renderAccountDetails();
         updateBalance(false);
+        if (openAccountHubBtn) {
+          openAccountHubBtn.disabled = true;
+          openAccountHubBtn.textContent = 'Login Required';
+        }
+        setAccountStatus(message, isError);
+      }
+
+      async function initializeAccount() {
+        setAccountStatus('Checking session...');
+        const existing = await fetchSessionAccount();
+        if (existing) {
+          applyAccountData(existing);
+          setAccountStatus('Session active. Welcome back.');
+          setAuthStatus(`Logged in as ${existing.username}.`);
+          return;
+        }
+        clearAccountData();
+        setAuthStatus('Login or register to begin.');
+      }
+
+      function requireActiveSession() {
+        if (!accountData) {
+          setAccountStatus('Please log in to use account actions.', true);
+          toggleAuthForm('login');
+          return false;
+        }
+        return true;
+      }
+
+      async function submitAuthForm(event, mode) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const username = formData.get('username')?.toString().trim();
+        const password = formData.get('password')?.toString().trim();
+        if (!username || !password) {
+          setAuthStatus('Username and password are required.', true);
+          return;
+        }
+
+        setAuthStatus(mode === 'login' ? 'Logging in...' : 'Creating your account...');
+        try {
+          const response = await fetch(`/api/${mode}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+          });
+
+          if (!response.ok) {
+            const errorPayload = await response.json().catch(() => ({}));
+            setAuthStatus(errorPayload.error || 'Unable to process request.', true);
+            return;
+          }
+
+          const payload = await response.json();
+          if (payload?.user) {
+            applyAccountData(payload.user);
+            setAuthStatus(
+              mode === 'login'
+                ? `Welcome back, ${payload.user.username}.`
+                : 'Account created with a $1,000 balance.',
+            );
+            setAccountStatus('Account ready.');
+            closeAuthForms();
+          }
+        } catch (error) {
+          console.error('Authentication failed', error);
+          setAuthStatus('Unable to reach the server.', true);
+        }
+      }
+
+      async function handleLogout() {
+        try {
+          await fetch('/api/logout', { method: 'POST' });
+        } catch (error) {
+          console.error('Logout failed', error);
+        }
+        clearAccountData('Logged out. Login again to access your account.');
+        setAuthStatus('You have been logged out.');
+        closeAuthForms();
       }
 
       async function updateAccountBalance(delta) {
-        if (!accountId) return null;
+        if (!requireActiveSession()) return null;
         try {
           setAccountStatus('Updating balance...');
-          const response = await fetch(`/api/update-balance/${accountId}`, {
+          const response = await fetch('/api/update-balance', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ delta }),
           });
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return null;
+          }
           if (!response.ok) {
             setAccountStatus('Balance update failed.', true);
             return null;
           }
           const payload = await response.json();
-          if (payload?.account) {
-            applyAccountData(payload.account, true);
+          if (payload?.user) {
+            applyAccountData(payload.user);
             setAccountStatus('Balance synced.');
-            return payload.account;
+            return payload.user;
           }
           setAccountStatus('Balance update failed.', true);
           return null;
@@ -4059,39 +4339,369 @@
       }
 
       function handleBalanceAction(delta, successMessage) {
+        if (!requireActiveSession()) return;
         updateAccountBalance(delta).then((account) => {
           if (!account) return;
-          setAccountStatus(`${successMessage} New balance: $${account.balance.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}.`);
+          setAccountStatus(`${successMessage} New balance: ${formatCurrency(account.balance)}.`);
         });
       }
 
       async function refreshAccountFromServer() {
-        if (!accountId) return;
-        const latest = await fetchAccountById(accountId);
+        if (!requireActiveSession()) return;
+        const latest = await fetchSessionAccount();
         if (latest) {
-          applyAccountData(latest, true);
+          applyAccountData(latest);
           setAccountStatus('Account refreshed.');
         } else {
           setAccountStatus('Unable to refresh account.', true);
         }
       }
 
+      function renderVaultHistory(history = []) {
+        if (!vaultHistoryEl) return;
+        vaultHistoryEl.innerHTML = '';
+        if (!history.length) {
+          const empty = document.createElement('li');
+          empty.textContent = 'No vault ledger entries yet.';
+          vaultHistoryEl.appendChild(empty);
+          return;
+        }
+
+        history
+          .slice()
+          .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))
+          .forEach((entry) => {
+            const item = document.createElement('li');
+            const meta = document.createElement('div');
+            meta.className = 'vault-entry-meta';
+
+            const title = document.createElement('div');
+            title.textContent = entry.description || 'Vault activity';
+            const subtext = document.createElement('div');
+            subtext.className = 'vault-entry-subtext';
+            const when = entry.timestamp ? new Date(entry.timestamp).toLocaleString() : 'Recent';
+            subtext.textContent = `${entry.type || 'transfer'} · ${when}`;
+            meta.appendChild(title);
+            meta.appendChild(subtext);
+
+            const amount = document.createElement('span');
+            amount.className = `vault-amount ${entry.type || 'transfer'}`;
+            const signed = entry.type === 'withdrawal' ? -Math.abs(Number(entry.amount || 0)) : Number(entry.amount || 0);
+            amount.textContent = formatCurrency(signed);
+
+            item.appendChild(meta);
+            item.appendChild(amount);
+            vaultHistoryEl.appendChild(item);
+          });
+      }
+
+      async function loadVault() {
+        if (!requireActiveSession()) return;
+        if (vaultStatusEl) {
+          vaultStatusEl.textContent = 'Loading vault...';
+          vaultStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
+        }
+        try {
+          const response = await fetch('/api/vault');
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return;
+          }
+          if (!response.ok) {
+            if (vaultStatusEl) {
+              vaultStatusEl.textContent = 'Unable to load vault data.';
+              vaultStatusEl.style.color = '#ff9bb3';
+            }
+            return;
+          }
+          const payload = await response.json();
+          const { vault } = payload || {};
+          if (!vault) {
+            if (vaultStatusEl) {
+              vaultStatusEl.textContent = 'Vault unavailable.';
+              vaultStatusEl.style.color = '#ff9bb3';
+            }
+            return;
+          }
+          if (vaultCreditsEl) {
+            vaultCreditsEl.textContent = formatCurrency(vault.credits);
+          }
+          if (vaultQueueEl) {
+            const pending = vault.withdrawalQueue ?? 0;
+            vaultQueueEl.textContent = `${pending} pending`;
+          }
+          renderVaultHistory(vault.history || []);
+          if (vaultStatusEl) {
+            vaultStatusEl.textContent = 'Vault synced.';
+            vaultStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
+          }
+        } catch (error) {
+          console.error('Failed to load vault', error);
+          if (vaultStatusEl) {
+            vaultStatusEl.textContent = 'Could not reach the vault service.';
+            vaultStatusEl.style.color = '#ff9bb3';
+          }
+        }
+      }
+
+      function updateDailyWheelUI(data) {
+        if (dailyWheelRewardEl) {
+          if (data?.lastReward !== undefined && data?.lastReward !== null) {
+            dailyWheelRewardEl.textContent = formatCurrency(data.lastReward);
+          } else {
+            dailyWheelRewardEl.textContent = '--';
+          }
+        }
+        if (dailyWheelStatusEl) {
+          if (data?.nextEligibleAt) {
+            dailyWheelStatusEl.textContent = `Next spin available ${new Date(
+              data.nextEligibleAt,
+            ).toLocaleString()}.`;
+          } else {
+            dailyWheelStatusEl.textContent = 'Daily wheel is ready.';
+          }
+          dailyWheelStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
+        }
+      }
+
+      async function refreshDailyWheelStatus() {
+        if (!requireActiveSession()) return;
+        if (dailyWheelStatusEl) {
+          dailyWheelStatusEl.textContent = 'Checking availability...';
+          dailyWheelStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
+        }
+        try {
+          const response = await fetch('/api/daily-wheel');
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return;
+          }
+          if (!response.ok) {
+            if (dailyWheelStatusEl) {
+              dailyWheelStatusEl.textContent = 'Unable to load wheel status.';
+              dailyWheelStatusEl.style.color = '#ff9bb3';
+            }
+            return;
+          }
+          const payload = await response.json();
+          updateDailyWheelUI(payload);
+        } catch (error) {
+          console.error('Failed to load daily wheel', error);
+          if (dailyWheelStatusEl) {
+            dailyWheelStatusEl.textContent = 'Could not reach the wheel service.';
+            dailyWheelStatusEl.style.color = '#ff9bb3';
+          }
+        }
+      }
+
+      async function spinDailyWheel() {
+        if (!requireActiveSession()) return;
+        if (dailyWheelStatusEl) {
+          dailyWheelStatusEl.textContent = 'Spinning...';
+          dailyWheelStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
+        }
+        try {
+          const response = await fetch('/api/daily-wheel', { method: 'POST' });
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return;
+          }
+          if (response.status === 429) {
+            const payload = await response.json();
+            updateDailyWheelUI(payload);
+            if (dailyWheelStatusEl) {
+              const nextWindow = payload?.nextEligibleAt
+                ? new Date(payload.nextEligibleAt).toLocaleString()
+                : 'later today';
+              dailyWheelStatusEl.textContent = `Already spun. Next spin after ${nextWindow}.`;
+              dailyWheelStatusEl.style.color = '#ff9bb3';
+            }
+            return;
+          }
+          if (!response.ok) {
+            if (dailyWheelStatusEl) {
+              dailyWheelStatusEl.textContent = 'Spin failed.';
+              dailyWheelStatusEl.style.color = '#ff9bb3';
+            }
+            return;
+          }
+          const payload = await response.json();
+          updateDailyWheelUI({
+            lastReward: payload?.reward,
+            nextEligibleAt: payload?.nextEligibleAt,
+          });
+          if (dailyWheelStatusEl) {
+            dailyWheelStatusEl.textContent = `Wheel awarded ${formatCurrency(payload?.reward)}.`;
+          }
+          await refreshAccountFromServer();
+        } catch (error) {
+          console.error('Failed to spin daily wheel', error);
+          if (dailyWheelStatusEl) {
+            dailyWheelStatusEl.textContent = 'Could not spin the wheel.';
+            dailyWheelStatusEl.style.color = '#ff9bb3';
+          }
+        }
+      }
+
+      function renderShopItems(items = []) {
+        if (!shopInventoryEl) return;
+        shopInventoryEl.innerHTML = '';
+        if (!items.length) {
+          const empty = document.createElement('li');
+          empty.textContent = 'No items available yet.';
+          shopInventoryEl.appendChild(empty);
+          return;
+        }
+
+        items.forEach((item) => {
+          const li = document.createElement('li');
+          const details = document.createElement('div');
+          details.className = 'vault-entry-meta';
+
+          const title = document.createElement('div');
+          title.className = 'shop-item-title';
+          title.textContent = item.name;
+
+          const meta = document.createElement('div');
+          meta.className = 'shop-item-meta';
+          meta.textContent = item.description || 'Cosmetic upgrade';
+
+          details.appendChild(title);
+          details.appendChild(meta);
+
+          const right = document.createElement('div');
+          right.style.display = 'flex';
+          right.style.flexDirection = 'column';
+          right.style.alignItems = 'flex-end';
+          right.style.gap = '6px';
+
+          const rarity = document.createElement('span');
+          rarity.className = 'shop-badge';
+          rarity.textContent = item.rarity || 'standard';
+
+          const price = document.createElement('span');
+          price.className = 'shop-price';
+          price.textContent = `${item.price} credits`;
+
+          right.appendChild(rarity);
+          right.appendChild(price);
+
+          li.appendChild(details);
+          li.appendChild(right);
+
+          shopInventoryEl.appendChild(li);
+        });
+      }
+
+      async function loadShopInventory() {
+        if (shopStatusEl) {
+          shopStatusEl.textContent = 'Loading shop inventory...';
+          shopStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
+        }
+        try {
+          const response = await fetch('/api/shop');
+          if (!response.ok) {
+            if (shopStatusEl) {
+              shopStatusEl.textContent = 'Unable to load shop inventory.';
+              shopStatusEl.style.color = '#ff9bb3';
+            }
+            return;
+          }
+          const payload = await response.json();
+          renderShopItems(payload?.items || []);
+          if (shopStatusEl) {
+            shopStatusEl.textContent = 'Shop inventory ready.';
+          }
+        } catch (error) {
+          console.error('Failed to load shop inventory', error);
+          if (shopStatusEl) {
+            shopStatusEl.textContent = 'Could not reach the shop service.';
+            shopStatusEl.style.color = '#ff9bb3';
+          }
+        }
+      }
+
+      function renderLeaderboardTable(entries = []) {
+        if (!leaderboardBodyEl) return;
+        leaderboardBodyEl.innerHTML = '';
+        if (!entries.length) {
+          const row = document.createElement('tr');
+          const cell = document.createElement('td');
+          cell.colSpan = 4;
+          cell.textContent = 'No players on the board yet.';
+          row.appendChild(cell);
+          leaderboardBodyEl.appendChild(row);
+          return;
+        }
+
+        entries.forEach((entry) => {
+          const row = document.createElement('tr');
+          const rank = document.createElement('td');
+          rank.textContent = entry.rank;
+          const player = document.createElement('td');
+          player.textContent = entry.player;
+          const balanceCell = document.createElement('td');
+          balanceCell.textContent = formatCurrency(entry.balance);
+          const joined = document.createElement('td');
+          joined.textContent = formatDate(entry.joinedAt);
+
+          row.appendChild(rank);
+          row.appendChild(player);
+          row.appendChild(balanceCell);
+          row.appendChild(joined);
+          leaderboardBodyEl.appendChild(row);
+        });
+      }
+
+      async function loadLeaderboard() {
+        if (leaderboardStatusEl) {
+          leaderboardStatusEl.textContent = 'Loading leaderboard...';
+          leaderboardStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
+        }
+        try {
+          const response = await fetch('/api/leaderboard');
+          if (!response.ok) {
+            if (leaderboardStatusEl) {
+              leaderboardStatusEl.textContent = 'Unable to load leaderboard.';
+              leaderboardStatusEl.style.color = '#ff9bb3';
+            }
+            return;
+          }
+          const payload = await response.json();
+          renderLeaderboardTable(payload?.leaderboard || []);
+          if (leaderboardStatusEl) {
+            leaderboardStatusEl.textContent = 'Leaderboard ready.';
+          }
+        } catch (error) {
+          console.error('Failed to load leaderboard', error);
+          if (leaderboardStatusEl) {
+            leaderboardStatusEl.textContent = 'Could not reach the leaderboard service.';
+            leaderboardStatusEl.style.color = '#ff9bb3';
+          }
+        }
+      }
+
       async function persistBalanceDelta(delta) {
-        if (!accountId || balanceSyncInFlight || delta === 0) return;
+        if (!accountData || balanceSyncInFlight || delta === 0) return;
         balanceSyncInFlight = true;
         try {
-          const response = await fetch(`/api/update-balance/${accountId}`, {
+          const response = await fetch('/api/update-balance', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ delta }),
           });
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return;
+          }
           if (!response.ok) return;
           const payload = await response.json();
-          if (payload?.account) {
-            applyAccountData(payload.account, true);
+          if (payload?.user) {
+            applyAccountData(payload.user);
           }
         } catch (error) {
           console.error('Failed to sync balance', error);
@@ -4208,9 +4818,27 @@
         Object.values(accountPages).forEach((page) => page.classList.remove('active'));
         accountNavButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.accountTarget === pageId));
         accountPages[pageId].classList.add('active');
+
+        switch (pageId) {
+          case 'vaultPage':
+            loadVault();
+            break;
+          case 'dailyWheelPage':
+            refreshDailyWheelStatus();
+            break;
+          case 'shopPage':
+            loadShopInventory();
+            break;
+          case 'leaderboardPage':
+            loadLeaderboard();
+            break;
+          default:
+            break;
+        }
       }
 
       function openAccountHub(pageId = 'profilePage') {
+        if (!requireActiveSession()) return;
         if (activeMode) {
           const leftSkill = exitSkillGame(false);
           if (!leftSkill) return;
