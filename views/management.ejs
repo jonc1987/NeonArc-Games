@@ -85,6 +85,74 @@
       .cashout-empty {
         color: #8fa2c1;
       }
+      .user-panel {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .field-label {
+        display: block;
+        font-size: 14px;
+        color: #9fb1ca;
+        margin-bottom: 4px;
+      }
+      .input,
+      .textarea,
+      .select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.05);
+        color: #e8edf4;
+      }
+      .inline-form {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .button {
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.18), rgba(255, 110, 230, 0.14));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #e8edf4;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .button:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+      }
+      .muted {
+        color: #8fa2c1;
+        font-size: 14px;
+      }
+      .row-selected td {
+        background: rgba(110, 243, 255, 0.08);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        color: #0b1220;
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.9), rgba(255, 110, 230, 0.8));
+      }
+      .user-panel h3 {
+        margin: 0;
+      }
     </style>
   </head>
   <body>
@@ -113,6 +181,43 @@
             <tbody id="userTableBody"></tbody>
           </table>
         </div>
+
+        <div class="user-panel" id="userControls">
+          <div class="meta" id="selectedUserLabel">Select a user to manage balance and visibility.</div>
+          <div class="inline-form">
+            <div style="flex: 1 1 180px; min-width: 160px;">
+              <label class="field-label" for="creditAmount">Add balance</label>
+              <input class="input" type="number" step="0.01" min="0" id="creditAmount" placeholder="$0.00" />
+            </div>
+            <div style="align-self: flex-end;">
+              <button class="button" type="button" id="creditBtn" disabled>Apply Credit</button>
+            </div>
+          </div>
+          <div>
+            <label class="field-label" for="viewModeSelect">What this user sees</label>
+            <select class="select" id="viewModeSelect" disabled>
+              <option value="standard">Standard experience</option>
+              <option value="vip">VIP focus</option>
+              <option value="limited">Limited/preview view</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="dashboardNote">User-facing note</label>
+            <textarea
+              class="textarea"
+              rows="3"
+              id="dashboardNote"
+              maxlength="240"
+              placeholder="Optional dashboard note the user will see in their profile."
+              disabled
+            ></textarea>
+          </div>
+          <div class="inline-form" style="justify-content: space-between; align-items: center;">
+            <button class="button" type="button" id="saveDisplayBtn" disabled>Save View Preferences</button>
+            <span class="badge" id="viewModeBadge">Awaiting selection</span>
+          </div>
+          <p class="muted" id="controlStatus">Choose a user from the table to enable controls.</p>
+        </div>
       </div>
 
       <div class="card">
@@ -122,15 +227,26 @@
     </section>
 
     <script>
-      const users = <%- JSON.stringify(users || []) %>;
+      let users = <%- JSON.stringify(users || []) %>;
       const cashouts = <%- JSON.stringify(cashouts || []) %>;
 
       const userTableBody = document.getElementById('userTableBody');
       const searchInput = document.getElementById('userSearch');
       const userCount = document.getElementById('userCount');
       const cashoutList = document.getElementById('cashoutList');
+      const creditInput = document.getElementById('creditAmount');
+      const creditBtn = document.getElementById('creditBtn');
+      const viewModeSelect = document.getElementById('viewModeSelect');
+      const dashboardNoteInput = document.getElementById('dashboardNote');
+      const saveDisplayBtn = document.getElementById('saveDisplayBtn');
+      const selectedUserLabel = document.getElementById('selectedUserLabel');
+      const controlStatus = document.getElementById('controlStatus');
+      const viewModeBadge = document.getElementById('viewModeBadge');
+
+      const adminKey = new URLSearchParams(window.location.search).get('key') || '';
 
       let currentSort = { key: 'username', direction: 'asc' };
+      let selectedUserId = null;
 
       function formatDate(value) {
         if (!value) return '—';
@@ -151,6 +267,10 @@
         userTableBody.innerHTML = '';
         list.forEach((user) => {
           const row = document.createElement('tr');
+          row.dataset.userId = user.id;
+          if (user.id === selectedUserId) {
+            row.classList.add('row-selected');
+          }
           row.innerHTML = `
             <td>${user.username || '—'}</td>
             <td>${user.id || '—'}</td>
@@ -158,6 +278,7 @@
             <td>${formatDate(user.joinedAt)}</td>
             <td>${formatDate(user.lastActivity)}</td>
           `;
+          row.addEventListener('click', () => selectUser(user));
           userTableBody.appendChild(row);
         });
         if (userCount) {
@@ -201,6 +322,7 @@
 
         const sorted = sortUsers(list, currentSort.key, currentSort.direction);
         renderUsers(sorted);
+        syncSelectionControls();
       }
 
       function renderCashouts() {
@@ -221,6 +343,108 @@
           )} — please confirm payout manually.`;
           cashoutList.appendChild(item);
         });
+      }
+
+      function setControlStatus(message, isError = false) {
+        if (!controlStatus) return;
+        controlStatus.textContent = message;
+        controlStatus.style.color = isError ? '#ff9bb3' : '#8fa2c1';
+      }
+
+      function syncSelectionControls() {
+        const selectedUser = users.find((user) => user.id === selectedUserId) || null;
+        const hasSelection = Boolean(selectedUser);
+        [creditBtn, viewModeSelect, dashboardNoteInput, saveDisplayBtn].forEach((el) => {
+          if (el) el.disabled = !hasSelection || !adminKey;
+        });
+        if (creditInput) creditInput.disabled = !hasSelection;
+
+        if (!hasSelection) {
+          if (selectedUserLabel) selectedUserLabel.textContent = 'Select a user to manage balance and visibility.';
+          if (viewModeBadge) viewModeBadge.textContent = adminKey ? 'Awaiting selection' : 'Admin key missing';
+          setControlStatus(adminKey ? 'Choose a user from the table to enable controls.' : 'Admin key missing from request.', !adminKey);
+          return;
+        }
+
+        if (selectedUserLabel)
+          selectedUserLabel.textContent = `Editing ${selectedUser.username} (${selectedUser.id})`;
+        if (viewModeSelect) viewModeSelect.value = selectedUser.viewMode || 'standard';
+        if (dashboardNoteInput)
+          dashboardNoteInput.value = selectedUser.dashboardNote || '';
+        if (viewModeBadge)
+          viewModeBadge.textContent = `${selectedUser.viewMode || 'standard'} view`.replace(/\b\w/g, (m) => m.toUpperCase());
+        setControlStatus('Adjust balance or change what this user sees.');
+      }
+
+      function selectUser(user) {
+        selectedUserId = user?.id || null;
+        syncSelectionControls();
+        applyFilters();
+      }
+
+      async function applyCredit() {
+        const selectedUser = users.find((user) => user.id === selectedUserId);
+        if (!selectedUser || !adminKey) return;
+        const amount = Number(creditInput?.value);
+        if (!Number.isFinite(amount) || amount <= 0) {
+          setControlStatus('Enter a positive amount to credit.', true);
+          return;
+        }
+
+        try {
+          setControlStatus('Submitting credit...');
+          const response = await fetch('/api/admin/credit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({ userId: selectedUser.id, amount }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setControlStatus(payload.error || 'Unable to credit balance.', true);
+            return;
+          }
+          const updatedUser = payload.user;
+          if (updatedUser) {
+            users = users.map((user) => (user.id === updatedUser.id ? updatedUser : user));
+            selectedUserId = updatedUser.id;
+            setControlStatus('Balance updated.');
+            applyFilters();
+          }
+        } catch (error) {
+          console.error('Failed to credit user', error);
+          setControlStatus('Unable to credit balance right now.', true);
+        }
+      }
+
+      async function saveDisplayPreferences() {
+        const selectedUser = users.find((user) => user.id === selectedUserId);
+        if (!selectedUser || !adminKey) return;
+        const viewMode = viewModeSelect?.value || 'standard';
+        const dashboardNote = dashboardNoteInput?.value || '';
+
+        try {
+          setControlStatus('Saving view preferences...');
+          const response = await fetch('/api/admin/display', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({ userId: selectedUser.id, viewMode, dashboardNote }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setControlStatus(payload.error || 'Unable to update view.', true);
+            return;
+          }
+          const updatedUser = payload.user;
+          if (updatedUser) {
+            users = users.map((user) => (user.id === updatedUser.id ? updatedUser : user));
+            selectedUserId = updatedUser.id;
+            setControlStatus('User view updated.');
+            applyFilters();
+          }
+        } catch (error) {
+          console.error('Failed to update view preferences', error);
+          setControlStatus('Unable to save view preferences right now.', true);
+        }
       }
 
       document.querySelectorAll('th[data-sort]').forEach((header) => {
@@ -245,8 +469,17 @@
         searchInput.addEventListener('input', applyFilters);
       }
 
+      if (creditBtn) {
+        creditBtn.addEventListener('click', applyCredit);
+      }
+
+      if (saveDisplayBtn) {
+        saveDisplayBtn.addEventListener('click', saveDisplayPreferences);
+      }
+
       renderCashouts();
       applyFilters();
+      syncSelectionControls();
     </script>
   </body>
 </html>

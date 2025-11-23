@@ -56,6 +56,12 @@ function findUser(username) {
   return getUsers().find((user) => user.username.toLowerCase() === normalized) || null;
 }
 
+function findUserById(id) {
+  const normalized = id?.toString().trim();
+  if (!normalized) return null;
+  return getUsers().find((user) => user.id === normalized) || null;
+}
+
 function createUser(username, passwordHash, balance = 1000) {
   const users = getUsers();
   const normalized = username?.toString().trim();
@@ -74,6 +80,8 @@ function createUser(username, passwordHash, balance = 1000) {
     balance: Number(balance) || 0,
     joinedAt: nowIso,
     lastActivity: nowIso,
+    viewMode: 'standard',
+    dashboardNote: '',
   };
   users.push(newUser);
   saveUsers(users);
@@ -107,15 +115,59 @@ function updateUserBalance(username, delta, { allowNegative = false } = {}) {
     return null;
   }
 
+  return updateUserBalanceById(
+    getUsers().find((user) => user.username.toLowerCase() === normalized)?.id,
+    delta,
+    { allowNegative },
+  );
+}
+
+function updateUserBalanceById(id, delta, { allowNegative = false } = {}) {
+  const normalized = id?.toString().trim();
+  if (!normalized || !Number.isFinite(Number(delta))) {
+    return null;
+  }
+
   const users = getUsers();
   let updatedUser = null;
 
   const updatedUsers = users.map((user) => {
-    if (user.username.toLowerCase() === normalized) {
+    if (user.id === normalized) {
       const startingBalance = Number(user.balance || 0);
       const nextBalance = startingBalance + Number(delta);
       const balance = allowNegative ? nextBalance : Math.max(0, nextBalance);
       updatedUser = { ...user, balance, lastActivity: new Date().toISOString() };
+      return updatedUser;
+    }
+    return user;
+  });
+
+  if (updatedUser) {
+    saveUsers(updatedUsers);
+  }
+
+  return updatedUser;
+}
+
+function setUserDisplayPreferences(id, { viewMode, dashboardNote }) {
+  const normalizedId = id?.toString().trim();
+  if (!normalizedId) return null;
+
+  const allowedModes = new Set(['standard', 'vip', 'limited']);
+  const safeMode = allowedModes.has(viewMode) ? viewMode : 'standard';
+  const safeNote = dashboardNote?.toString().trim().slice(0, 240) || '';
+
+  const users = getUsers();
+  let updatedUser = null;
+
+  const updatedUsers = users.map((user) => {
+    if (user.id === normalizedId) {
+      updatedUser = {
+        ...user,
+        viewMode: safeMode,
+        dashboardNote: safeNote,
+        lastActivity: new Date().toISOString(),
+      };
       return updatedUser;
     }
     return user;
@@ -154,11 +206,14 @@ module.exports = {
   getUsers,
   saveUsers,
   findUser,
+  findUserById,
   createUser,
   ensureDataFile,
   updateUserBalance,
+  updateUserBalanceById,
   getCashouts,
   saveCashouts,
   addCashout,
   markUserActivity,
+  setUserDisplayPreferences,
 };

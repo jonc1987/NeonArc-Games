@@ -35,6 +35,7 @@ app.use('/api/daily-wheel', require('./routes/dailyWheel'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
 app.use('/api', require('./routes/account'));
 app.use('/api', require('./routes/cashouts'));
+app.use('/api/admin', require('./routes/admin'));
 
 app.get('/', (req, res) => {
   res.render('index');
