@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 
-const { createUser, findUser, updateUserBalance } = require('../utils/userStorage');
+const { createUser, findUser, updateUserBalance, markUserActivity } = require('../utils/userStorage');
 
 const router = express.Router();
 
@@ -60,8 +60,9 @@ router.post('/login', async (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials.' });
   }
 
-  req.session.user = { username: user.username };
-  return res.json({ user: publicUser(user) });
+  const refreshedUser = markUserActivity(user.username) || user;
+  req.session.user = { username: refreshedUser.username };
+  return res.json({ user: publicUser(refreshedUser) });
 });
 
 router.post('/logout', (req, res) => {
