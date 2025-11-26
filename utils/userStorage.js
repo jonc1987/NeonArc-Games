@@ -1,155 +1,102 @@
-const fs = require('fs');
-const path = require('path');
 const { randomUUID } = require('crypto');
+const { query } = require('./db');
 
-const dataDir = path.join(__dirname, '..', 'data');
-const usersFile = path.join(dataDir, 'users.json');
-const cashoutsFile = path.join(dataDir, 'cashouts.json');
-
-function ensureDataFile() {
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-  if (!fs.existsSync(usersFile)) {
-    fs.writeFileSync(usersFile, '[]', 'utf8');
-  }
-  if (!fs.existsSync(cashoutsFile)) {
-    fs.writeFileSync(cashoutsFile, '[]', 'utf8');
-  }
-}
-
-function getUsers() {
-  ensureDataFile();
-  try {
-    const raw = fs.readFileSync(usersFile, 'utf8');
-    return JSON.parse(raw);
-  } catch (error) {
-    console.error('Failed to read users file', error);
-    return [];
-  }
-}
-
-function saveUsers(users) {
-  ensureDataFile();
-  fs.writeFileSync(usersFile, JSON.stringify(users, null, 2), 'utf8');
-}
-
-function getCashouts() {
-  ensureDataFile();
-  try {
-    const raw = fs.readFileSync(cashoutsFile, 'utf8');
-    return JSON.parse(raw);
-  } catch (error) {
-    console.error('Failed to read cashouts file', error);
-    return [];
-  }
-}
-
-function saveCashouts(cashouts) {
-  ensureDataFile();
-  fs.writeFileSync(cashoutsFile, JSON.stringify(cashouts, null, 2), 'utf8');
-}
-
-function findUser(username) {
-  const normalized = username?.toString().trim().toLowerCase();
-  if (!normalized) return null;
-  return getUsers().find((user) => user.username.toLowerCase() === normalized) || null;
-}
-
-function findUserById(id) {
-  const normalized = id?.toString().trim();
-  if (!normalized) return null;
-  return getUsers().find((user) => user.id === normalized) || null;
-}
-
-function createUser(username, passwordHash, balance = 250) {
-  const users = getUsers();
-  const normalized = username?.toString().trim();
-  if (!normalized) {
-    throw new Error('Username is required');
-  }
-  const duplicate = users.find((user) => user.username.toLowerCase() === normalized.toLowerCase());
-  if (duplicate) {
-    throw new Error('Username already exists');
-  }
-  const nowIso = new Date().toISOString();
-  const newUser = {
-    id: randomUUID(),
-    username: normalized,
-    password: passwordHash,
-    balance: Number(balance) || 0,
-    joinedAt: nowIso,
-    lastActivity: nowIso,
-    viewMode: 'standard',
-    dashboardNote: '',
+function mapUser(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    username: row.username,
+    email: row.email,
+    password: row.password,
+    balance: Number(row.balance ?? 0),
+    joinedAt: row.joined_at ? new Date(row.joined_at).toISOString() : null,
+    lastActivity: row.last_activity ? new Date(row.last_activity).toISOString() : null,
+    viewMode: row.view_mode || 'standard',
+    dashboardNote: row.dashboard_note || '',
   };
-  users.push(newUser);
-  saveUsers(users);
-  return newUser;
 }
 
-function markUserActivity(username) {
+async function getUsers() {
+  const { rows } = await query('SELECT * FROM users ORDER BY username ASC');
+  return rows.map(mapUser);
+}
+
+async function findUser(username) {
   const normalized = username?.toString().trim().toLowerCase();
   if (!normalized) return null;
-
-  const users = getUsers();
-  let updatedUser = null;
-  const updatedUsers = users.map((user) => {
-    if (user.username.toLowerCase() === normalized) {
-      updatedUser = { ...user, lastActivity: new Date().toISOString() };
-      return updatedUser;
-    }
-    return user;
-  });
-
-  if (updatedUser) {
-    saveUsers(updatedUsers);
-  }
-
-  return updatedUser;
+  const { rows } = await query('SELECT * FROM users WHERE LOWER(username) = $1 LIMIT 1', [normalized]);
+  return mapUser(rows[0]);
 }
 
-function updateUserBalance(username, delta, { allowNegative = false } = {}) {
+async function findUserById(id) {
+  const normalized = id?.toString().trim();
+  if (!normalized) return null;
+  const { rows } = await query('SELECT * FROM users WHERE id = $1 LIMIT 1', [normalized]);
+  return mapUser(rows[0]);
+}
+
+async function createUser(username, passwordHash, email, balance = 0) {
+  const normalizedUsername = username?.toString().trim();
+  const normalizedEmail = email?.toString().trim();
+
+  if (!normalizedUsername || !normalizedEmail) {
+    throw new Error('Username and email are required');
+  }
+
+  const id = randomUUID();
+  const nowIso = new Date().toISOString();
+
+  await query(
+    `INSERT INTO users (id, username, email, password, balance, joined_at, last_activity, view_mode, dashboard_note)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, 'standard', '')`,
+    [id, normalizedUsername, normalizedEmail, passwordHash, Number(balance) || 0, nowIso, nowIso],
+  );
+
+  return findUserById(id);
+}
+
+async function markUserActivity(username) {
+  const normalized = username?.toString().trim().toLowerCase();
+  if (!normalized) return null;
+  const { rows } = await query(
+    `UPDATE users SET last_activity = $1 WHERE LOWER(username) = $2 RETURNING *`,
+    [new Date().toISOString(), normalized],
+  );
+  return mapUser(rows[0]);
+}
+
+async function updateUserBalance(username, delta, { allowNegative = false } = {}) {
   const normalized = username?.toString().trim().toLowerCase();
   if (!normalized || !Number.isFinite(Number(delta))) {
     return null;
   }
 
-  return updateUserBalanceById(
-    getUsers().find((user) => user.username.toLowerCase() === normalized)?.id,
-    delta,
-    { allowNegative },
-  );
+  const { rows } = await query('SELECT id FROM users WHERE LOWER(username) = $1 LIMIT 1', [normalized]);
+  if (!rows[0]) return null;
+  return updateUserBalanceById(rows[0].id, delta, { allowNegative });
 }
 
-function updateUserBalanceById(id, delta, { allowNegative = false } = {}) {
+async function updateUserBalanceById(id, delta, { allowNegative = false } = {}) {
   const normalized = id?.toString().trim();
   if (!normalized || !Number.isFinite(Number(delta))) {
     return null;
   }
 
-  const users = getUsers();
-  let updatedUser = null;
+  const { rows } = await query('SELECT balance FROM users WHERE id = $1 LIMIT 1', [normalized]);
+  if (!rows[0]) return null;
 
-  const updatedUsers = users.map((user) => {
-    if (user.id === normalized) {
-      const startingBalance = Number(user.balance || 0);
-      const nextBalance = startingBalance + Number(delta);
-      const balance = allowNegative ? nextBalance : Math.max(0, nextBalance);
-      updatedUser = { ...user, balance, lastActivity: new Date().toISOString() };
-      return updatedUser;
-    }
-    return user;
-  });
+  const startingBalance = Number(rows[0].balance || 0);
+  const nextBalance = startingBalance + Number(delta);
+  const balance = allowNegative ? nextBalance : Math.max(0, nextBalance);
 
-  if (updatedUser) {
-    saveUsers(updatedUsers);
-  }
-
-  return updatedUser;
+  const { rows: updated } = await query(
+    `UPDATE users SET balance = $1, last_activity = $2 WHERE id = $3 RETURNING *`,
+    [balance, new Date().toISOString(), normalized],
+  );
+  return mapUser(updated[0]);
 }
 
-function setUserDisplayPreferences(id, { viewMode, dashboardNote }) {
+async function setUserDisplayPreferences(id, { viewMode, dashboardNote }) {
   const normalizedId = id?.toString().trim();
   if (!normalizedId) return null;
 
@@ -157,31 +104,26 @@ function setUserDisplayPreferences(id, { viewMode, dashboardNote }) {
   const safeMode = allowedModes.has(viewMode) ? viewMode : 'standard';
   const safeNote = dashboardNote?.toString().trim().slice(0, 240) || '';
 
-  const users = getUsers();
-  let updatedUser = null;
+  const { rows } = await query(
+    `UPDATE users SET view_mode = $1, dashboard_note = $2, last_activity = $3 WHERE id = $4 RETURNING *`,
+    [safeMode, safeNote, new Date().toISOString(), normalizedId],
+  );
 
-  const updatedUsers = users.map((user) => {
-    if (user.id === normalizedId) {
-      updatedUser = {
-        ...user,
-        viewMode: safeMode,
-        dashboardNote: safeNote,
-        lastActivity: new Date().toISOString(),
-      };
-      return updatedUser;
-    }
-    return user;
-  });
-
-  if (updatedUser) {
-    saveUsers(updatedUsers);
-  }
-
-  return updatedUser;
+  return mapUser(rows[0]);
 }
 
-function addCashout({ id, username, amount }) {
-  ensureDataFile();
+async function getCashouts() {
+  const { rows } = await query('SELECT * FROM cashouts ORDER BY requested_at DESC');
+  return rows.map((row) => ({
+    id: row.id,
+    userId: row.user_id,
+    username: row.username,
+    amount: Number(row.amount || 0),
+    requestedAt: row.requested_at ? new Date(row.requested_at).toISOString() : null,
+  }));
+}
+
+async function addCashout({ id, username, amount }) {
   const sanitizedId = id?.toString().trim();
   const sanitizedUsername = username?.toString().trim();
   const numericAmount = Number(amount);
@@ -190,29 +132,30 @@ function addCashout({ id, username, amount }) {
     throw new Error('Invalid cashout details');
   }
 
-  const cashouts = getCashouts();
-  const newCashout = {
-    id: sanitizedId,
-    username: sanitizedUsername,
-    amount: numericAmount,
-    requestedAt: new Date().toISOString(),
+  const { rows } = await query(
+    `INSERT INTO cashouts (user_id, username, amount, requested_at)
+     VALUES ($1, $2, $3, $4) RETURNING *`,
+    [sanitizedId, sanitizedUsername, numericAmount, new Date().toISOString()],
+  );
+
+  const row = rows[0];
+  return {
+    id: row.id,
+    userId: row.user_id,
+    username: row.username,
+    amount: Number(row.amount || 0),
+    requestedAt: row.requested_at ? new Date(row.requested_at).toISOString() : null,
   };
-  cashouts.push(newCashout);
-  saveCashouts(cashouts);
-  return newCashout;
 }
 
 module.exports = {
   getUsers,
-  saveUsers,
   findUser,
   findUserById,
   createUser,
-  ensureDataFile,
   updateUserBalance,
   updateUserBalanceById,
   getCashouts,
-  saveCashouts,
   addCashout,
   markUserActivity,
   setUserDisplayPreferences,

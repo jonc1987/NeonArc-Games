@@ -39,13 +39,13 @@ router.get('/', (req, res) => {
   });
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const username = req.session?.user?.username;
   if (!username) {
     return res.status(401).json({ error: 'Not authenticated.' });
   }
 
-  const user = findUser(username);
+  const user = await findUser(username);
   if (!user) {
     return res.status(404).json({ error: 'Account not found.' });
   }
@@ -66,7 +66,7 @@ router.post('/', (req, res) => {
   }
 
   const reward = rewards[Math.floor(Math.random() * rewards.length)];
-  const updatedUser = updateUserBalance(user.username, reward);
+  const updatedUser = await updateUserBalance(user.username, reward);
   state.spins[username] = {
     lastSpin: now.toISOString(),
     lastReward: reward,
