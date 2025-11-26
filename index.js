@@ -3,11 +3,10 @@ const path = require('path');
 const session = require('express-session');
 const cors = require('cors');
 require('dotenv').config();
-const { ensureDataFile, getUsers, getCashouts } = require('./utils/userStorage');
+const { ensureDatabase } = require('./utils/db');
+const { getUsers, getCashouts } = require('./utils/userStorage');
 
 const app = express();
-
-ensureDataFile();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -57,7 +56,7 @@ app.get('/confirm', (req, res) => {
   res.render('confirm');
 });
 
-app.get('/management', (req, res) => {
+app.get('/management', async (req, res) => {
   const providedKey = req.query?.key;
   const adminKey = process.env.ADMIN_KEY;
 
@@ -65,11 +64,26 @@ app.get('/management', (req, res) => {
     return res.status(403).send('Access Denied');
   }
 
-  const users = getUsers();
-  const cashouts = getCashouts();
+  try {
+    const users = await getUsers();
+    const cashouts = await getCashouts();
+    const recoverySql =
+      'SELECT id, username, email, balance, joined_at, last_activity, view_mode, dashboard_note FROM users ORDER BY joined_at DESC;';
 
-  return res.render('management', { users, cashouts });
+    return res.render('management', { users, cashouts, recoverySql });
+  } catch (error) {
+    console.error('Failed to load management data', error);
+    return res.status(500).send('Unable to load management dashboard');
+  }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`NeonArc server running on http://localhost:${PORT}`));
+
+ensureDatabase()
+  .then(() => {
+    app.listen(PORT, () => console.log(`NeonArc server running on http://localhost:${PORT}`));
+  })
+  .catch((error) => {
+    console.error('Database initialization failed', error);
+    process.exit(1);
+  });

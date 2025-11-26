@@ -101,6 +101,10 @@
           <input id="username" name="username" type="text" autocomplete="username" required />
         </div>
         <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div>
           <label for="password">Password</label>
           <input id="password" name="password" type="password" autocomplete="new-password" required minlength="6" />
         </div>
@@ -119,9 +123,10 @@
         event.preventDefault();
         const data = new FormData(form);
         const username = data.get('username')?.toString().trim();
+        const email = data.get('email')?.toString().trim();
         const password = data.get('password')?.toString().trim();
-        if (!username || !password) {
-          statusEl.textContent = 'Username and password are required.';
+        if (!username || !password || !email) {
+          statusEl.textContent = 'Username, email, and password are required.';
           statusEl.style.color = '#ff9bb3';
           return;
         }
@@ -131,7 +136,7 @@
           const response = await fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ username, email, password }),
           });
           const payload = await response.json().catch(() => ({}));
           if (!response.ok) {

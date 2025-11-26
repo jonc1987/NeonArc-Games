@@ -21,13 +21,13 @@ function adminKeyValid(providedKey) {
   return Boolean(expected) && providedKey === expected;
 }
 
-router.post('/cashout', (req, res) => {
+router.post('/cashout', async (req, res) => {
   const username = req.session?.user?.username;
   if (!username) {
     return res.status(401).json({ error: 'Not authenticated.' });
   }
 
-  const user = findUser(username);
+  const user = await findUser(username);
   if (!user) {
     return res.status(404).json({ error: 'Account not found.' });
   }
@@ -48,9 +48,9 @@ router.post('/cashout', (req, res) => {
   }
 
   try {
-    const updatedUser = updateUserBalance(user.username, -amount);
-    const activityUser = markUserActivity(user.username) || updatedUser;
-    const cashout = addCashout({ id: user.id, username: user.username, amount });
+    const updatedUser = await updateUserBalance(user.username, -amount);
+    const activityUser = (await markUserActivity(user.username)) || updatedUser;
+    const cashout = await addCashout({ id: user.id, username: user.username, amount });
     return res.status(201).json({ user: activityUser, cashout });
   } catch (error) {
     console.error('Failed to record cashout', error);
@@ -58,13 +58,14 @@ router.post('/cashout', (req, res) => {
   }
 });
 
-router.get('/cashouts', (req, res) => {
+router.get('/cashouts', async (req, res) => {
   const providedKey = req.query?.key || req.headers['x-admin-key'];
   if (!adminKeyValid(providedKey)) {
     return res.status(403).json({ error: 'Access denied.' });
   }
 
-  return res.json({ cashouts: getCashouts() });
+  const cashouts = await getCashouts();
+  return res.json({ cashouts });
 });
 
 module.exports = router;

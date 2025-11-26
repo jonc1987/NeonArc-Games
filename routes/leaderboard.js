@@ -4,8 +4,8 @@ const { getUsers } = require('../utils/userStorage');
 
 const router = express.Router();
 
-router.get('/', (_req, res) => {
-  const users = getUsers();
+router.get('/', async (_req, res) => {
+  const users = await getUsers();
   const leaderboard = users
     .map((user) => ({
       username: user.username,

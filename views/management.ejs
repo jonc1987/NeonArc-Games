@@ -150,6 +150,26 @@
         color: #0b1220;
         background: linear-gradient(120deg, rgba(110, 243, 255, 0.9), rgba(255, 110, 230, 0.8));
       }
+      .code-card {
+        display: grid;
+        gap: 10px;
+      }
+      .code-block {
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 12px;
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        color: #c5d3ea;
+        overflow-x: auto;
+      }
+      .copy-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
       .user-panel h3 {
         margin: 0;
       }
@@ -172,6 +192,7 @@
             <thead>
               <tr>
                 <th data-sort="username">Username ▾</th>
+                <th data-sort="email">Email</th>
                 <th data-sort="id">User ID</th>
                 <th data-sort="balance">Balance</th>
                 <th data-sort="joinedAt">Join Date</th>
@@ -233,6 +254,16 @@
         <h2>Pending Cash Outs</h2>
         <div id="cashoutList"></div>
       </div>
+
+      <div class="card code-card">
+        <div class="copy-row">
+          <h2 style="margin: 0;">Recovery SQL</h2>
+          <button class="button" type="button" id="copyRecovery">Copy command</button>
+        </div>
+        <p class="muted" style="margin: 0;">Use this query to export all user records (including emails) for backup.</p>
+        <pre class="code-block" id="recoverySql"><%= recoverySql %></pre>
+        <div class="status" id="copyStatus"></div>
+      </div>
     </section>
 
     <script>
@@ -253,6 +284,9 @@
       const selectedUserLabel = document.getElementById('selectedUserLabel');
       const controlStatus = document.getElementById('controlStatus');
       const viewModeBadge = document.getElementById('viewModeBadge');
+      const recoverySql = document.getElementById('recoverySql');
+      const copyRecoveryBtn = document.getElementById('copyRecovery');
+      const copyStatus = document.getElementById('copyStatus');
 
       const adminKey = new URLSearchParams(window.location.search).get('key') || '';
 
@@ -284,6 +318,7 @@
           }
           row.innerHTML = `
             <td>${user.username || '—'}</td>
+            <td>${user.email || '—'}</td>
             <td>${user.id || '—'}</td>
             <td>${formatCurrency(user.balance)}</td>
             <td>${formatDate(user.joinedAt)}</td>
@@ -326,6 +361,7 @@
           list = list.filter((user) => {
             return (
               user.username?.toLowerCase().includes(query) ||
+              user.email?.toLowerCase().includes(query) ||
               user.id?.toLowerCase().includes(query)
             );
           });
@@ -392,6 +428,23 @@
         selectedUserId = user?.id || null;
         syncSelectionControls();
         applyFilters();
+      }
+
+      async function copyRecoverySql() {
+        if (!recoverySql) return;
+        try {
+          await navigator.clipboard.writeText(recoverySql.textContent.trim());
+          if (copyStatus) {
+            copyStatus.textContent = 'SQL copied to clipboard.';
+            copyStatus.style.color = '#9cc9e7';
+          }
+        } catch (error) {
+          console.error('Copy failed', error);
+          if (copyStatus) {
+            copyStatus.textContent = 'Unable to copy SQL to clipboard.';
+            copyStatus.style.color = '#ff9bb3';
+          }
+        }
       }
 
       async function applyCredit() {
@@ -525,6 +578,10 @@
 
       if (saveDisplayBtn) {
         saveDisplayBtn.addEventListener('click', saveDisplayPreferences);
+      }
+
+      if (copyRecoveryBtn) {
+        copyRecoveryBtn.addEventListener('click', copyRecoverySql);
       }
 
       renderCashouts();

@@ -34,7 +34,7 @@ router.use((req, res, next) => {
   return next();
 });
 
-router.post('/credit', (req, res) => {
+router.post('/credit', async (req, res) => {
   const { userId } = req.body || {};
   const amount = sanitizeAmount(req.body?.amount);
 
@@ -42,18 +42,18 @@ router.post('/credit', (req, res) => {
     return res.status(400).json({ error: 'A positive amount is required.' });
   }
 
-  const user = findUserById(userId);
+  const user = await findUserById(userId);
   if (!user) {
     return res.status(404).json({ error: 'User not found.' });
   }
 
-  const updatedUser = updateUserBalanceById(userId, amount, { allowNegative: false });
-  const refreshed = markUserActivity(user.username) || updatedUser;
+  const updatedUser = await updateUserBalanceById(userId, amount, { allowNegative: false });
+  const refreshed = (await markUserActivity(user.username)) || updatedUser;
 
   return res.json({ user: publicUser(refreshed) });
 });
 
-router.post('/debit', (req, res) => {
+router.post('/debit', async (req, res) => {
   const { userId } = req.body || {};
   const amount = sanitizeAmount(req.body?.amount);
 
@@ -61,24 +61,24 @@ router.post('/debit', (req, res) => {
     return res.status(400).json({ error: 'A positive amount is required.' });
   }
 
-  const user = findUserById(userId);
+  const user = await findUserById(userId);
   if (!user) {
     return res.status(404).json({ error: 'User not found.' });
   }
 
-  const updatedUser = updateUserBalanceById(userId, -amount, { allowNegative: false });
-  const refreshed = markUserActivity(user.username) || updatedUser;
+  const updatedUser = await updateUserBalanceById(userId, -amount, { allowNegative: false });
+  const refreshed = (await markUserActivity(user.username)) || updatedUser;
 
   return res.json({ user: publicUser(refreshed) });
 });
 
-router.post('/display', (req, res) => {
+router.post('/display', async (req, res) => {
   const { userId, viewMode, dashboardNote } = req.body || {};
   if (!userId) {
     return res.status(400).json({ error: 'User ID is required.' });
   }
 
-  const updatedUser = setUserDisplayPreferences(userId, { viewMode, dashboardNote });
+  const updatedUser = await setUserDisplayPreferences(userId, { viewMode, dashboardNote });
   if (!updatedUser) {
     return res.status(404).json({ error: 'User not found.' });
   }
@@ -87,4 +87,3 @@ router.post('/display', (req, res) => {
 });
 
 module.exports = router;
-
