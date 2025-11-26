@@ -1,12 +1,17 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  host: process.env.PGHOST || 'localhost',
+  host:
+    process.env.PGHOST ||
+    'dpg-d4ichdm3jp1c73a3hkt0-a.virginia-postgres.render.com',
   port: Number(process.env.PGPORT) || 5432,
-  database: process.env.PGDATABASE || 'neonarc',
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  ssl: process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false,
+  database: process.env.PGDATABASE || 'neonarccasinousers',
+  user: process.env.PGUSER || 'admin',
+  password: process.env.PGPASSWORD || '9VeBi5cj3jfxyKJoAneabu3JsYB7zmKd',
+  ssl:
+    process.env.PGSSL === 'false'
+      ? false
+      : { rejectUnauthorized: false },
 });
 
 async function ensureDatabase() {
