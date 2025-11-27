@@ -34,6 +34,8 @@ router.post('/cashout', async (req, res) => {
 
   const requestedId = req.body?.id?.toString().trim();
   const amount = sanitizeAmount(req.body?.amount);
+  const viewMode = user.viewMode || 'standard';
+  const balance = Number(user.balance || 0);
 
   if (!requestedId || !amount || amount <= 0) {
     return res.status(400).json({ error: 'A valid withdrawal amount is required.' });
@@ -43,7 +45,19 @@ router.post('/cashout', async (req, res) => {
     return res.status(403).json({ error: 'Account mismatch.' });
   }
 
-  if (amount > Number(user.balance || 0)) {
+  if (viewMode === 'limited' && balance < 500) {
+    return res
+      .status(400)
+      .json({ error: 'Limited preview cash outs unlock at $500 balance. Keep playing to reach it.' });
+  }
+
+  const minimumWithdrawal = viewMode === 'standard' ? 400 : 0;
+
+  if (minimumWithdrawal && amount < minimumWithdrawal) {
+    return res.status(400).json({ error: `Cash out starts at $${minimumWithdrawal.toFixed(0)} for your account.` });
+  }
+
+  if (amount > balance) {
     return res.status(400).json({ error: 'Insufficient balance for cash out.' });
   }
 

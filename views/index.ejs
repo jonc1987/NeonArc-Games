@@ -4583,62 +4583,87 @@
           return null;
         }
       }
-      async function requestCashOut() {
-        if (!requireActiveSession()) return;
-        const input = prompt('How much would you like to cash out?');
-        if (input === null) return;
+        async function requestCashOut() {
+          if (!requireActiveSession()) return;
+          const mode = accountData?.viewMode || 'standard';
+          const stayMessage =
+            mode === 'vip'
+              ? 'VIP lane is hot—stick around for priority drops.'
+              : mode === 'limited'
+                ? 'Preview mode active. Build to $500 to unlock withdrawals.'
+                : 'Standard lane: bigger balances get better perks. Play another round?';
+          setAccountStatus(stayMessage);
 
-        const parsed = Number(input);
-        const amount = Math.floor(parsed * 100) / 100;
-
-        if (!Number.isFinite(amount) || amount <= 0) {
-          alert('Enter a valid cash-out amount.');
-          return;
-        }
-
-        if (amount > Number(balance || 0)) {
-          alert('Requested amount exceeds your available balance.');
-          return;
-        }
-
-        try {
-          setAccountStatus('Submitting cash-out request...');
-          const response = await fetch('/api/cashout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: accountData?.id, amount }),
-          });
-
-          const payload = await response.json().catch(() => ({}));
-
-          if (response.status === 401) {
-            clearAccountData('Session expired. Please log in again.', true);
-            setAuthStatus('Session expired. Please log in again.', true);
+          if (mode === 'limited' && Number(balance || 0) < 500) {
+            const limitedNote = 'Limited preview cash outs unlock at $500 balance. Keep playing to reach it.';
+            alert(limitedNote);
+            setAccountStatus(limitedNote, true);
             return;
           }
 
-          if (!response.ok) {
-            setAccountStatus(payload.error || 'Unable to submit cash-out request.', true);
-            alert(payload.error || 'Unable to submit cash-out request.');
+          const minimum = mode === 'standard' ? 400 : 0;
+
+          const input = prompt('How much would you like to cash out?');
+          if (input === null) return;
+
+          const parsed = Number(input);
+          const amount = Math.floor(parsed * 100) / 100;
+
+          if (!Number.isFinite(amount) || amount <= 0) {
+            alert('Enter a valid cash-out amount.');
             return;
           }
 
-          if (payload?.user) {
-            applyAccountData(payload.user);
-          } else if (accountData) {
-            balance = Math.max(0, Number(balance || 0) - amount);
-            accountData.balance = balance;
-            updateBalance(false);
+          if (minimum && amount < minimum) {
+            const minimumCopy = `Cash out starts at $${minimum.toFixed(0)} for your account. A few more rounds will get you there.`;
+            alert(minimumCopy);
+            setAccountStatus(minimumCopy, true);
+            return;
           }
 
-          alert('Cash-out request submitted. Please allow manual review.');
-          setAccountStatus('Cash-out request recorded and awaiting manual review.');
-        } catch (error) {
-          console.error('Cash-out request failed', error);
-          setAccountStatus('Could not submit cash-out request.', true);
-          alert('Could not submit cash-out request.');
+          if (amount > Number(balance || 0)) {
+            alert('Requested amount exceeds your available balance.');
+            return;
+          }
+
+          try {
+            setAccountStatus('Submitting cash-out request...');
+            const response = await fetch('/api/cashout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: accountData?.id, amount }),
+            });
+
+            const payload = await response.json().catch(() => ({}));
+
+            if (response.status === 401) {
+              clearAccountData('Session expired. Please log in again.', true);
+              setAuthStatus('Session expired. Please log in again.', true);
+              return;
+            }
+
+            if (!response.ok) {
+              setAccountStatus(payload.error || 'Unable to submit cash-out request.', true);
+              alert(payload.error || 'Unable to submit cash-out request.');
+              return;
+            }
+
+            if (payload?.user) {
+              applyAccountData(payload.user);
+            } else if (accountData) {
+              balance = Math.max(0, Number(balance || 0) - amount);
+              accountData.balance = balance;
+              updateBalance(false);
+            }
+
+            alert('Cash-out request submitted. Please allow manual review.');
+            setAccountStatus('Cash-out request recorded. Jump back into a run while we review it.');
+          } catch (error) {
+            console.error('Cash-out request failed', error);
+            setAccountStatus('Could not submit cash-out request.', true);
+            alert('Could not submit cash-out request.');
+          }
         }
-      }
 
       async function refreshAccountFromServer() {
         if (!requireActiveSession()) return;
