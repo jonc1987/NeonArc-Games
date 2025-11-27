@@ -3136,7 +3136,7 @@
             </div>
           </div>
           <div class="account-actions">
-            <button class="account-action" id="cashOutBtn" type="button">Cash Out</button>
+            <button class="account-action" id="accountCashOutBtn" type="button">Cash Out</button>
             <button class="account-action secondary" id="refreshAccountBtn" type="button">Refresh Account</button>
           </div>
           <div class="account-card">
@@ -3262,7 +3262,7 @@
                 </div>
                 <div class="button-row">
                   <button class="launch" id="launchBtn">Launch</button>
-                  <button class="cashout" id="cashOutBtn" disabled>Cash Out</button>
+                  <button class="cashout" id="rocketCashBtn" disabled>Cash Out</button>
                 </div>
                 <div class="risk-copy" id="riskCopy"></div>
                 <div class="status" id="status">Rocket idling on the pad.</div>
@@ -3895,7 +3895,7 @@
       const showLoginBtn = document.getElementById('showLogin');
       const showRegisterBtn = document.getElementById('showRegister');
       const logoutBtn = document.getElementById('logoutBtn');
-      const cashOutBtn = document.getElementById('cashOutBtn');
+      const accountCashOutBtn = document.getElementById('accountCashOutBtn');
       const refreshAccountBtn = document.getElementById('refreshAccountBtn');
       const viewModeDisplay = document.getElementById('viewModeDisplay');
       const viewNote = document.getElementById('viewNote');
@@ -4024,7 +4024,7 @@
       const riskCopy = document.getElementById('riskCopy');
       const roundTag = document.getElementById('roundTag');
       const launchBtn = document.getElementById('launchBtn');
-      const cashBtn = document.getElementById('cashOutBtn');
+      const rocketCashBtn = document.getElementById('rocketCashBtn');
       const statusEl = document.getElementById('status');
       const multiplierEl = document.getElementById('multiplier');
       const resultEl = document.getElementById('roundResult');
@@ -4162,8 +4162,8 @@
         if (logoutBtn) {
           logoutBtn.addEventListener('click', handleLogout);
         }
-        if (cashOutBtn) {
-          cashOutBtn.addEventListener('click', () => requestCashOut());
+        if (accountCashOutBtn) {
+          accountCashOutBtn.addEventListener('click', () => requestCashOut());
         }
         if (spinWheelBtn) {
           spinWheelBtn.addEventListener('click', () => spinDailyWheel());
@@ -4265,7 +4265,7 @@
         binaryLockBtn.addEventListener('click', finishBinaryPoker);
         binaryHandEl.addEventListener('click', handleBinaryHandClick);
         launchBtn.addEventListener('click', launchRocket);
-        cashBtn.addEventListener('click', cashOut);
+        rocketCashBtn.addEventListener('click', cashOut);
         betInput.addEventListener('input', updateRiskMessaging);
         pulseLaunchBtn.addEventListener('click', startPulseCash);
         pulseCashBtn.addEventListener('click', cashOutPulse);
@@ -4303,8 +4303,8 @@
         if (logoutBtn) {
           logoutBtn.classList.toggle('hidden', !loggedIn);
         }
-        if (cashOutBtn) {
-          cashOutBtn.classList.toggle('hidden', !loggedIn);
+        if (accountCashOutBtn) {
+          accountCashOutBtn.classList.toggle('hidden', !loggedIn);
         }
         if (authPanel) {
           authPanel.classList.toggle('authenticated', loggedIn);
@@ -6871,7 +6871,7 @@
 
         rocketStage.classList.remove('idle', 'exploded', 'danger');
         launchBtn.disabled = true;
-        cashBtn.disabled = false;
+        rocketCashBtn.disabled = false;
         betInput.disabled = true;
         roundTag.textContent = 'Live';
         setStatus('Hold steady...');
@@ -6971,7 +6971,7 @@
         clearInterval(flightInterval);
         flightInterval = null;
         inFlight = false;
-        cashBtn.disabled = true;
+        rocketCashBtn.disabled = true;
       }
 
       function scheduleReset() {
@@ -6995,7 +6995,7 @@
         roundTag.textContent = 'Idle';
         launchBtn.disabled = false;
         betInput.disabled = false;
-        cashBtn.disabled = true;
+        rocketCashBtn.disabled = true;
         currentBet = 0;
         resultEl.classList.remove('win', 'loss');
         resultEl.textContent = 'Enter a bet to play.';
