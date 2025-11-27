@@ -82,6 +82,29 @@
         border: 1px solid rgba(255, 255, 255, 0.06);
         margin-bottom: 8px;
       }
+      .cashout-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(110, 243, 255, 0.16);
+        color: #e8edf4;
+        border: 1px solid rgba(110, 243, 255, 0.35);
+        font-size: 12px;
+      }
+      .cashout-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-top: 6px;
+      }
       .cashout-empty {
         color: #8fa2c1;
       }
@@ -252,7 +275,10 @@
 
       <div class="card">
         <h2>Pending Cash Outs</h2>
+        <div class="meta" id="cashoutMeta"></div>
         <div id="cashoutList"></div>
+        <h2 style="margin-top: 16px;">Completed Payouts</h2>
+        <div id="cashoutCompleted"></div>
       </div>
 
       <div class="card code-card">
@@ -268,12 +294,14 @@
 
     <script>
       let users = <%- JSON.stringify(users || []) %>;
-      const cashouts = <%- JSON.stringify(cashouts || []) %>;
+      let cashouts = <%- JSON.stringify(cashouts || []) %>;
 
       const userTableBody = document.getElementById('userTableBody');
       const searchInput = document.getElementById('userSearch');
       const userCount = document.getElementById('userCount');
       const cashoutList = document.getElementById('cashoutList');
+      const cashoutCompletedList = document.getElementById('cashoutCompleted');
+      const cashoutMeta = document.getElementById('cashoutMeta');
       const creditInput = document.getElementById('creditAmount');
       const creditBtn = document.getElementById('creditBtn');
       const debitInput = document.getElementById('debitAmount');
@@ -373,29 +401,109 @@
       }
 
       function renderCashouts() {
-        if (!cashoutList) return;
+        if (!cashoutList || !cashoutCompletedList) return;
         cashoutList.innerHTML = '';
-        if (!cashouts.length) {
+        cashoutCompletedList.innerHTML = '';
+
+        const pending = cashouts.filter((entry) => (entry.status || 'pending') !== 'completed' && entry.remaining > 0);
+        const completed = cashouts.filter((entry) => (entry.status || 'pending') === 'completed' || entry.remaining <= 0);
+
+        if (cashoutMeta) {
+          cashoutMeta.textContent = `${pending.length} pending · ${completed.length} completed`;
+        }
+
+        if (!pending.length) {
           const empty = document.createElement('p');
           empty.className = 'cashout-empty';
           empty.textContent = 'No pending cash outs.';
           cashoutList.appendChild(empty);
-          return;
+        } else {
+          pending.forEach((entry) => {
+            const item = document.createElement('div');
+            item.className = 'cashout-item';
+            item.innerHTML = `
+              <div class="cashout-row">
+                <div><strong>${entry.username}</strong> requested ${formatCurrency(entry.amount)}</div>
+                <span class="pill">${formatCurrency(entry.remaining)} owed</span>
+              </div>
+              <div class="muted">Paid ${formatCurrency(entry.paidAmount)} · Requested ${formatDate(entry.requestedAt)}</div>
+              <div class="cashout-actions">
+                <input class="input" type="number" step="0.01" min="0" placeholder="Amount paid"
+                  data-cashout="${entry.id}" />
+                <button class="button record-payment" type="button" data-cashout="${entry.id}">Record payment</button>
+              </div>
+            `;
+
+            const input = item.querySelector('input[data-cashout]');
+            const button = item.querySelector('button[data-cashout]');
+            if (button) {
+              button.addEventListener('click', () => recordPayment(entry.id, input));
+            }
+            cashoutList.appendChild(item);
+          });
         }
-        cashouts.forEach((entry) => {
-          const item = document.createElement('div');
-          item.className = 'cashout-item';
-          item.textContent = `User ${entry.username} requested ${formatCurrency(entry.amount)} on ${formatDate(
-            entry.requestedAt,
-          )} — please confirm payout manually.`;
-          cashoutList.appendChild(item);
-        });
+
+        if (!completed.length) {
+          const empty = document.createElement('p');
+          empty.className = 'cashout-empty';
+          empty.textContent = 'No completed payouts yet.';
+          cashoutCompletedList.appendChild(empty);
+        } else {
+          completed.forEach((entry) => {
+            const item = document.createElement('div');
+            item.className = 'cashout-item';
+            item.innerHTML = `
+              <div class="cashout-row">
+                <div><strong>${entry.username}</strong> paid in full.</div>
+                <span class="pill">${formatCurrency(entry.amount)} completed</span>
+              </div>
+              <div class="muted">Last updated ${formatDate(entry.lastUpdated || entry.requestedAt)}</div>
+            `;
+            cashoutCompletedList.appendChild(item);
+          });
+        }
       }
 
       function setControlStatus(message, isError = false) {
         if (!controlStatus) return;
         controlStatus.textContent = message;
         controlStatus.style.color = isError ? '#ff9bb3' : '#8fa2c1';
+      }
+
+      async function recordPayment(cashoutId, inputEl) {
+        if (!adminKey) {
+          setControlStatus('Admin key missing from request.', true);
+          return;
+        }
+        const amount = Number(inputEl?.value);
+        if (!Number.isFinite(amount) || amount <= 0) {
+          setControlStatus('Enter the amount paid to record progress.', true);
+          return;
+        }
+
+        try {
+          setControlStatus('Recording payout...');
+          const response = await fetch(`/api/admin/cashouts/${cashoutId}/pay`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({ amount }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setControlStatus(payload.error || 'Unable to record payout.', true);
+            return;
+          }
+          const updated = payload.cashout;
+          if (updated) {
+            cashouts = cashouts.map((entry) => (entry.id === updated.id ? updated : entry));
+            setControlStatus('Payout progress updated.');
+            renderCashouts();
+            if (inputEl) inputEl.value = '';
+          }
+        } catch (error) {
+          console.error('Failed to record payout', error);
+          setControlStatus('Unable to record payout right now.', true);
+        }
       }
 
       function syncSelectionControls() {

@@ -16,6 +16,24 @@ function mapUser(row) {
   };
 }
 
+function mapCashout(row) {
+  if (!row) return null;
+  const amount = Number(row.amount || 0);
+  const paidAmount = Number(row.paid_amount || 0);
+  const remaining = Math.max(0, amount - paidAmount);
+  return {
+    id: row.id,
+    userId: row.user_id,
+    username: row.username,
+    amount,
+    paidAmount,
+    remaining,
+    status: row.status || (remaining <= 0 ? 'completed' : 'pending'),
+    requestedAt: row.requested_at ? new Date(row.requested_at).toISOString() : null,
+    lastUpdated: row.last_updated ? new Date(row.last_updated).toISOString() : null,
+  };
+}
+
 async function getUsers() {
   const { rows } = await query('SELECT * FROM users ORDER BY username ASC');
   return rows.map(mapUser);
@@ -114,13 +132,7 @@ async function setUserDisplayPreferences(id, { viewMode, dashboardNote }) {
 
 async function getCashouts() {
   const { rows } = await query('SELECT * FROM cashouts ORDER BY requested_at DESC');
-  return rows.map((row) => ({
-    id: row.id,
-    userId: row.user_id,
-    username: row.username,
-    amount: Number(row.amount || 0),
-    requestedAt: row.requested_at ? new Date(row.requested_at).toISOString() : null,
-  }));
+  return rows.map(mapCashout);
 }
 
 async function addCashout({ id, username, amount }) {
@@ -138,14 +150,35 @@ async function addCashout({ id, username, amount }) {
     [sanitizedId, sanitizedUsername, numericAmount, new Date().toISOString()],
   );
 
-  const row = rows[0];
-  return {
-    id: row.id,
-    userId: row.user_id,
-    username: row.username,
-    amount: Number(row.amount || 0),
-    requestedAt: row.requested_at ? new Date(row.requested_at).toISOString() : null,
-  };
+  return mapCashout(rows[0]);
+}
+
+async function applyCashoutPayment(cashoutId, paymentAmount) {
+  const normalizedId = cashoutId?.toString().trim();
+  const amount = Number(paymentAmount);
+
+  if (!normalizedId || !Number.isFinite(amount) || amount <= 0) {
+    return null;
+  }
+
+  const { rows: existingRows } = await query('SELECT * FROM cashouts WHERE id = $1 LIMIT 1', [normalizedId]);
+  const existing = existingRows[0];
+  if (!existing) return null;
+
+  const totalRequested = Number(existing.amount || 0);
+  const alreadyPaid = Number(existing.paid_amount || 0);
+  const nextPaid = Math.min(totalRequested, alreadyPaid + amount);
+  const status = nextPaid >= totalRequested ? 'completed' : 'pending';
+
+  const { rows } = await query(
+    `UPDATE cashouts
+      SET paid_amount = $1, status = $2, last_updated = $3
+      WHERE id = $4
+      RETURNING *`,
+    [nextPaid, status, new Date().toISOString(), normalizedId],
+  );
+
+  return mapCashout(rows[0]);
 }
 
 module.exports = {
@@ -157,6 +190,7 @@ module.exports = {
   updateUserBalanceById,
   getCashouts,
   addCashout,
+  applyCashoutPayment,
   markUserActivity,
   setUserDisplayPreferences,
 };

@@ -5,6 +5,7 @@ const {
   updateUserBalanceById,
   setUserDisplayPreferences,
   markUserActivity,
+  applyCashoutPayment,
 } = require('../utils/userStorage');
 
 const router = express.Router();
@@ -84,6 +85,26 @@ router.post('/display', async (req, res) => {
   }
 
   return res.json({ user: publicUser(updatedUser) });
+});
+
+router.post('/cashouts/:id/pay', async (req, res) => {
+  const amount = sanitizeAmount(req.body?.amount);
+  const cashoutId = req.params?.id;
+
+  if (!cashoutId || !amount || amount <= 0) {
+    return res.status(400).json({ error: 'A positive payout amount is required.' });
+  }
+
+  try {
+    const updatedCashout = await applyCashoutPayment(cashoutId, amount);
+    if (!updatedCashout) {
+      return res.status(404).json({ error: 'Cash out request not found.' });
+    }
+    return res.json({ cashout: updatedCashout });
+  } catch (error) {
+    console.error('Failed to update cashout payment', error);
+    return res.status(500).json({ error: 'Unable to record payout.' });
+  }
 });
 
 module.exports = router;

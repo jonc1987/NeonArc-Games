@@ -3768,6 +3768,46 @@
       let ambientPrimed = false;
       let glowWheelSpinTimer = null;
 
+      function getPlayerTier() {
+        const mode = accountData?.viewMode || 'standard';
+        if (mode === 'vip') return 'vip';
+        if (mode === 'limited') return 'limited';
+        return 'standard';
+      }
+
+      function getTierWinModifier() {
+        const tier = getPlayerTier();
+        if (tier === 'vip') return 0.25;
+        if (tier === 'standard') return 0.16;
+        return 0.08;
+      }
+
+      function getTierVolatilityScale() {
+        const tier = getPlayerTier();
+        if (tier === 'vip') return 0.72;
+        if (tier === 'standard') return 0.58;
+        return 0.42;
+      }
+
+      function tieredWinAllowed(baseChance = 0.35) {
+        const modifier = getTierWinModifier();
+        const allowedChance = Math.max(0, Math.min(1, baseChance * modifier));
+        return Math.random() < allowedChance;
+      }
+
+      function gateTieredPayout({ baseChance = 0.35, onFailure }) {
+        const allowed = tieredWinAllowed(baseChance);
+        if (!allowed && typeof onFailure === 'function') {
+          onFailure();
+        }
+        return allowed;
+      }
+
+      function applyTierVolatility(value) {
+        const scale = getTierVolatilityScale();
+        return Math.max(1, Number((value * scale).toFixed(2)));
+      }
+
       // ---------------- Rocket state ----------------
       let currentBet = 0;
       let multiplier = 1;
@@ -5362,6 +5402,17 @@
           payout *= 0.5;
         }
         payout = Math.max(0, payout);
+        const allowed = gateTieredPayout({
+          baseChance: 0.4,
+          onFailure: () => {
+            setStackStatus('Tier odds tipped the tower. Bet lost.');
+            collapseTower();
+            scheduleStackReset();
+          },
+        });
+        if (!allowed) {
+          return;
+        }
         balance += payout;
         updateBalance();
         setStackStatus(`Held at ${stackTotal}. Won $${payout.toFixed(2)}.`);
@@ -5790,12 +5841,24 @@
         let winnings = 0;
 
         if (multiplierWin > 0) {
-          winnings = binaryBet * multiplierWin;
-          balance += winnings;
-          updateBalance();
-          setBinaryStatus(
-            `Distance ${distance}. Payout ${multiplierWin.toFixed(2)}x = $${winnings.toFixed(2)}.`
-          );
+          const allowed = gateTieredPayout({
+            baseChance: 0.35,
+            onFailure: () => {
+              setBinaryStatus('Tier odds voided the binary hand. Bet lost.');
+              if (binaryResultEl) {
+                binaryResultEl.textContent = 'Tier odds blocked the payout.';
+              }
+            },
+          });
+
+          if (allowed) {
+            winnings = binaryBet * multiplierWin;
+            balance += winnings;
+            updateBalance();
+            setBinaryStatus(
+              `Distance ${distance}. Payout ${multiplierWin.toFixed(2)}x = $${winnings.toFixed(2)}.`
+            );
+          }
         } else {
           setBinaryStatus(`Distance ${distance}. Bet lost.`);
         }
@@ -6021,6 +6084,13 @@
         }
         const payoutRaw = echoBet * (echoTotal / 21) * 2;
         const payout = Math.max(0, Number(payoutRaw.toFixed(2)));
+        const allowed = gateTieredPayout({
+          baseChance: 0.38,
+          onFailure: () => handleEchoBust('Tier odds collapsed the echo field. Bet lost.'),
+        });
+        if (!allowed) {
+          return;
+        }
         balance += payout;
         updateBalance();
         setEchoStatus(`Stabilized at ${echoTotal}. Echo payout $${payout.toFixed(2)}.`);
@@ -6337,18 +6407,33 @@
         const payoutRaw = fuseBet * (finalScore / 21) * 2;
         const payout = Math.max(0, Number(payoutRaw.toFixed(2)));
         fuseBet = 0;
+        let payoutBlocked = false;
 
         if (payout > 0) {
-          balance += payout;
-          updateBalance();
+          const allowed = gateTieredPayout({
+            baseChance: 0.32,
+            onFailure: () => {
+              payoutBlocked = true;
+              setFuseStatus('Tier odds destabilized the containment. Bet lost.');
+              if (fuseResultEl) {
+                fuseResultEl.textContent = 'Tier odds blocked the payout.';
+              }
+            },
+          });
+          if (allowed) {
+            balance += payout;
+            updateBalance();
+          }
         }
 
-        setFuseStatus(`Hybrids contained at ${totalValue.toFixed(1)} power. Final score ${finalScore.toFixed(1)}.`);
-        if (fuseResultEl) {
-          fuseResultEl.textContent =
-            payout > 0
-              ? `Payout $${payout.toFixed(2)} from score ${finalScore.toFixed(1)}.`
-              : `No payout · score ${finalScore.toFixed(1)} after instability.`;
+        if (!payoutBlocked) {
+          setFuseStatus(`Hybrids contained at ${totalValue.toFixed(1)} power. Final score ${finalScore.toFixed(1)}.`);
+          if (fuseResultEl) {
+            fuseResultEl.textContent =
+              payout > 0
+                ? `Payout $${payout.toFixed(2)} from score ${finalScore.toFixed(1)}.`
+                : `No payout · score ${finalScore.toFixed(1)} after instability.`;
+          }
         }
         pulseFuseOverlay('CONTAINED');
         renderFuseCards();
@@ -6679,7 +6764,21 @@
         }
 
         let payout = 0;
-        if (multiplier > 0) {
+        let payoutBlocked = false;
+        const allowPayout =
+          multiplier > 0 &&
+          gateTieredPayout({
+            baseChance: 0.36,
+            onFailure: () => {
+              payoutBlocked = true;
+              setPerceptionStatus('Tier odds clouded the vision. Bet lost.');
+              if (perceptionResultEl) {
+                perceptionResultEl.textContent = 'Tier odds blocked the payout.';
+              }
+            },
+          });
+
+        if (allowPayout) {
           payout = perceptionBet * multiplier;
           balance += payout;
           updateBalance();
@@ -6687,7 +6786,7 @@
           if (perceptionResultEl) {
             perceptionResultEl.textContent = `Payout $${payout.toFixed(2)} (${multiplier}×).`;
           }
-        } else {
+        } else if (!payoutBlocked) {
           setPerceptionStatus(`Score ${score}. Illusions consumed the wager.`);
           if (perceptionResultEl) {
             perceptionResultEl.textContent = 'Score below 10 · Bet lost.';
@@ -6964,6 +7063,16 @@
 
       function cashOut() {
         if (!inFlight || cashedOut) return;
+        const allowed = gateTieredPayout({
+          baseChance: 0.3,
+          onFailure: () => {
+            setStatus('Tier odds blocked the cash out. Engines failed.');
+            explodeRocket();
+          },
+        });
+        if (!allowed) {
+          return;
+        }
         cashedOut = true;
         const winnings = currentBet * multiplier;
         balance += winnings;
@@ -7031,19 +7140,19 @@
       function getExplosionPoint(bet) {
         const roll = Math.random();
         if (bet < 10) {
-          if (roll < 0.6) return randRange(1, 12);
-          if (roll < 0.85) return randRange(12, 25);
-          if (roll < 0.95) return randRange(25, 50);
-          return randRange(50, settings.maxMultiplier);
+          if (roll < 0.6) return applyTierVolatility(randRange(1, 12));
+          if (roll < 0.85) return applyTierVolatility(randRange(12, 25));
+          if (roll < 0.95) return applyTierVolatility(randRange(25, 50));
+          return applyTierVolatility(randRange(50, settings.maxMultiplier));
         }
         if (bet <= 50) {
-          if (roll < 0.7) return randRange(1, 12);
-          if (roll < 0.9) return randRange(12, 20);
-          return randRange(20, 60);
+          if (roll < 0.7) return applyTierVolatility(randRange(1, 12));
+          if (roll < 0.9) return applyTierVolatility(randRange(12, 20));
+          return applyTierVolatility(randRange(20, 60));
         }
-        if (roll < 0.8) return randRange(1, 5);
-        if (roll < 0.95) return randRange(5, 12);
-        return randRange(12, 40);
+        if (roll < 0.8) return applyTierVolatility(randRange(1, 5));
+        if (roll < 0.95) return applyTierVolatility(randRange(5, 12));
+        return applyTierVolatility(randRange(12, 40));
       }
 
       function setStatus(message) {
@@ -7150,6 +7259,16 @@
 
       function cashOutPulse() {
         if (!pulseRunning || pulseCashedOut) return;
+        const allowed = gateTieredPayout({
+          baseChance: 0.28,
+          onFailure: () => {
+            setPulseStatus('Tier odds stalled the surge. Overload triggered.');
+            explodePulse();
+          },
+        });
+        if (!allowed) {
+          return;
+        }
         pulseCashedOut = true;
         const winnings = pulseBet * pulseMultiplier;
         balance += winnings;
@@ -7223,21 +7342,21 @@
       function getPulseExplosionPoint(bet) {
         const roll = Math.random();
         if (bet < 10) {
-          if (roll < 0.5) return randRange(1, 15);
-          if (roll < 0.8) return randRange(15, 40);
-          if (roll < 0.95) return randRange(40, 70);
-          return randRange(70, 100);
+          if (roll < 0.5) return applyTierVolatility(randRange(1, 15));
+          if (roll < 0.8) return applyTierVolatility(randRange(15, 40));
+          if (roll < 0.95) return applyTierVolatility(randRange(40, 70));
+          return applyTierVolatility(randRange(70, 100));
         }
         if (bet <= 50) {
-          if (roll < 0.6) return randRange(1, 10);
-          if (roll < 0.85) return randRange(10, 20);
-          if (roll < 0.97) return randRange(20, 35);
-          return randRange(35, 60);
+          if (roll < 0.6) return applyTierVolatility(randRange(1, 10));
+          if (roll < 0.85) return applyTierVolatility(randRange(10, 20));
+          if (roll < 0.97) return applyTierVolatility(randRange(20, 35));
+          return applyTierVolatility(randRange(35, 60));
         }
-        if (roll < 0.75) return randRange(1, 6);
-        if (roll < 0.92) return randRange(6, 12);
-        if (roll < 0.985) return randRange(12, 18);
-        return randRange(18, 35);
+        if (roll < 0.75) return applyTierVolatility(randRange(1, 6));
+        if (roll < 0.92) return applyTierVolatility(randRange(6, 12));
+        if (roll < 0.985) return applyTierVolatility(randRange(12, 18));
+        return applyTierVolatility(randRange(18, 35));
       }
 
       // ---------------- Mind Bet mode ----------------
@@ -7275,7 +7394,7 @@
         updateBalance();
 
         mindMultiplier = 1;
-        mindThreshold = randRange(1, settings.maxMultiplier);
+        mindThreshold = applyTierVolatility(randRange(1, settings.maxMultiplier));
         mindRunning = true;
         mindCashedOut = false;
         mindLastTick = performance.now();
@@ -7371,6 +7490,16 @@
 
       function cashOutMindBet() {
         if (!mindRunning || mindCashedOut) return;
+        const allowed = gateTieredPayout({
+          baseChance: 0.26,
+          onFailure: () => {
+            setMindStatus('Tier odds disrupted the link. Bet lost.');
+            explodeMindBet();
+          },
+        });
+        if (!allowed) {
+          return;
+        }
         mindCashedOut = true;
         const winnings = mindBet * mindMultiplier;
         balance += winnings;

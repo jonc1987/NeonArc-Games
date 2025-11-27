@@ -31,10 +31,23 @@ async function ensureDatabase() {
       user_id TEXT NOT NULL,
       username TEXT NOT NULL,
       amount NUMERIC NOT NULL,
+      paid_amount NUMERIC DEFAULT 0,
+      status TEXT DEFAULT 'pending',
       requested_at TIMESTAMPTZ DEFAULT NOW(),
+      last_updated TIMESTAMPTZ DEFAULT NOW(),
       CONSTRAINT fk_cashouts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`,
   );
+
+  await pool.query(
+    `ALTER TABLE cashouts
+      ADD COLUMN IF NOT EXISTS paid_amount NUMERIC DEFAULT 0,
+      ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending',
+      ADD COLUMN IF NOT EXISTS last_updated TIMESTAMPTZ DEFAULT NOW()`,
+  );
+
+  await pool.query(`UPDATE cashouts SET status = 'pending' WHERE status IS NULL`);
+  await pool.query(`UPDATE cashouts SET paid_amount = COALESCE(paid_amount, 0)`);
 }
 
 function query(text, params) {
