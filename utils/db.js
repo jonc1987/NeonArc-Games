@@ -8,10 +8,6 @@ const pool = new Pool({
   database: process.env.PGDATABASE || 'neonarccasinousers',
   user: process.env.PGUSER || 'admin',
   password: process.env.PGPASSWORD || '9VeBi5cj3jfxyKJoAneabu3JsYB7zmKd',
-  ssl:
-    process.env.PGSSL === 'false'
-      ? false
-      : { rejectUnauthorized: false },
 });
 
 async function ensureDatabase() {
