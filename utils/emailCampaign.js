@@ -97,15 +97,27 @@ async function sendEmail({ to, subject, html }) {
     throw new Error('A valid recipient email is required.');
   }
 
-  const { from } = getMailConfig();
-  const mailer = getTransporter();
+  console.log(`[EMAIL] Queued: ${subject} → ${recipient}`);
 
-  await mailer.sendMail({
-    from,
-    to: recipient,
-    subject,
-    html,
-  });
+  try {
+    const { from } = getMailConfig();
+    const mailer = getTransporter();
+
+    console.log(`[EMAIL] Sending: ${subject} → ${recipient}`);
+    
+    const info = await mailer.sendMail({
+      from,
+      to: recipient,
+      subject,
+      html,
+    });
+
+    console.log(`[EMAIL] ✓ Sent: ${subject} → ${recipient} (Message ID: ${info.messageId})`);
+    return info;
+  } catch (error) {
+    console.error(`[EMAIL] ✗ Failed: ${subject} → ${recipient} - ${error.message}`);
+    throw error;
+  }
 }
 
 const welcomeHtml = `<!doctype html>
@@ -650,10 +662,12 @@ const welcomeHtml = `<!doctype html>
 </html>`;
 
 async function sendWelcomeEmail(to) {
+  console.log(`[EMAIL] Welcome email queued for: ${to}`);
   return sendEmail({ to, subject: 'Welcome to NeonArc Casino', html: welcomeHtml });
 }
 
 async function sendCreditPromoEmail(to) {
+  console.log(`[EMAIL] Promo email queued for: ${to}`);
   return sendEmail({ to, subject: 'Why NeonArc Credits Change Everything', html: promoHtml });
 }
 
