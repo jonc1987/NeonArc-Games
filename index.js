@@ -35,6 +35,7 @@ app.use('/api/leaderboard', require('./routes/leaderboard'));
 app.use('/api', require('./routes/account'));
 app.use('/api', require('./routes/cashouts'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/campaigns', require('./routes/campaigns'));
 
 app.get('/', (req, res) => {
   res.render('home');

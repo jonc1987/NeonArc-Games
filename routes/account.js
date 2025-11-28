@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 
 const { createUser, findUser, updateUserBalance, markUserActivity } = require('../utils/userStorage');
+const { isEmailConfigured, sendWelcomeEmail } = require('../utils/emailCampaign');
 
 const router = express.Router();
 
@@ -45,6 +46,13 @@ router.post('/register', async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
     const user = await createUser(username, hash, email, 0);
     req.session.user = { username: user.username };
+
+    if (isEmailConfigured()) {
+      sendWelcomeEmail(user.email).catch((error) =>
+        console.error('Failed to send welcome email', error),
+      );
+    }
+
     return res.status(201).json({ user: publicUser(user) });
   } catch (error) {
     console.error('Failed to register user', error);
