@@ -11,7 +11,7 @@ const envFallbacks = {
 function readEnvValue(keys = []) {
   for (const key of keys) {
     if (process.env[key]) {
-      return { key, value: process.env[key] };
+      return { key, value: process.env[key].trim() };
     }
   }
   return { key: null, value: undefined };
