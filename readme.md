@@ -95,9 +95,16 @@ Each game follows a consistent lifecycle pattern:
 
 ### 🎨 UI Design
 
-- **Reusable Components:** Neon buttons, toggles, sliders, and balance displays.  
-- **Consistent Aesthetic:** Every game inherits the shared dark-neon theme.  
-- **Lightweight Animations:** All transitions and effects use pure CSS (`transform`, `transition`, `keyframes`) — no heavy libraries.  
+- **Reusable Components:** Neon buttons, toggles, sliders, and balance displays.
+- **Consistent Aesthetic:** Every game inherits the shared dark-neon theme.
+- **Lightweight Animations:** All transitions and effects use pure CSS (`transform`, `transition`, `keyframes`) — no heavy libraries.
+
+### 📧 Email Campaigns
+
+- SMTP transport accepts either the generic variables (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, optional `SMTP_FROM`, and optional `SMTP_SECURE`) **or** Brevo’s field names (`BREVO_SMTP_HOST`/`BREVO_SMTP_SERVER`, `BREVO_SMTP_PORT`, `BREVO_SMTP_LOGIN`, `BREVO_SMTP_KEY`, optional `BREVO_SMTP_FROM`). If both exist, the generic keys win. `SMTP_SECURE` remains optional (defaults to `true` on port 465).
+- The admin-only API `POST /api/campaigns/send` accepts `{ campaign: "welcome" | "promotion", recipients?: string[], audience?: "all-users", key: <ADMIN_KEY> }` to deliver the provided welcome or credits-promotion HTML to either a supplied list or every stored user email.
+- A quick status check is available at `GET /api/campaigns/status` (requires the same admin key) to report whether the SMTP credentials are present.
+- New registrations automatically receive the welcome campaign when SMTP variables are present; failures are logged without blocking sign-up.
 
 ---
 
