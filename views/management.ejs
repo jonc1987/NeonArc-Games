@@ -290,6 +290,61 @@
         <pre class="code-block" id="recoverySql"><%= recoverySql %></pre>
         <div class="status" id="copyStatus"></div>
       </div>
+
+      <div class="card">
+        <h2>Email Campaigns</h2>
+        <div class="meta" id="campaignMeta">Loading campaigns...</div>
+        
+        <div style="margin-bottom: 20px;">
+          <h3 style="margin-top: 0;">Create New Campaign</h3>
+          <div class="user-panel" style="margin-top: 0; padding-bottom: 0;">
+            <div style="display: grid; gap: 12px;">
+              <div>
+                <label class="field-label" for="campaignName">Campaign Name</label>
+                <input class="input" type="text" id="campaignName" placeholder="e.g., Spring Promo 2025" />
+              </div>
+              <div>
+                <label class="field-label" for="campaignSubject">Email Subject</label>
+                <input class="input" type="text" id="campaignSubject" placeholder="e.g., Exclusive Offer Just for You" />
+              </div>
+              <div>
+                <label class="field-label" for="campaignHtml">HTML Email Content</label>
+                <textarea class="textarea" id="campaignHtml" rows="8" placeholder="Paste your HTML email template here. You can use inline CSS."></textarea>
+                <p class="muted" style="margin-top: 6px;">Tip: Use inline CSS styles for best email client compatibility.</p>
+              </div>
+              <button class="button" type="button" id="createCampaignBtn">Create Campaign</button>
+              <div id="createStatus" style="margin-top: 6px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="margin-top: 0; margin-bottom: 12px;">Existing Campaigns</h3>
+          <div id="campaignsList"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Send Individual Email</h2>
+        <div class="user-panel" style="margin-top: 0;">
+          <div style="display: grid; gap: 12px;">
+            <div>
+              <label class="field-label" for="individualEmail">User Email</label>
+              <input class="input" type="email" id="individualEmail" placeholder="user@example.com" />
+            </div>
+            <div>
+              <label class="field-label" for="individualSubject">Email Subject</label>
+              <input class="input" type="text" id="individualSubject" placeholder="Message subject" />
+            </div>
+            <div>
+              <label class="field-label" for="individualHtml">HTML Content</label>
+              <textarea class="textarea" id="individualHtml" rows="8" placeholder="Paste your HTML email template here."></textarea>
+            </div>
+            <button class="button" type="button" id="sendIndividualBtn">Send Email</button>
+            <div id="individualStatus" style="margin-top: 6px;"></div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <script>
@@ -695,6 +750,259 @@
       renderCashouts();
       applyFilters();
       syncSelectionControls();
+
+      // CAMPAIGN MANAGEMENT
+      let campaigns = [];
+      const campaignMeta = document.getElementById('campaignMeta');
+      const campaignsList = document.getElementById('campaignsList');
+      const campaignNameInput = document.getElementById('campaignName');
+      const campaignSubjectInput = document.getElementById('campaignSubject');
+      const campaignHtmlInput = document.getElementById('campaignHtml');
+      const createCampaignBtn = document.getElementById('createCampaignBtn');
+      const createStatus = document.getElementById('createStatus');
+      
+      const individualEmail = document.getElementById('individualEmail');
+      const individualSubject = document.getElementById('individualSubject');
+      const individualHtml = document.getElementById('individualHtml');
+      const sendIndividualBtn = document.getElementById('sendIndividualBtn');
+      const individualStatus = document.getElementById('individualStatus');
+
+      function setCampaignStatus(message, isError = false) {
+        if (createStatus) {
+          createStatus.textContent = message;
+          createStatus.style.color = isError ? '#ff9bb3' : '#9cc9e7';
+        }
+      }
+
+      function setIndividualStatus(message, isError = false) {
+        if (individualStatus) {
+          individualStatus.textContent = message;
+          individualStatus.style.color = isError ? '#ff9bb3' : '#9cc9e7';
+        }
+      }
+
+      async function loadCampaigns() {
+        try {
+          const response = await fetch(`/api/campaigns/list?key=${adminKey}`);
+          if (!response.ok) throw new Error('Failed to load campaigns');
+          campaigns = await response.json();
+          renderCampaigns();
+          if (campaignMeta) {
+            campaignMeta.textContent = `${campaigns.length} campaign${campaigns.length === 1 ? '' : 's'} created`;
+          }
+        } catch (error) {
+          console.error('Failed to load campaigns', error);
+          if (campaignMeta) campaignMeta.textContent = 'Error loading campaigns';
+        }
+      }
+
+      function renderCampaigns() {
+        if (!campaignsList) return;
+        campaignsList.innerHTML = '';
+        
+        if (campaigns.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'cashout-empty';
+          empty.textContent = 'No campaigns created yet.';
+          campaignsList.appendChild(empty);
+          return;
+        }
+
+        campaigns.forEach((campaign) => {
+          const item = document.createElement('div');
+          item.className = 'cashout-item';
+          const createdDate = new Date(campaign.created_at).toLocaleDateString();
+          item.innerHTML = `
+            <div class="cashout-row">
+              <div><strong>${campaign.name}</strong></div>
+              <span class="pill">Sent ${campaign.sent_count} times</span>
+            </div>
+            <div class="muted">Subject: ${campaign.subject}</div>
+            <div class="muted">Created ${createdDate}</div>
+            <div class="cashout-actions">
+              <button class="button edit-campaign" type="button" data-id="${campaign.id}">Edit</button>
+              <button class="button send-campaign" type="button" data-id="${campaign.id}">Send to All Users</button>
+              <button class="button delete-campaign" type="button" data-id="${campaign.id}" style="background: linear-gradient(120deg, rgba(255, 155, 179, 0.18), rgba(255, 110, 110, 0.14));">Delete</button>
+            </div>
+          `;
+          
+          const editBtn = item.querySelector('.edit-campaign');
+          const sendBtn = item.querySelector('.send-campaign');
+          const deleteBtn = item.querySelector('.delete-campaign');
+          
+          if (editBtn) editBtn.addEventListener('click', () => editCampaign(campaign));
+          if (sendBtn) sendBtn.addEventListener('click', () => sendCampaignToAll(campaign.id, campaign.name));
+          if (deleteBtn) deleteBtn.addEventListener('click', () => deleteCampaign(campaign.id));
+          
+          campaignsList.appendChild(item);
+        });
+      }
+
+      async function createCampaign() {
+        const name = campaignNameInput?.value?.trim();
+        const subject = campaignSubjectInput?.value?.trim();
+        const html_content = campaignHtmlInput?.value?.trim();
+
+        if (!name || !subject || !html_content) {
+          setCampaignStatus('Please fill in all fields.', true);
+          return;
+        }
+
+        try {
+          setCampaignStatus('Creating campaign...');
+          const response = await fetch('/api/campaigns/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({ name, subject, html_content }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setCampaignStatus(payload.error || 'Failed to create campaign.', true);
+            return;
+          }
+          setCampaignStatus('Campaign created successfully!');
+          if (campaignNameInput) campaignNameInput.value = '';
+          if (campaignSubjectInput) campaignSubjectInput.value = '';
+          if (campaignHtmlInput) campaignHtmlInput.value = '';
+          loadCampaigns();
+        } catch (error) {
+          console.error('Failed to create campaign', error);
+          setCampaignStatus('Error creating campaign.', true);
+        }
+      }
+
+      function editCampaign(campaign) {
+        if (campaignNameInput) campaignNameInput.value = campaign.name;
+        if (campaignSubjectInput) campaignSubjectInput.value = campaign.subject;
+        if (campaignHtmlInput) campaignHtmlInput.value = campaign.html_content;
+        
+        const oldCreateClick = createCampaignBtn?.onclick;
+        if (createCampaignBtn) {
+          createCampaignBtn.textContent = 'Update Campaign';
+          createCampaignBtn.onclick = async () => {
+            const name = campaignNameInput?.value?.trim();
+            const subject = campaignSubjectInput?.value?.trim();
+            const html_content = campaignHtmlInput?.value?.trim();
+            
+            if (!name || !subject || !html_content) {
+              setCampaignStatus('Please fill in all fields.', true);
+              return;
+            }
+
+            try {
+              setCampaignStatus('Updating campaign...');
+              const response = await fetch(`/api/campaigns/update/${campaign.id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+                body: JSON.stringify({ name, subject, html_content }),
+              });
+              const payload = await response.json().catch(() => ({}));
+              if (!response.ok) {
+                setCampaignStatus(payload.error || 'Failed to update campaign.', true);
+                return;
+              }
+              setCampaignStatus('Campaign updated successfully!');
+              if (campaignNameInput) campaignNameInput.value = '';
+              if (campaignSubjectInput) campaignSubjectInput.value = '';
+              if (campaignHtmlInput) campaignHtmlInput.value = '';
+              createCampaignBtn.textContent = 'Create Campaign';
+              createCampaignBtn.onclick = null;
+              loadCampaigns();
+            } catch (error) {
+              console.error('Failed to update campaign', error);
+              setCampaignStatus('Error updating campaign.', true);
+            }
+          };
+        }
+      }
+
+      async function sendCampaignToAll(campaignId, campaignName) {
+        if (!confirm(`Send campaign "${campaignName}" to all users?`)) return;
+
+        try {
+          setCampaignStatus(`Sending campaign "${campaignName}"...`);
+          const response = await fetch(`/api/campaigns/send-campaign/${campaignId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({}),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setCampaignStatus(payload.error || 'Failed to send campaign.', true);
+            return;
+          }
+          setCampaignStatus(`Campaign sent! Delivered to ${payload.sent}/${payload.attempted} users.`);
+          loadCampaigns();
+        } catch (error) {
+          console.error('Failed to send campaign', error);
+          setCampaignStatus('Error sending campaign.', true);
+        }
+      }
+
+      async function deleteCampaign(campaignId) {
+        if (!confirm('Delete this campaign? This cannot be undone.')) return;
+
+        try {
+          setCampaignStatus('Deleting campaign...');
+          const response = await fetch(`/api/campaigns/delete/${campaignId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({}),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setCampaignStatus(payload.error || 'Failed to delete campaign.', true);
+            return;
+          }
+          setCampaignStatus('Campaign deleted.');
+          loadCampaigns();
+        } catch (error) {
+          console.error('Failed to delete campaign', error);
+          setCampaignStatus('Error deleting campaign.', true);
+        }
+      }
+
+      async function sendIndividualEmail() {
+        const email = individualEmail?.value?.trim();
+        const subject = individualSubject?.value?.trim();
+        const html_content = individualHtml?.value?.trim();
+
+        if (!email || !subject || !html_content) {
+          setIndividualStatus('Please fill in all fields.', true);
+          return;
+        }
+
+        try {
+          setIndividualStatus('Sending email...');
+          const response = await fetch('/api/campaigns/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({ email, subject, html_content }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setIndividualStatus(payload.error || 'Failed to send email.', true);
+            return;
+          }
+          setIndividualStatus(`Email sent to ${email}!`);
+          if (individualEmail) individualEmail.value = '';
+          if (individualSubject) individualSubject.value = '';
+          if (individualHtml) individualHtml.value = '';
+        } catch (error) {
+          console.error('Failed to send email', error);
+          setIndividualStatus('Error sending email.', true);
+        }
+      }
+
+      if (createCampaignBtn) {
+        createCampaignBtn.addEventListener('click', createCampaign);
+      }
+
+      if (sendIndividualBtn) {
+        sendIndividualBtn.addEventListener('click', sendIndividualEmail);
+      }
+
+      loadCampaigns();
     </script>
   </body>
 </html>
