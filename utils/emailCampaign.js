@@ -677,26 +677,47 @@ const welcomeHtml = `<!doctype html>
       const baseFontSize = config.font_size || defaultConfig.font_size;
       const baseFontStack = 'sans-serif';
       
-      document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
-      
-      if (mainTitle) mainTitle.style.fontSize = `${baseFontSize * 3}px`;
-      if (tagline) tagline.style.fontSize = `${baseFontSize * 1.125}px`;
-      if (bonusAmount) bonusAmount.style.fontSize = `${baseFontSize * 3.5}px`;
-      if (bonusDescription) bonusDescription.style.fontSize = `${baseFontSize}px`;
-      
-      const buttons = document.querySelectorAll('.btn');
-      buttons.forEach(btn => {
-        btn.style.fontSize = `${baseFontSize * 1.125}px`;
-      });
-      
-      document.body.style.background = config.background_color || defaultConfig.background_color;
-      
-      const emailWrapper = document.querySelector('.email-wrapper');
-      if (emailWrapper) {
-        emailWrapper.style.background = `linear-gradient(180deg, ${config.background_color || defaultConfig.background_color} 0%, #000000 50%, ${config.background_color || defaultConfig.background_color} 100%)`;
-      }
-    }
-    
+     function applyStyles(config = {}, defaultConfig = {}) {
+  const customFont = config.custom_font || "Inter";
+  const baseFontStack = config.base_font_stack || "sans-serif";
+  const baseFontSize = config.base_font_size || 16;
+  const bg = config.background_color || defaultConfig.background_color || "#000";
+
+  // Font family
+  document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+
+  // Helper safely sets font-size if element exists
+  const setFontSize = (selector, scale) => {
+    const el = document.querySelector(selector);
+    if (el) el.style.fontSize = `${baseFontSize * scale}px`;
+  };
+
+  setFontSize(".main-title", 3);
+  setFontSize(".tagline", 1.125);
+  setFontSize(".bonus-amount", 3.5);
+  setFontSize(".bonus-description", 1);
+
+  // Buttons
+  document.querySelectorAll(".btn").forEach(btn => {
+    btn.style.fontSize = `${baseFontSize * 1.125}px`;
+  });
+
+  // Background
+  document.body.style.background = bg;
+
+  // Email wrapper gradient
+  const emailWrapper = document.querySelector(".email-wrapper");
+  if (emailWrapper) {
+    emailWrapper.style.background = `
+      linear-gradient(
+        180deg,
+        ${bg} 0%,
+        #000000 50%,
+        ${bg} 100%
+      )
+    `;
+  }
+}
     function mapToCapabilities(config) {
       return {
         recolorables: [
