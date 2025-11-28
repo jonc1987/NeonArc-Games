@@ -506,9 +506,15 @@ async function sendCreditPromoEmail(to) {
   return sendEmail({ to, subject: 'Why NeonArc Credits Change Everything', html: promoHtml });
 }
 
+async function sendCustomEmail(to, subject, html) {
+  console.log(`[EMAIL] Custom email queued for: ${to}`);
+  return sendEmail({ to, subject, html });
+}
+
 module.exports = {
   getMailConfigStatus,
   isEmailConfigured,
   sendWelcomeEmail,
   sendCreditPromoEmail,
+  sendCustomEmail,
 };

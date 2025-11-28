@@ -47,6 +47,19 @@ async function ensureDatabase() {
       ADD COLUMN IF NOT EXISTS last_updated TIMESTAMPTZ DEFAULT NOW()`,
   );
 
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS email_campaigns (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL UNIQUE,
+      subject TEXT NOT NULL,
+      html_content TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      sent_count INT DEFAULT 0,
+      is_active BOOLEAN DEFAULT true
+    )`,
+  );
+
   await pool.query(`UPDATE cashouts SET status = 'pending' WHERE status IS NULL`);
   await pool.query(`UPDATE cashouts SET paid_amount = COALESCE(paid_amount, 0)`);
 }
