@@ -106,7 +106,7 @@ async function sendEmail({ to, subject, html }) {
     console.log(`[EMAIL] Sending: ${subject} → ${recipient}`);
     
     const info = await mailer.sendMail({
-      from,
+      from: `NeonArc Casino <${from}>`,
       to: recipient,
       subject,
       html,
