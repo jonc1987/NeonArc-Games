@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 
-const { createUser, findUser, updateUserBalance, markUserActivity } = require('../utils/userStorage');
+const { createUser, findUser, updateUserWallet, markUserActivity } = require('../utils/userStorage');
 const { isEmailConfigured, sendWelcomeEmail } = require('../utils/emailCampaign');
 
 const router = express.Router();
@@ -118,14 +118,28 @@ router.post('/update-balance', async (req, res) => {
     return res.status(404).json({ error: 'Account not found.' });
   }
 
-  const { delta } = req.body || {};
-  const amount = Number(delta);
+  const { delta, cashDelta, creditDelta, source } = req.body || {};
 
-  if (!Number.isFinite(amount)) {
+  const legacyDelta = Number(delta);
+  let cashChange = Number(cashDelta);
+  let creditChange = Number(creditDelta);
+
+  if (Number.isFinite(legacyDelta) && !Number.isFinite(cashChange) && !Number.isFinite(creditChange)) {
+    if (source === 'credit' || source === 'purchase') {
+      creditChange = legacyDelta;
+    } else {
+      cashChange = legacyDelta;
+    }
+  }
+
+  cashChange = Number.isFinite(cashChange) ? cashChange : 0;
+  creditChange = Number.isFinite(creditChange) ? creditChange : 0;
+
+  if (cashChange === 0 && creditChange === 0) {
     return res.status(400).json({ error: 'A numeric delta value is required.' });
   }
 
-  const updatedUser = await updateUserBalance(user.username, amount);
+  const updatedUser = await updateUserWallet(user.username, { cashDelta: cashChange, creditDelta: creditChange });
   if (!updatedUser) {
     return res.status(500).json({ error: 'Unable to update balance.' });
   }

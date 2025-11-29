@@ -2,7 +2,7 @@ const express = require('express');
 
 const {
   findUserById,
-  updateUserBalanceById,
+  updateUserWalletById,
   setUserDisplayPreferences,
   markUserActivity,
   applyCashoutPayment,
@@ -22,6 +22,14 @@ function sanitizeAmount(value) {
   return Math.max(0, Math.floor(numeric * 100) / 100);
 }
 
+function resolveFundType(value, fallback = 'cash') {
+  const normalized = value?.toString().trim().toLowerCase();
+  if (normalized === 'cash' || normalized === 'credit') {
+    return normalized;
+  }
+  return fallback;
+}
+
 function publicUser(user) {
   if (!user) return null;
   const { password, ...rest } = user;
@@ -38,6 +46,7 @@ router.use((req, res, next) => {
 router.post('/credit', async (req, res) => {
   const { userId } = req.body || {};
   const amount = sanitizeAmount(req.body?.amount);
+  const fundType = resolveFundType(req.body?.fundType, 'credit');
 
   if (!userId || !amount || amount <= 0) {
     return res.status(400).json({ error: 'A positive amount is required.' });
@@ -48,7 +57,8 @@ router.post('/credit', async (req, res) => {
     return res.status(404).json({ error: 'User not found.' });
   }
 
-  const updatedUser = await updateUserBalanceById(userId, amount, { allowNegative: false });
+  const walletDelta = fundType === 'cash' ? { cashDelta: amount } : { creditDelta: amount };
+  const updatedUser = await updateUserWalletById(userId, walletDelta, { allowNegative: false });
   const refreshed = (await markUserActivity(user.username)) || updatedUser;
 
   return res.json({ user: publicUser(refreshed) });
@@ -57,6 +67,7 @@ router.post('/credit', async (req, res) => {
 router.post('/debit', async (req, res) => {
   const { userId } = req.body || {};
   const amount = sanitizeAmount(req.body?.amount);
+  const fundType = resolveFundType(req.body?.fundType, 'cash');
 
   if (!userId || !amount || amount <= 0) {
     return res.status(400).json({ error: 'A positive amount is required.' });
@@ -67,7 +78,8 @@ router.post('/debit', async (req, res) => {
     return res.status(404).json({ error: 'User not found.' });
   }
 
-  const updatedUser = await updateUserBalanceById(userId, -amount, { allowNegative: false });
+  const walletDelta = fundType === 'credit' ? { creditDelta: -amount } : { cashDelta: -amount };
+  const updatedUser = await updateUserWalletById(userId, walletDelta, { allowNegative: false });
   const refreshed = (await markUserActivity(user.username)) || updatedUser;
 
   return res.json({ user: publicUser(refreshed) });

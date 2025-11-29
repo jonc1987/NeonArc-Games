@@ -1,14 +1,24 @@
 const { randomUUID } = require('crypto');
 const { query } = require('./db');
 
+function normalizeAmount(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, Math.round(numeric * 100) / 100);
+}
+
 function mapUser(row) {
   if (!row) return null;
+  const cashBalance = normalizeAmount(row.cash_balance ?? row.balance ?? 0);
+  const creditBalance = normalizeAmount(row.credit_balance ?? 0);
   return {
     id: row.id,
     username: row.username,
     email: row.email,
     password: row.password,
-    balance: Number(row.balance ?? 0),
+    balance: normalizeAmount(cashBalance + creditBalance),
+    cashBalance,
+    creditBalance,
     joinedAt: row.joined_at ? new Date(row.joined_at).toISOString() : null,
     lastActivity: row.last_activity ? new Date(row.last_activity).toISOString() : null,
     viewMode: row.view_mode || 'standard',
@@ -63,11 +73,24 @@ async function createUser(username, passwordHash, email, balance = 0) {
 
   const id = randomUUID();
   const nowIso = new Date().toISOString();
+  const startingCash = normalizeAmount(balance);
+  const startingCredit = 0;
+  const totalBalance = normalizeAmount(startingCash + startingCredit);
 
   await query(
-    `INSERT INTO users (id, username, email, password, balance, joined_at, last_activity, view_mode, dashboard_note)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, 'standard', '')`,
-    [id, normalizedUsername, normalizedEmail, passwordHash, Number(balance) || 0, nowIso, nowIso],
+    `INSERT INTO users (id, username, email, password, cash_balance, credit_balance, balance, joined_at, last_activity, view_mode, dashboard_note)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'standard', '')`,
+    [
+      id,
+      normalizedUsername,
+      normalizedEmail,
+      passwordHash,
+      startingCash,
+      startingCredit,
+      totalBalance,
+      nowIso,
+      nowIso,
+    ],
   );
 
   return findUserById(id);
@@ -83,35 +106,52 @@ async function markUserActivity(username) {
   return mapUser(rows[0]);
 }
 
-async function updateUserBalance(username, delta, { allowNegative = false } = {}) {
+async function updateUserWallet(username, deltas, { allowNegative = false } = {}) {
   const normalized = username?.toString().trim().toLowerCase();
-  if (!normalized || !Number.isFinite(Number(delta))) {
+  if (!normalized) {
     return null;
   }
 
   const { rows } = await query('SELECT id FROM users WHERE LOWER(username) = $1 LIMIT 1', [normalized]);
   if (!rows[0]) return null;
-  return updateUserBalanceById(rows[0].id, delta, { allowNegative });
+  return updateUserWalletById(rows[0].id, deltas, { allowNegative });
 }
 
-async function updateUserBalanceById(id, delta, { allowNegative = false } = {}) {
+async function updateUserWalletById(id, deltas, { allowNegative = false } = {}) {
   const normalized = id?.toString().trim();
-  if (!normalized || !Number.isFinite(Number(delta))) {
+  const cashDelta = Number(deltas?.cashDelta || 0);
+  const creditDelta = Number(deltas?.creditDelta || 0);
+
+  if (!normalized || !Number.isFinite(cashDelta) || !Number.isFinite(creditDelta)) {
     return null;
   }
 
-  const { rows } = await query('SELECT balance FROM users WHERE id = $1 LIMIT 1', [normalized]);
+  const { rows } = await query('SELECT cash_balance, credit_balance FROM users WHERE id = $1 LIMIT 1', [normalized]);
   if (!rows[0]) return null;
 
-  const startingBalance = Number(rows[0].balance || 0);
-  const nextBalance = startingBalance + Number(delta);
-  const balance = allowNegative ? nextBalance : Math.max(0, nextBalance);
+  const currentCash = normalizeAmount(rows[0].cash_balance);
+  const currentCredit = normalizeAmount(rows[0].credit_balance);
+
+  const nextCashRaw = currentCash + cashDelta;
+  const nextCreditRaw = currentCredit + creditDelta;
+
+  const nextCash = allowNegative ? nextCashRaw : Math.max(0, nextCashRaw);
+  const nextCredit = allowNegative ? nextCreditRaw : Math.max(0, nextCreditRaw);
+  const totalBalance = normalizeAmount(nextCash + nextCredit);
 
   const { rows: updated } = await query(
-    `UPDATE users SET balance = $1, last_activity = $2 WHERE id = $3 RETURNING *`,
-    [balance, new Date().toISOString(), normalized],
+    `UPDATE users SET cash_balance = $1, credit_balance = $2, balance = $3, last_activity = $4 WHERE id = $5 RETURNING *`,
+    [normalizeAmount(nextCash), normalizeAmount(nextCredit), totalBalance, new Date().toISOString(), normalized],
   );
   return mapUser(updated[0]);
+}
+
+async function updateUserBalance(username, delta, { allowNegative = false } = {}) {
+  return updateUserWallet(username, { cashDelta: delta }, { allowNegative });
+}
+
+async function updateUserBalanceById(id, delta, { allowNegative = false } = {}) {
+  return updateUserWalletById(id, { cashDelta: delta }, { allowNegative });
 }
 
 async function setUserDisplayPreferences(id, { viewMode, dashboardNote }) {
@@ -188,6 +228,8 @@ module.exports = {
   createUser,
   updateUserBalance,
   updateUserBalanceById,
+  updateUserWallet,
+  updateUserWalletById,
   getCashouts,
   addCashout,
   applyCashoutPayment,

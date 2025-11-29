@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { readJson, writeJson } = require('../utils/dataStorage');
-const { findUser, updateUserBalance } = require('../utils/userStorage');
+const { findUser, updateUserWallet } = require('../utils/userStorage');
 
 const router = express.Router();
 
@@ -66,7 +66,7 @@ router.post('/', async (req, res) => {
   }
 
   const reward = rewards[Math.floor(Math.random() * rewards.length)];
-  const updatedUser = await updateUserBalance(user.username, reward);
+  const updatedUser = await updateUserWallet(user.username, { cashDelta: reward });
   state.spins[username] = {
     lastSpin: now.toISOString(),
     lastReward: reward,
@@ -76,6 +76,8 @@ router.post('/', async (req, res) => {
   return res.json({
     reward,
     balance: updatedUser?.balance ?? user.balance,
+    cashBalance: updatedUser?.cashBalance ?? reward,
+    creditBalance: updatedUser?.creditBalance ?? 0,
     nextEligibleAt: getNextEligibleDate(now.toISOString()),
   });
 });

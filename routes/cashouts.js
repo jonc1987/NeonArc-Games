@@ -2,7 +2,7 @@ const express = require('express');
 
 const {
   findUser,
-  updateUserBalance,
+  updateUserWallet,
   addCashout,
   getCashouts,
   markUserActivity,
@@ -35,7 +35,7 @@ router.post('/cashout', async (req, res) => {
   const requestedId = req.body?.id?.toString().trim();
   const amount = sanitizeAmount(req.body?.amount);
   const viewMode = user.viewMode || 'standard';
-  const balance = Number(user.balance || 0);
+  const cashBalance = Number(user.cashBalance ?? user.balance ?? 0);
 
   if (!requestedId || !amount || amount <= 0) {
     return res.status(400).json({ error: 'A valid withdrawal amount is required.' });
@@ -45,10 +45,10 @@ router.post('/cashout', async (req, res) => {
     return res.status(403).json({ error: 'Account mismatch.' });
   }
 
-  if (viewMode === 'limited' && balance < 500) {
+  if (viewMode === 'limited' && cashBalance < 500) {
     return res
       .status(400)
-      .json({ error: 'Limited preview cash outs unlock at $500 balance. Keep playing to reach it.' });
+      .json({ error: 'Limited preview cash outs unlock at $500 cash-out eligible balance. Keep playing to reach it.' });
   }
 
   const minimumWithdrawal = viewMode === 'standard' ? 400 : 0;
@@ -57,12 +57,12 @@ router.post('/cashout', async (req, res) => {
     return res.status(400).json({ error: `Cash out starts at $${minimumWithdrawal.toFixed(0)} for your account.` });
   }
 
-  if (amount > balance) {
-    return res.status(400).json({ error: 'Insufficient balance for cash out.' });
+  if (amount > cashBalance) {
+    return res.status(400).json({ error: 'Insufficient cash-out eligible balance.' });
   }
 
   try {
-    const updatedUser = await updateUserBalance(user.username, -amount);
+    const updatedUser = await updateUserWallet(user.username, { cashDelta: -amount });
     const activityUser = (await markUserActivity(user.username)) || updatedUser;
     const cashout = await addCashout({ id: user.id, username: user.username, amount });
     return res.status(201).json({ user: activityUser, cashout });
