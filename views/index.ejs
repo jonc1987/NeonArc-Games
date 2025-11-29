@@ -3672,37 +3672,39 @@
                   </button>
                   <div class="binary-instructions-body" id="echoInstructionsBody" hidden>
                     <p class="binary-instructions-intro">
-                      Objective: Finish with a total of 21 or less after every delayed echo resolves.
+                      Objective: Build a resonant hand under 21 while modifiers reshape each delayed echo.
                     </p>
                     <h3>Gameplay Loop</h3>
                     <ol>
                       <li>Enter your bet and click <strong>Start Hand</strong> to draw four opening cards.</li>
-                      <li>Each card shows a value (1–10) and automatically schedules an echo two turns later.</li>
-                      <li>Use <strong>Draw</strong> to add new cards—each new card pushes the echo queue forward.</li>
                       <li>
-                        When a card’s delay expires, an Echo Wave pulses, replaying its value into your total. Waves can
-                        chain as you keep drawing.
+                        Every card gains a modifier: Pulses add extra value later, Dampeners return half, Inverters send a
+                        negative echo, and Resonants scale with your growing resonance meter.
                       </li>
                       <li>
-                        Hit <strong>Hold</strong> to stop drawing and let the remaining echoes resolve. If your total ever
-                        breaks 21, the round busts immediately.
+                        Use <strong>Draw</strong> to add new cards—each new card pushes the echo queue forward and can grow your
+                        resonance once its echo resolves.
+                      </li>
+                      <li>
+                        Hit <strong>Hold</strong> to stop drawing and let the queue finish. Busting over 21 ends the round
+                        immediately.
                       </li>
                     </ol>
                     <h3>Payouts</h3>
                     <ul>
                       <li><strong>Bust (total &gt; 21)</strong> → lose the wager.</li>
                       <li>
-                        <strong>Hold without busting</strong> → payout = bet × (final total ÷ 21) × 2. Bigger totals (without
-                        busting) pay more.
+                        <strong>Hold without busting</strong> → payout = bet × (final total ÷ 21) × resonance bonus.
+                        Stacking echoes and resonance yields bigger results.
                       </li>
                     </ul>
                     <p class="binary-instructions-tip">
-                      <strong>Timing Tip:</strong> Track the queue label—if several echoes are stacked, holding early can
-                      prevent an overcharge.
+                      <strong>Timing Tip:</strong> Positive modifiers love late-game queues; bank early if inverters are
+                      stacking to protect the run.
                     </p>
                   </div>
                 </div>
-                <p class="echo-copy">Draw carefully: each card repeats two turns later. Hold to ride out remaining waves.</p>
+                <p class="echo-copy">Modifiers, resonance, and queued echoes turn this into a rhythmic push-your-luck ride.</p>
                 <div>
                   <label for="echoBet">Bet Amount</label>
                   <input type="number" id="echoBet" min="1" step="1" value="25" />
@@ -3710,6 +3712,7 @@
                 <div class="panel-meta">
                   <span>Turns: <strong id="echoTurnCount">0</strong></span>
                   <span>Queued: <strong id="echoQueuedLabel">0</strong></span>
+                  <span>Resonance: <strong id="echoResonanceLabel">1.0</strong></span>
                 </div>
                 <div class="button-row echo-button-row">
                   <button class="launch" id="echoStart">Start Hand</button>
@@ -3747,7 +3750,7 @@
               </div>
               <aside class="control-panel card-controls">
                 <h2>Fuse</h2>
-                <p class="fuse-copy">Select two cards to merge their power. Keep the instability below 10 or the core explodes.</p>
+                <p class="fuse-copy">Select two cards to merge their power. Surges spawn bonus cards or vent instability—keep it under 10.</p>
                 <div class="binary-instructions fuse-instructions" id="fuseInstructions">
                   <button
                     class="binary-instructions-toggle"
@@ -3761,13 +3764,14 @@
                   </button>
                   <div class="binary-instructions-body" id="fuseInstructionsBody" hidden>
                     <p>
-                      Click <strong>Start Fuse</strong> to draw three charged cards. Select any two active cards and
-                      press <strong>Fuse Selected</strong> to combine them into a hybrid. Repeat until you're satisfied,
-                      then <strong>Hold</strong> to cash out the remaining energy.
+                      Click <strong>Start Fuse</strong> to draw four charged cards. Select any two active cards and
+                      press <strong>Fuse Selected</strong> to combine them into a hybrid. Each fusion triggers a surge that
+                      might mint a bonus card, vent instability, or supercharge your hybrid. Hold when your chain feels hot
+                      enough.
                     </p>
                     <ol>
                       <li>
-                        <strong>Prime</strong>: Enter a wager, press <em>Start Fuse</em>, and study the three glowing cards
+                        <strong>Prime</strong>: Enter a wager, press <em>Start Fuse</em>, and study the four glowing cards
                         (each shows a suit and power value from 1–10).
                       </li>
                       <li>
@@ -3779,13 +3783,17 @@
                         effects: ♠ + ♥ = +2 · ♦ + ♣ = –1 · ♥ + ♦ = 0 · ♣ + ♠ = +1. All other pairings are neutral.
                       </li>
                       <li>
+                        <strong>Surge</strong>: Every fusion fires a surge—bonus base cards, instability vents, or a +2
+                        supercharge—before instability is checked.
+                      </li>
+                      <li>
                         <strong>Contain</strong>: If instability climbs above 10 the hybrid explodes and the round is
                         lost. Otherwise the fused value is added to your total and instability meter.
                       </li>
                       <li>
                         <strong>Hold</strong>: After at least one successful hybrid, press Hold to lock in
-                        <code>final score = total fused value × (1 – total instability ÷ 20)</code>. Payout = bet ×
-                        (final score ÷ 21) × 2.
+                        <code>final score = total fused value × (1 – total instability ÷ 18) × chain bonus</code>. Payout = bet
+                        × (final score ÷ 21) × 2.25.
                       </li>
                     </ol>
                   </div>
@@ -3828,7 +3836,8 @@
                 <h2>Perception</h2>
                 <p class="perception-copy">
                   Four cards broadcast numbers and colors — but some signals lie. Spend limited scans to detect
-                  illusions, then decide when to trust the spread. More truthful cards mean larger payouts.
+                  illusions, then decide whether to trust the spread for boosted payouts or bail out for a smaller,
+                  safer return.
                 </p>
                 <div class="perception-instructions">
                   <h3>How to Read the Grid</h3>
@@ -3838,16 +3847,18 @@
                       Each <strong>Analyze</strong> scan (max 2) costs 10% of your wager and tells you if that card is
                       truthful or an illusion.
                     </li>
-                    <li>When you believe the spread, hit <strong>Trust &amp; Reveal</strong>.</li>
+                    <li>When you believe the spread, hit <strong>Trust &amp; Reveal</strong> for premium payouts.</li>
+                    <li>Not convinced? Tap <strong>Walk Away</strong> to recover part of your wager before revealing.</li>
                     <li>Truths add their number, illusions subtract 3. Score high to multiply your bet.</li>
                   </ol>
                   <div class="perception-payouts">
                     <h3>Payouts</h3>
                     <ul>
-                      <li>Score ≥ 30 → <strong>5×</strong></li>
-                      <li>Score 20–29 → <strong>3×</strong></li>
-                      <li>Score 10–19 → <strong>2×</strong></li>
-                      <li>Score &lt; 10 → Bet lost</li>
+                      <li>Trust &amp; Reveal: Score ≥ 30 → <strong>6×</strong></li>
+                      <li>Trust &amp; Reveal: Score 20–29 → <strong>4×</strong></li>
+                      <li>Trust &amp; Reveal: Score 12–19 → <strong>2.5×</strong></li>
+                      <li>Walk Away before revealing → recover <strong>60%</strong> of wager (scans are still spent)</li>
+                      <li>Score &lt; 12 → Bet lost</li>
                     </ul>
                   </div>
                 </div>
@@ -3861,6 +3872,7 @@
                 </div>
                 <div class="button-row perception-buttons">
                   <button class="launch" id="perceptionStart">Start Perception</button>
+                  <button class="ghost-button" id="perceptionWalk">Walk Away</button>
                   <button class="cashout" id="perceptionLock" disabled>Trust &amp; Reveal</button>
                 </div>
                 <div class="perception-scoreboard">
@@ -4058,6 +4070,7 @@
       let echoCards = [];
       let echoTimers = [];
       let echoCardId = 0;
+      let echoResonance = 1;
 
       // ---------------- Fuse state ----------------
       let fuseRunning = false;
@@ -4210,6 +4223,7 @@
       const echoPendingEl = document.getElementById('echoPendingEchoes');
       const echoTurnEl = document.getElementById('echoTurnCount');
       const echoQueueLabel = document.getElementById('echoQueuedLabel');
+      const echoResonanceLabel = document.getElementById('echoResonanceLabel');
       const echoBetInput = document.getElementById('echoBet');
       const echoStartBtn = document.getElementById('echoStart');
       const echoDrawBtn = document.getElementById('echoDraw');
@@ -4233,6 +4247,7 @@
       const perceptionCardsArea = document.getElementById('perceptionCardsArea');
       const perceptionBetInput = document.getElementById('perceptionBet');
       const perceptionStartBtn = document.getElementById('perceptionStart');
+      const perceptionWalkBtn = document.getElementById('perceptionWalk');
       const perceptionLockBtn = document.getElementById('perceptionLock');
       const perceptionStatusEl = document.getElementById('perceptionStatus');
       const perceptionScoreEl = document.getElementById('perceptionScore');
@@ -4485,6 +4500,9 @@
         }
         if (perceptionStartBtn) {
           perceptionStartBtn.addEventListener('click', () => startPerception());
+        }
+        if (perceptionWalkBtn) {
+          perceptionWalkBtn.addEventListener('click', () => walkPerception());
         }
         if (perceptionLockBtn) {
           perceptionLockBtn.addEventListener('click', () => lockInPerception());
@@ -6207,6 +6225,7 @@
         echoTotal = 0;
         echoCards = [];
         echoCardId = 0;
+        echoResonance = 1;
         if (echoStage) {
           echoStage.classList.remove('idle');
           echoStage.classList.add('live');
@@ -6217,9 +6236,9 @@
         renderEchoCards();
         updateEchoTotals();
         updateEchoButtons();
-        setEchoStatus('Charging deck. Four cards incoming.');
+        setEchoStatus('Charging deck. Four cards incoming with fresh modifiers.');
         if (echoResultEl) {
-          echoResultEl.textContent = 'Echo grid calibrating.';
+          echoResultEl.textContent = 'Echo grid calibrating with resonance at 1.0.';
         }
 
         for (let i = 0; i < 4; i += 1) {
@@ -6248,7 +6267,8 @@
           echoResultEl.textContent = `Running total ${echoTotal}/21`;
         }
         const verb = isInitial ? 'dealt' : 'drawn';
-        setEchoStatus(`Card ${card.turn} ${verb}. Echo hits on turn ${card.echoTurn}.`);
+        const modifierCopy = describeEchoModifier(card);
+        setEchoStatus(`Card ${card.turn} ${verb}. ${modifierCopy}. Echo hits on turn ${card.echoTurn}.`);
         if (echoTotal > 21) {
           handleEchoBust('You overloaded the grid before the echoes hit.');
           return;
@@ -6290,20 +6310,23 @@
         echoResolving = true;
         updateEchoButtons();
         const [card, ...rest] = queue;
-        triggerEchoWave(card);
-        setEchoStatus(`Echo wave from Card ${card.turn} is surging...`);
+        const echoValue = getEchoValue(card);
+        triggerEchoWave(card, echoValue);
+        setEchoStatus(`Echo wave from Card ${card.turn} (${card.modifier}) is surging...`);
         scheduleEchoTimeout(() => {
-          echoTotal += card.value;
+          echoTotal += echoValue;
           card.echoResolved = true;
           updateEchoTotals();
           renderEchoCards();
           if (echoResultEl) {
-            echoResultEl.textContent = `Echo surge total ${echoTotal}/21`;
+            echoResultEl.textContent = `Echo surge total ${echoTotal}/21 · resonance ${echoResonance.toFixed(1)}`;
           }
           if (echoTotal > 21) {
             handleEchoBust(`Echo wave from Card ${card.turn} overloaded the grid.`);
             return;
           }
+          echoResonance = Math.min(5, echoResonance + 0.35);
+          updateEchoTotals();
           resolveEchoes(rest, options);
         }, 1500);
       }
@@ -6316,7 +6339,7 @@
         resolveEchoes(dueCards.slice());
       }
 
-      function triggerEchoWave(card) {
+      function triggerEchoWave(card, echoValue) {
         if (!echoStage || !echoWaveLayer) return;
         const cardEl = echoCardsArea ? echoCardsArea.querySelector(`[data-card-id="${card.id}"]`) : null;
         if (cardEl) {
@@ -6326,7 +6349,8 @@
         const wave = document.createElement('div');
         wave.className = 'echo-wave';
         const label = document.createElement('span');
-        label.textContent = `+${card.value}`;
+        const formatted = echoValue >= 0 ? `+${echoValue}` : `${echoValue}`;
+        label.textContent = formatted;
         wave.appendChild(label);
         const stageRect = echoStage.getBoundingClientRect();
         let x = stageRect.width / 2;
@@ -6355,19 +6379,24 @@
           echoStage.classList.remove('live');
           echoStage.classList.add('idle');
         }
-        const payoutRaw = echoBet * (echoTotal / 21) * 2;
+        const resonanceBonus = 1 + Math.min(0.8, echoResonance * 0.2) + Math.min(0.3, echoCards.length * 0.03);
+        const payoutRaw = echoBet * (echoTotal / 21) * 1.8 * resonanceBonus;
         const payout = Math.max(0, Number(payoutRaw.toFixed(2)));
         const allowed = gateTieredPayout({
-          baseChance: 0.38,
+          baseChance: 0.42,
           onFailure: () => handleEchoBust('Tier odds collapsed the echo field. Bet lost.'),
         });
         if (!allowed) {
           return;
         }
         addCashWinnings(payout);
-        setEchoStatus(`Stabilized at ${echoTotal}. Echo payout $${payout.toFixed(2)}.`);
+        setEchoStatus(
+          `Stabilized at ${echoTotal}. Resonance bonus ${resonanceBonus.toFixed(2)}× paid $${payout.toFixed(2)}.`,
+        );
         if (echoResultEl) {
-          echoResultEl.textContent = `Payout $${payout.toFixed(2)} · Final ${echoTotal}/21`;
+          echoResultEl.textContent = `Payout $${payout.toFixed(2)} · Final ${echoTotal}/21 · Resonance ${echoResonance.toFixed(
+            1,
+          )}`;
         }
         echoBet = 0;
         updateEchoButtons();
@@ -6385,11 +6414,13 @@
         if (echoWaveLayer) {
           echoWaveLayer.innerHTML = '';
         }
+        echoResonance = 1;
         setEchoStatus(message || 'Echo overload. Bet lost.');
         if (echoResultEl) {
           echoResultEl.textContent = `Bust at ${echoTotal}. Bet lost.`;
         }
         echoBet = 0;
+        updateEchoTotals();
         updateEchoButtons();
       }
 
@@ -6403,6 +6434,7 @@
         echoTotal = 0;
         echoCards = [];
         echoCardId = 0;
+        echoResonance = 1;
         if (echoStage) {
           echoStage.classList.remove('live');
           echoStage.classList.add('idle');
@@ -6460,11 +6492,11 @@
           meta.className = 'echo-card-meta';
           const turnsUntil = Math.max(card.echoTurn - echoTurn, 0);
           if (card.echoResolved) {
-            meta.textContent = 'Echo released';
+            meta.textContent = `${describeEchoModifier(card)} · Echo released`;
           } else if (turnsUntil === 0) {
-            meta.textContent = 'Echo imminent';
+            meta.textContent = `${describeEchoModifier(card)} · Echo imminent`;
           } else {
-            meta.textContent = `Echo in ${turnsUntil} ${turnsUntil === 1 ? 'turn' : 'turns'}`;
+            meta.textContent = `${describeEchoModifier(card)} · Echo in ${turnsUntil} ${turnsUntil === 1 ? 'turn' : 'turns'}`;
           }
           cardEl.appendChild(label);
           cardEl.appendChild(value);
@@ -6488,17 +6520,59 @@
         if (echoQueueLabel) {
           echoQueueLabel.textContent = pending.toString();
         }
+        if (echoResonanceLabel) {
+          echoResonanceLabel.textContent = echoResonance.toFixed(1);
+        }
       }
 
       function generateEchoCard() {
         const symbols = ['◆', '◇', '⬢', '✦', '✶', '✷', '★', '✪'];
-        const value = Math.floor(Math.random() * 10) + 1;
+        const value = Math.floor(Math.random() * 9) + 2;
+        const roll = Math.random();
+        let modifier = 'Pulse';
+        if (roll < 0.25) modifier = 'Pulse';
+        else if (roll < 0.5) modifier = 'Dampen';
+        else if (roll < 0.75) modifier = 'Invert';
+        else modifier = 'Resonate';
         return {
           id: ++echoCardId,
           value,
           symbol: symbols[Math.floor(Math.random() * symbols.length)],
           delay: 2,
+          modifier,
+          turn: 0,
+          echoTurn: 0,
+          echoResolved: false,
         };
+      }
+
+      function describeEchoModifier(card) {
+        const preview = getEchoPreviewValue(card);
+        if (card.modifier === 'Pulse') return `Pulse (+${preview} later)`;
+        if (card.modifier === 'Dampen') return `Dampen (+${preview} later)`;
+        if (card.modifier === 'Invert') return `Invert (${preview > 0 ? '+' : ''}${preview} later)`;
+        if (card.modifier === 'Resonate') return `Resonate (scales with resonance to ${preview})`;
+        return 'Standard echo';
+      }
+
+      function getEchoPreviewValue(card) {
+        const resonancePower = Math.max(1, echoResonance);
+        switch (card.modifier) {
+          case 'Pulse':
+            return card.value + 2;
+          case 'Dampen':
+            return Math.max(1, Math.ceil(card.value / 2));
+          case 'Invert':
+            return -Math.max(1, Math.floor(card.value / 2));
+          case 'Resonate':
+            return card.value + Math.floor(resonancePower);
+          default:
+            return card.value;
+        }
+      }
+
+      function getEchoValue(card) {
+        return getEchoPreviewValue(card);
       }
 
       function setEchoStatus(message) {
@@ -6546,7 +6620,7 @@
         fuseCardId = 0;
         fuseSelectedCards = [];
         fuseTotalInstability = 0;
-        fuseCardsState = Array.from({ length: 3 }, () => createBaseFuseCard());
+        fuseCardsState = Array.from({ length: 4 }, () => createBaseFuseCard());
 
         if (fuseStage) {
           fuseStage.classList.remove('idle', 'exploded');
@@ -6557,9 +6631,9 @@
           fuseOverlay.style.opacity = '0';
         }
 
-        setFuseStatus('Cards charged. Select any two to merge.');
+        setFuseStatus('Cards charged. Select any two to merge and chase surges.');
         if (fuseResultEl) {
-          fuseResultEl.textContent = 'Instability steady at 0.0.';
+          fuseResultEl.textContent = 'Instability steady at 0.0. Chain fusions spawn surges.';
         }
         renderFuseCards();
         updateFuseMeter();
@@ -6633,22 +6707,24 @@
         fuseCardsState.push(hybrid);
 
         createFuseEnergySurge();
+        const surgeNote = applyFuseSurge(hybrid);
         renderFuseCards();
         updateFuseMeter();
 
-        if (instability > 10) {
+        if (fuseTotalInstability > 10) {
           handleFuseExplosion(instability);
           return;
         }
 
         const totalHybridValue = getActiveHybridCards().reduce((sum, card) => sum + card.value, 0);
-        setFuseStatus(
-          `Hybrid stabilized at ${hybrid.value}. Instability +${instability.toFixed(1)} (total ${fuseTotalInstability.toFixed(1)}).`
-        );
+        const statusParts = [
+          `Hybrid stabilized at ${hybrid.value}. Instability +${instability.toFixed(1)} (total ${fuseTotalInstability.toFixed(1)}).`,
+          surgeNote,
+        ].filter(Boolean);
+        setFuseStatus(statusParts.join(' '));
         if (fuseResultEl) {
-          fuseResultEl.textContent = `Active hybrid value ${totalHybridValue.toFixed(1)} · Instability ${fuseTotalInstability.toFixed(
-            1
-          )}`;
+          const surgeResultCopy = surgeNote ? ` · ${surgeNote}` : '';
+          fuseResultEl.textContent = `Active hybrid value ${totalHybridValue.toFixed(1)} · Instability ${fuseTotalInstability.toFixed(1)}${surgeResultCopy}`;
         }
 
         updateFuseControls();
@@ -6677,16 +6753,17 @@
         }
 
         const totalValue = activeHybrids.reduce((sum, card) => sum + card.value, 0);
-        const stabilityFactor = Math.max(0, 1 - fuseTotalInstability / 20);
-        const finalScore = Math.max(0, totalValue * stabilityFactor);
-        const payoutRaw = fuseBet * (finalScore / 21) * 2;
+        const stabilityFactor = Math.max(0, 1 - fuseTotalInstability / 18);
+        const chainBonus = 1 + Math.min(0.5, fuseFusions * 0.14);
+        const finalScore = Math.max(0, totalValue * stabilityFactor * chainBonus);
+        const payoutRaw = fuseBet * (finalScore / 21) * 2.25;
         const payout = Math.max(0, Number(payoutRaw.toFixed(2)));
         fuseBet = 0;
         let payoutBlocked = false;
 
         if (payout > 0) {
           const allowed = gateTieredPayout({
-            baseChance: 0.32,
+            baseChance: 0.38,
             onFailure: () => {
               payoutBlocked = true;
               setFuseStatus('Tier odds destabilized the containment. Bet lost.');
@@ -6701,7 +6778,9 @@
         }
 
         if (!payoutBlocked) {
-          setFuseStatus(`Hybrids contained at ${totalValue.toFixed(1)} power. Final score ${finalScore.toFixed(1)}.`);
+          setFuseStatus(
+            `Hybrids contained at ${totalValue.toFixed(1)} power. Final score ${finalScore.toFixed(1)} with chain bonus ${chainBonus.toFixed(2)}×.`,
+          );
           if (fuseResultEl) {
             fuseResultEl.textContent =
               payout > 0
@@ -6863,6 +6942,26 @@
         return fuseCardsState.filter((card) => card.active && card.type === 'hybrid');
       }
 
+      function applyFuseSurge(hybrid) {
+        let surgeMessage = '';
+        const roll = Math.random();
+        if (roll < 0.4) {
+          const bonusCard = createBaseFuseCard();
+          bonusCard.value = Math.min(14, bonusCard.value + 2);
+          fuseCardsState.push(bonusCard);
+          surgeMessage = `Surge minted a bonus ${bonusCard.suits[0]} ${bonusCard.value}.`;
+        } else if (roll < 0.7) {
+          const relief = Number((Math.random() * 1.5 + 0.5).toFixed(1));
+          fuseTotalInstability = Math.max(0, fuseTotalInstability - relief);
+          surgeMessage = `Stabilizers vented ${relief.toFixed(1)} instability.`;
+        } else {
+          hybrid.value += 2;
+          surgeMessage = 'Hybrid supercharged with +2 value.';
+        }
+        updateFuseMeter();
+        return surgeMessage;
+      }
+
       function createFuseEnergySurge() {
         if (!fuseStage) return;
         const surge = document.createElement('div');
@@ -6959,7 +7058,7 @@
         renderPerceptionCards();
         updatePerceptionButtons();
         updatePerceptionAnalyzeInfo();
-        setPerceptionStatus('Signals live. Analyze up to two cards before trusting the grid.');
+        setPerceptionStatus('Signals live. Analyze up to two cards before trusting the grid or walking away.');
       }
 
       function analyzeCard(index) {
@@ -7002,6 +7101,31 @@
         setPerceptionStatus(`Scan ${perceptionAnalyzesUsed}/${perceptionMaxAnalyzes}: Card ${index + 1} is ${verdict}.`);
       }
 
+      function walkPerception() {
+        if (!perceptionRunning || perceptionLocked || perceptionRevealed) {
+          setPerceptionStatus('Start a round to walk away or finish revealing.');
+          return;
+        }
+        perceptionLocked = true;
+        const walkRate = 0.6;
+        const refund = Math.max(0, Number((perceptionBet * walkRate).toFixed(2)));
+        perceptionBet = 0;
+        perceptionRunning = false;
+        addCashWinnings(refund);
+        if (perceptionScoreEl) {
+          perceptionScoreEl.textContent = 'Score: --';
+        }
+        if (perceptionResultEl) {
+          perceptionResultEl.textContent = `Walked away · Recovered $${refund.toFixed(2)}`;
+        }
+        setPerceptionStatus('You chose not to trust the grid. Smaller recovery issued.');
+        if (perceptionStage) {
+          perceptionStage.classList.remove('live', 'revealing');
+          perceptionStage.classList.add('idle');
+        }
+        updatePerceptionButtons();
+      }
+
       function lockInPerception() {
         if (!perceptionRunning || perceptionLocked) {
           setPerceptionStatus(perceptionRunning ? 'Reveal already in progress.' : 'Start a round before locking in.');
@@ -7028,11 +7152,11 @@
         const score = calculatePerceptionScore();
         let multiplier = 0;
         if (score >= 30) {
-          multiplier = 5;
+          multiplier = 6;
         } else if (score >= 20) {
-          multiplier = 3;
-        } else if (score >= 10) {
-          multiplier = 2;
+          multiplier = 4;
+        } else if (score >= 12) {
+          multiplier = 2.5;
         }
 
         if (perceptionScoreEl) {
@@ -7044,7 +7168,7 @@
         const allowPayout =
           multiplier > 0 &&
           gateTieredPayout({
-            baseChance: 0.36,
+            baseChance: 0.42,
             onFailure: () => {
               payoutBlocked = true;
               setPerceptionStatus('Tier odds clouded the vision. Bet lost.');
@@ -7064,7 +7188,7 @@
         } else if (!payoutBlocked) {
           setPerceptionStatus(`Score ${score}. Illusions consumed the wager.`);
           if (perceptionResultEl) {
-            perceptionResultEl.textContent = 'Score below 10 · Bet lost.';
+            perceptionResultEl.textContent = 'Score below 12 · Bet lost.';
           }
         }
 
@@ -7167,6 +7291,9 @@
         }
         if (perceptionBetInput) {
           perceptionBetInput.disabled = perceptionRunning && !perceptionRevealed;
+        }
+        if (perceptionWalkBtn) {
+          perceptionWalkBtn.disabled = !perceptionRunning || perceptionLocked || perceptionRevealed;
         }
         if (perceptionLockBtn) {
           perceptionLockBtn.disabled = !perceptionRunning || perceptionLocked;
