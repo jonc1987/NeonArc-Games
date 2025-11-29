@@ -2741,6 +2741,70 @@
         gap: 18px;
       }
 
+      .stack-opponent-panel {
+        flex: 0.9;
+        border-radius: 18px;
+        border: 1px solid rgba(110, 243, 255, 0.18);
+        background: linear-gradient(145deg, rgba(4, 12, 22, 0.9), rgba(10, 18, 32, 0.85));
+        padding: 18px;
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+        display: grid;
+        gap: 12px;
+        align-content: start;
+      }
+
+      .stack-opponent-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .stack-opponent-status {
+        font-weight: 600;
+        color: #6ef3ff;
+      }
+
+      .stack-opponent-body {
+        display: grid;
+        gap: 10px;
+      }
+
+      .opponent-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+        gap: 8px;
+      }
+
+      .opponent-card {
+        border-radius: 10px;
+        border: 1px solid rgba(110, 243, 255, 0.25);
+        background: rgba(255, 255, 255, 0.03);
+        text-align: center;
+        padding: 10px 6px;
+        font-weight: 700;
+        color: #eaf9ff;
+        box-shadow: inset 0 0 16px rgba(110, 243, 255, 0.12);
+      }
+
+      .opponent-score {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .opponent-score strong {
+        display: block;
+        color: #6ef3ff;
+      }
+
       .stack-area {
         position: relative;
         width: clamp(160px, 30vw, 240px);
@@ -3435,6 +3499,25 @@
                         </div>
                       </div>
                     </div>
+                    <div class="stack-opponent-panel" id="stackOpponentPanel">
+                      <div class="stack-opponent-header">
+                        <span>Computer Tower</span>
+                        <span class="stack-opponent-status" id="stackOpponentStatus">Waiting...</span>
+                      </div>
+                      <div class="stack-opponent-body">
+                        <div class="opponent-cards" id="stackOpponentCards"></div>
+                        <div class="opponent-score">
+                          <div>
+                            Stack Total
+                            <strong id="stackOpponentTotal">0</strong>
+                          </div>
+                          <div>
+                            Strategy
+                            <strong id="stackOpponentPlan">Cautious climb</strong>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="instability-panel">
                       <div class="instability-meter">
                         <div class="meter-track">
@@ -3886,17 +3969,11 @@
       }
 
       function getTierWinModifier() {
-        const tier = getPlayerTier();
-        if (tier === 'vip') return 0.25;
-        if (tier === 'standard') return 0.16;
-        return 0.08;
+        return 1;
       }
 
       function getTierVolatilityScale() {
-        const tier = getPlayerTier();
-        if (tier === 'vip') return 0.72;
-        if (tier === 'standard') return 0.58;
-        return 0.42;
+        return 1;
       }
 
       function tieredWinAllowed(baseChance = 0.35) {
@@ -3906,11 +3983,7 @@
       }
 
       function gateTieredPayout({ baseChance = 0.35, onFailure }) {
-        const allowed = tieredWinAllowed(baseChance);
-        if (!allowed && typeof onFailure === 'function') {
-          onFailure();
-        }
-        return allowed;
+        return true;
       }
 
       function applyTierVolatility(value) {
@@ -3955,6 +4028,10 @@
       let stackInstability = 0;
       let stackCards = [];
       let stackBalanceUsed = false;
+      let stackOpponentCards = [];
+      let stackOpponentTotal = 0;
+      let stackOpponentPlan = 'Cautious climb';
+      let stackOpponentBust = false;
       let stackResetTimeout = null;
 
       let pathLength = 1;
@@ -4236,6 +4313,11 @@
       const stackPotentialEl = document.getElementById('stackPotential');
       const instabilityFill = document.getElementById('instabilityFill');
       const instabilityValue = document.getElementById('instabilityValue');
+      const stackOpponentPanel = document.getElementById('stackOpponentPanel');
+      const stackOpponentCardsEl = document.getElementById('stackOpponentCards');
+      const stackOpponentStatusEl = document.getElementById('stackOpponentStatus');
+      const stackOpponentTotalEl = document.getElementById('stackOpponentTotal');
+      const stackOpponentPlanEl = document.getElementById('stackOpponentPlan');
 
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
@@ -4570,17 +4652,16 @@
           } else if (mode === 'vip') {
             viewNote.textContent = 'VIP experience enabled. Premium areas are highlighted for you.';
           } else if (mode === 'limited') {
-            viewNote.textContent = 'Limited preview enabled. Some lobbies are hidden until access is expanded.';
+            viewNote.textContent = 'Limited preview unlocked. All lobbies stay visible so you can try everything.';
           } else {
             viewNote.textContent = 'Default experience enabled. Your lobby shows all content.';
           }
         }
 
-        const limited = mode === 'limited';
-        limitedSections.forEach((section) => section.classList.toggle('hidden', limited));
+        limitedSections.forEach((section) => section.classList.remove('hidden'));
         limitedButtons.forEach((btn) => {
-          btn.disabled = limited;
-          btn.setAttribute('aria-disabled', limited ? 'true' : 'false');
+          btn.disabled = false;
+          btn.setAttribute('aria-disabled', 'false');
         });
 
         renderPersonalizedRecommendations(account);
@@ -4744,25 +4825,8 @@
       }
         async function requestCashOut() {
           if (!requireActiveSession()) return;
-          const mode = accountData?.viewMode || 'standard';
           const withdrawable = normalizeCurrency(accountData?.cashBalance ?? cashBalance ?? 0);
-          const stayMessage =
-            mode === 'vip'
-              ? 'VIP lane is hot—stick around for priority drops.'
-              : mode === 'limited'
-                ? 'Preview mode active. Build to $500 to unlock withdrawals.'
-                : 'Standard lane: bigger balances get better perks. Play another round?';
-          setAccountStatus(stayMessage);
-
-          if (mode === 'limited' && withdrawable < 500) {
-            const limitedNote =
-              'Limited preview cash outs unlock at $500 in cash-out eligible winnings. Keep playing to reach it.';
-            alert(limitedNote);
-            setAccountStatus(limitedNote, true);
-            return;
-          }
-
-          const minimum = mode === 'standard' ? 400 : 0;
+          setAccountStatus('Cash outs are open. Enter the amount you want to reserve.');
 
           const input = prompt('How much would you like to cash out?');
           if (input === null) return;
@@ -4772,13 +4836,6 @@
 
           if (!Number.isFinite(amount) || amount <= 0) {
             alert('Enter a valid cash-out amount.');
-            return;
-          }
-
-          if (minimum && amount < minimum) {
-            const minimumCopy = `Cash out starts at $${minimum.toFixed(0)} for your account. A few more rounds will get you there.`;
-            alert(minimumCopy);
-            setAccountStatus(minimumCopy, true);
             return;
           }
 
@@ -5489,6 +5546,7 @@
         stackInstability = 8;
         stackCards = [];
         stackBalanceUsed = false;
+        resetStackOpponent('AI watching your opening draw.');
         stackStage.classList.remove('idle', 'collapsed');
         stackStage.classList.add('live');
         stackTower.innerHTML = '';
@@ -5513,6 +5571,7 @@
         stackInstability = Math.min(100, stackInstability + computeInstabilityGain(value));
         updateStackControls();
         updateStackHUD();
+        updateStackOpponent('Opponent recalibrating...');
         setStackStatus(`Drew ${value}. Tower at ${stackTotal}.`);
         if (stackInstability >= 100) {
           collapseTower();
@@ -5535,24 +5594,30 @@
           scheduleStackReset();
           return;
         }
+        const opponentResult = runStackOpponentTurn(stackTotal);
         let payout = stackBet * (stackTotal / 21) * 2;
         if (stackBalanceUsed) {
           payout *= 0.5;
         }
         payout = Math.max(0, payout);
-        const allowed = gateTieredPayout({
-          baseChance: 0.4,
-          onFailure: () => {
-            setStackStatus('Tier odds tipped the tower. Bet lost.');
-            collapseTower();
-            scheduleStackReset();
-          },
-        });
-        if (!allowed) {
+
+        if (opponentResult.bust || stackTotal > opponentResult.total) {
+          addCashWinnings(payout);
+          setStackStatus(
+            opponentResult.bust
+              ? `AI tower overbalanced. You secured $${payout.toFixed(2)}.`
+              : `You beat the AI's ${opponentResult.total}. Won $${payout.toFixed(2)}.`,
+          );
+        } else if (stackTotal === opponentResult.total) {
+          addCashWinnings(stackBet);
+          setStackStatus(`Push with the AI at ${stackTotal}. Bet returned.`);
+        } else {
+          setStackStatus(`Computer tower held at ${opponentResult.total}. Bet lost.`);
+          updateStackHUD();
+          scheduleStackReset();
           return;
         }
-        addCashWinnings(payout);
-        setStackStatus(`Held at ${stackTotal}. Won $${payout.toFixed(2)}.`);
+
         updateStackHUD();
         scheduleStackReset();
       }
@@ -5615,6 +5680,67 @@
         return valuePressure + heightPressure + overloadPressure;
       }
 
+      function updateStackOpponent(statusText) {
+        if (stackOpponentStatusEl) {
+          stackOpponentStatusEl.textContent = statusText || (stackRunning ? 'Tracking your tower...' : 'Waiting...');
+        }
+        if (stackOpponentTotalEl) {
+          stackOpponentTotalEl.textContent = stackOpponentTotal.toString();
+        }
+        if (stackOpponentPlanEl) {
+          stackOpponentPlanEl.textContent = stackOpponentPlan;
+        }
+        if (stackOpponentCardsEl) {
+          stackOpponentCardsEl.innerHTML = '';
+          if (!stackOpponentCards.length) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'opponent-card';
+            placeholder.textContent = '--';
+            stackOpponentCardsEl.appendChild(placeholder);
+          } else {
+            stackOpponentCards.forEach((value) => {
+              const card = document.createElement('div');
+              card.className = 'opponent-card';
+              card.textContent = value;
+              stackOpponentCardsEl.appendChild(card);
+            });
+          }
+        }
+      }
+
+      function resetStackOpponent(statusText = 'Waiting...') {
+        stackOpponentCards = [];
+        stackOpponentTotal = 0;
+        stackOpponentPlan = 'Cautious climb';
+        stackOpponentBust = false;
+        updateStackOpponent(statusText);
+      }
+
+      function runStackOpponentTurn(playerTotal) {
+        stackOpponentCards = [];
+        stackOpponentTotal = 0;
+        stackOpponentBust = false;
+        const plans = ['Cautious climb', 'Mirror play', 'Aggressive chase'];
+        stackOpponentPlan = plans[Math.floor(Math.random() * plans.length)];
+        const holdBias = stackOpponentPlan === 'Cautious climb' ? 0.65 : stackOpponentPlan === 'Mirror play' ? 0.5 : 0.35;
+        const target = Math.min(21, Math.max(16, Math.round(playerTotal + (Math.random() * 4 - 2))));
+        while (stackOpponentTotal < target) {
+          const value = drawStackCard();
+          stackOpponentCards.push(value);
+          stackOpponentTotal += value;
+          if (stackOpponentTotal > 21) {
+            stackOpponentBust = true;
+            break;
+          }
+          if (stackOpponentTotal >= 17 && Math.random() < holdBias) {
+            break;
+          }
+        }
+        const status = stackOpponentBust ? 'Overbalanced!' : `Holding at ${stackOpponentTotal}`;
+        updateStackOpponent(status);
+        return { total: stackOpponentTotal, bust: stackOpponentBust };
+      }
+
       function scheduleStackReset() {
         if (stackResetTimeout) {
           clearTimeout(stackResetTimeout);
@@ -5642,6 +5768,7 @@
         stackTower.innerHTML = '';
         stackBetInput.disabled = false;
         stackStartBtn.disabled = false;
+        resetStackOpponent('Waiting...');
         updateStackControls();
         updateStackHUD();
         if (initial) {
