@@ -7,7 +7,7 @@ const router = express.Router();
 
 const WHEEL_FILE = 'dailyWheel.json';
 
-const rewards = [50, 75, 100, 125, 150, 200];
+const rewards = [1, 5, 10, 15, 20, 30];
 
 function getState() {
   return readJson(WHEEL_FILE, { spins: {} });
