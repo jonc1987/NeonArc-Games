@@ -4379,10 +4379,14 @@
           accountBackToLobbyBtn.addEventListener('click', () => backToMainLobby());
         }
         if (showLoginBtn) {
-          showLoginBtn.addEventListener('click', () => toggleAuthForm('login'));
+          showLoginBtn.addEventListener('click', () => {
+            window.location.href = '/login';
+          });
         }
         if (showRegisterBtn) {
-          showRegisterBtn.addEventListener('click', () => toggleAuthForm('register'));
+          showRegisterBtn.addEventListener('click', () => {
+            window.location.href = '/register';
+          });
         }
         document.querySelectorAll('[data-auth-cancel]').forEach((button) => {
           button.addEventListener('click', closeAuthForms);
