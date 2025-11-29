@@ -66,7 +66,7 @@ router.post('/', async (req, res) => {
   }
 
   const reward = rewards[Math.floor(Math.random() * rewards.length)];
-  const updatedUser = await updateUserWallet(user.username, { cashDelta: reward });
+  const updatedUser = await updateUserWallet(user.username, { creditDelta: reward });
   state.spins[username] = {
     lastSpin: now.toISOString(),
     lastReward: reward,
