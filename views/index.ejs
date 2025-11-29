@@ -310,6 +310,51 @@
         box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.04);
       }
 
+      .balance-breakdown {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .breakdown-card {
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(110, 243, 255, 0.2);
+        background: rgba(110, 243, 255, 0.06);
+        box-shadow: inset 0 0 12px rgba(110, 243, 255, 0.08);
+      }
+
+      .breakdown-card.muted {
+        border-color: rgba(184, 155, 255, 0.28);
+        background: rgba(184, 155, 255, 0.07);
+        box-shadow: inset 0 0 12px rgba(184, 155, 255, 0.06);
+      }
+
+      .breakdown-label {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(234, 249, 255, 0.72);
+      }
+
+      .breakdown-value {
+        margin-top: 4px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 18px;
+        color: #8cf0ff;
+      }
+
+      .breakdown-card.muted .breakdown-value {
+        color: #f7c6ff;
+      }
+
+      .balance-subtext {
+        margin: 4px 0 0;
+        color: rgba(234, 249, 255, 0.7);
+        font-size: 13px;
+      }
+
       .account-card .label {
         font-size: 12px;
         letter-spacing: 0.16em;
@@ -3125,6 +3170,18 @@
             <div class="account-card">
               <div class="label">Total Balance</div>
               <div class="value" id="profileBalance">$0.00</div>
+              <div class="balance-breakdown">
+                <div class="breakdown-card">
+                  <div class="breakdown-label">Cash Out Available</div>
+                  <div class="breakdown-value" id="profileCashBalance">$0.00</div>
+                  <p class="balance-subtext">Winnings that can be withdrawn.</p>
+                </div>
+                <div class="breakdown-card muted">
+                  <div class="breakdown-label">Non-Cashable Credits</div>
+                  <div class="breakdown-value" id="profileCreditBalance">$0.00</div>
+                  <p class="balance-subtext">Purchased credits usable for wagers.</p>
+                </div>
+              </div>
             </div>
             <div class="account-card">
               <div class="label">Join Date</div>
@@ -3758,6 +3815,8 @@
 
       // ---------------- Shared state ----------------
       let balance = 0;
+      let cashBalance = 0;
+      let creditBalance = 0;
       let accountData = null;
       let balanceSyncInFlight = false;
       const historyItems = [];
@@ -3767,6 +3826,57 @@
       let ambientFadeFrame = null;
       let ambientPrimed = false;
       let glowWheelSpinTimer = null;
+
+      function normalizeCurrency(value, { clamp = true } = {}) {
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) return 0;
+        const rounded = Math.round(numeric * 100) / 100;
+        return clamp ? Math.max(0, rounded) : rounded;
+      }
+
+      function getTotalBalance() {
+        return normalizeCurrency(cashBalance + creditBalance);
+      }
+
+      function setWallet({ cash = 0, credits = 0 } = {}) {
+        cashBalance = normalizeCurrency(cash);
+        creditBalance = normalizeCurrency(credits);
+        balance = getTotalBalance();
+      }
+
+      function spendFromWallet(amount) {
+        const debit = normalizeCurrency(amount);
+        if (debit <= 0) return false;
+        const total = getTotalBalance();
+        if (debit > total) return false;
+        const cashUsed = Math.min(cashBalance, debit);
+        cashBalance = normalizeCurrency(cashBalance - cashUsed);
+        const remaining = normalizeCurrency(debit - cashUsed);
+        if (remaining > 0) {
+          creditBalance = normalizeCurrency(creditBalance - remaining);
+        }
+        balance = getTotalBalance();
+        updateBalance();
+        return true;
+      }
+
+      function addCashWinnings(amount) {
+        const gain = normalizeCurrency(amount);
+        if (gain <= 0) return 0;
+        cashBalance = normalizeCurrency(cashBalance + gain);
+        balance = getTotalBalance();
+        updateBalance();
+        return gain;
+      }
+
+      function addCreditDeposit(amount) {
+        const gain = normalizeCurrency(amount);
+        if (gain <= 0) return 0;
+        creditBalance = normalizeCurrency(creditBalance + gain);
+        balance = getTotalBalance();
+        updateBalance();
+        return gain;
+      }
 
       function getPlayerTier() {
         const mode = accountData?.viewMode || 'standard';
@@ -3923,6 +4033,8 @@
       const titleEl = document.getElementById('sectionTitle');
       const balanceEl = document.getElementById('balance');
       const profileBalanceEl = document.getElementById('profileBalance');
+      const profileCashBalanceEl = document.getElementById('profileCashBalance');
+      const profileCreditBalanceEl = document.getElementById('profileCreditBalance');
       const profileUsernameEl = document.getElementById('profileUsername');
       const profileJoinDateEl = document.getElementById('profileJoinDate');
       const profileAccountIdEl = document.getElementById('profileAccountId');
@@ -4488,11 +4600,18 @@
 
       function applyAccountData(account) {
         if (!account) return;
-        accountData = account;
-        balance = Number(account.balance || 0);
+        const cash = normalizeCurrency(account.cashBalance ?? account.balance ?? 0);
+        const credits = normalizeCurrency(account.creditBalance ?? 0);
+        setWallet({ cash, credits });
+        accountData = {
+          ...account,
+          cashBalance: cash,
+          creditBalance: credits,
+          balance: getTotalBalance(),
+        };
         renderAccountDetails();
         updateBalance(false);
-        applyViewPreferences(account);
+        applyViewPreferences(accountData);
         updateAuthVisibility();
         if (openAccountHubBtn) {
           openAccountHubBtn.disabled = false;
@@ -4502,7 +4621,7 @@
 
       function clearAccountData(message = 'Login or register to access the account hub.', isError = false) {
         accountData = null;
-        balance = 0;
+        setWallet({ cash: 0, credits: 0 });
         renderAccountDetails();
         updateBalance(false);
         applyViewPreferences({ viewMode: 'standard', dashboardNote: '' });
@@ -4598,7 +4717,7 @@
           const response = await fetch('/api/update-balance', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ delta }),
+            body: JSON.stringify({ cashDelta: delta }),
           });
           if (response.status === 401) {
             clearAccountData('Session expired. Please log in again.', true);
@@ -4626,6 +4745,7 @@
         async function requestCashOut() {
           if (!requireActiveSession()) return;
           const mode = accountData?.viewMode || 'standard';
+          const withdrawable = normalizeCurrency(accountData?.cashBalance ?? cashBalance ?? 0);
           const stayMessage =
             mode === 'vip'
               ? 'VIP lane is hot—stick around for priority drops.'
@@ -4634,8 +4754,9 @@
                 : 'Standard lane: bigger balances get better perks. Play another round?';
           setAccountStatus(stayMessage);
 
-          if (mode === 'limited' && Number(balance || 0) < 500) {
-            const limitedNote = 'Limited preview cash outs unlock at $500 balance. Keep playing to reach it.';
+          if (mode === 'limited' && withdrawable < 500) {
+            const limitedNote =
+              'Limited preview cash outs unlock at $500 in cash-out eligible winnings. Keep playing to reach it.';
             alert(limitedNote);
             setAccountStatus(limitedNote, true);
             return;
@@ -4661,8 +4782,8 @@
             return;
           }
 
-          if (amount > Number(balance || 0)) {
-            alert('Requested amount exceeds your available balance.');
+          if (amount > withdrawable) {
+            alert('Requested amount exceeds your cash-out eligible winnings.');
             return;
           }
 
@@ -4690,9 +4811,13 @@
 
             if (payload?.user) {
               applyAccountData(payload.user);
-            } else if (accountData) {
-              balance = Math.max(0, Number(balance || 0) - amount);
-              accountData.balance = balance;
+            } else {
+              cashBalance = normalizeCurrency(cashBalance - amount);
+              balance = getTotalBalance();
+              if (accountData) {
+                accountData.cashBalance = cashBalance;
+                accountData.balance = balance;
+              }
               updateBalance(false);
             }
 
@@ -5010,14 +5135,17 @@
         }
       }
 
-      async function persistBalanceDelta(delta) {
-        if (!accountData || balanceSyncInFlight || delta === 0) return;
+      async function persistBalanceDelta(deltas = {}) {
+        if (!accountData || balanceSyncInFlight) return;
+        const cashDelta = normalizeCurrency(deltas.cashDelta ?? 0, { clamp: false });
+        const creditDelta = normalizeCurrency(deltas.creditDelta ?? 0, { clamp: false });
+        if (cashDelta === 0 && creditDelta === 0) return;
         balanceSyncInFlight = true;
         try {
           const response = await fetch('/api/update-balance', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ delta }),
+            body: JSON.stringify({ cashDelta, creditDelta }),
           });
           if (response.status === 401) {
             clearAccountData('Session expired. Please log in again.', true);
@@ -5037,21 +5165,28 @@
       }
 
       function updateBalance(sync = true) {
+        balance = getTotalBalance();
         balanceEl.textContent = balance.toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         });
         if (profileBalanceEl) {
-          profileBalanceEl.textContent = `$${balance.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}`;
+          profileBalanceEl.textContent = formatCurrency(balance);
+        }
+        if (profileCashBalanceEl) {
+          profileCashBalanceEl.textContent = formatCurrency(cashBalance);
+        }
+        if (profileCreditBalanceEl) {
+          profileCreditBalanceEl.textContent = formatCurrency(creditBalance);
         }
 
-        if (sync && accountData?.balance !== undefined) {
-          const delta = Number((balance - accountData.balance).toFixed(2));
-          if (delta !== 0) {
-            persistBalanceDelta(delta);
+        if (sync && accountData) {
+          const serverCash = normalizeCurrency(accountData.cashBalance ?? accountData.balance ?? 0);
+          const serverCredit = normalizeCurrency(accountData.creditBalance ?? 0);
+          const cashDelta = normalizeCurrency(cashBalance - serverCash, { clamp: false });
+          const creditDelta = normalizeCurrency(creditBalance - serverCredit, { clamp: false });
+          if (cashDelta !== 0 || creditDelta !== 0) {
+            persistBalanceDelta({ cashDelta, creditDelta });
           }
         }
       }
@@ -5334,7 +5469,7 @@
           setStackStatus('Enter a valid bet to stack.');
           return;
         }
-        if (bet > balance) {
+        if (bet > getTotalBalance()) {
           setStackStatus('Insufficient balance for that tower.');
           return;
         }
@@ -5342,8 +5477,11 @@
           clearTimeout(stackResetTimeout);
           stackResetTimeout = null;
         }
-        balance -= bet;
-        updateBalance();
+        const debited = spendFromWallet(bet);
+        if (!debited) {
+          setStackStatus('Unable to reserve that wager.');
+          return;
+        }
         stackBet = bet;
         stackRunning = true;
         stackCollapsed = false;
@@ -5413,8 +5551,7 @@
         if (!allowed) {
           return;
         }
-        balance += payout;
-        updateBalance();
+        addCashWinnings(payout);
         setStackStatus(`Held at ${stackTotal}. Won $${payout.toFixed(2)}.`);
         updateStackHUD();
         scheduleStackReset();
@@ -5678,14 +5815,17 @@
           setBinaryStatus('Enter a valid bet to deal.');
           return;
         }
-        if (wager > balance) {
+        if (wager > getTotalBalance()) {
           setBinaryStatus('Insufficient balance for that wager.');
           return;
         }
 
         binaryBet = wager;
-        balance -= binaryBet;
-        updateBalance();
+        const debited = spendFromWallet(binaryBet);
+        if (!debited) {
+          setBinaryStatus('Unable to reserve that wager.');
+          return;
+        }
 
         binaryRunning = true;
         binaryFlipsLeft = 1;
@@ -5853,8 +5993,7 @@
 
           if (allowed) {
             winnings = binaryBet * multiplierWin;
-            balance += winnings;
-            updateBalance();
+            addCashWinnings(winnings);
             setBinaryStatus(
               `Distance ${distance}. Payout ${multiplierWin.toFixed(2)}x = $${winnings.toFixed(2)}.`
             );
@@ -5917,14 +6056,17 @@
           setEchoStatus('Enter a valid bet to start Echo Hand.');
           return;
         }
-        if (wager > balance) {
+        if (wager > getTotalBalance()) {
           setEchoStatus('Insufficient balance for that wager.');
           return;
         }
 
         clearEchoTimers();
-        balance -= wager;
-        updateBalance();
+        const debited = spendFromWallet(wager);
+        if (!debited) {
+          setEchoStatus('Unable to reserve that wager.');
+          return;
+        }
 
         echoBet = wager;
         echoRunning = true;
@@ -6091,8 +6233,7 @@
         if (!allowed) {
           return;
         }
-        balance += payout;
-        updateBalance();
+        addCashWinnings(payout);
         setEchoStatus(`Stabilized at ${echoTotal}. Echo payout $${payout.toFixed(2)}.`);
         if (echoResultEl) {
           echoResultEl.textContent = `Payout $${payout.toFixed(2)} · Final ${echoTotal}/21`;
@@ -6256,14 +6397,17 @@
           setFuseStatus('Enter a valid bet to ignite the Fuse core.');
           return;
         }
-        if (wager > balance) {
+        if (wager > getTotalBalance()) {
           setFuseStatus('Insufficient balance for that wager.');
           return;
         }
 
         fuseBet = wager;
-        balance -= fuseBet;
-        updateBalance();
+        const debited = spendFromWallet(fuseBet);
+        if (!debited) {
+          setFuseStatus('Unable to reserve that wager.');
+          return;
+        }
 
         fuseRunning = true;
         fuseExploded = false;
@@ -6421,8 +6565,7 @@
             },
           });
           if (allowed) {
-            balance += payout;
-            updateBalance();
+            addCashWinnings(payout);
           }
         }
 
@@ -6652,14 +6795,17 @@
           setPerceptionStatus('Enter a valid wager to begin.');
           return;
         }
-        if (wager > balance) {
+        if (wager > getTotalBalance()) {
           setPerceptionStatus('Insufficient balance for that wager.');
           return;
         }
 
         perceptionBet = wager;
-        balance -= perceptionBet;
-        updateBalance();
+        const debited = spendFromWallet(perceptionBet);
+        if (!debited) {
+          setPerceptionStatus('Unable to reserve that wager.');
+          return;
+        }
 
         perceptionRunning = true;
         perceptionLocked = false;
@@ -6701,13 +6847,12 @@
           return;
         }
         const scanCost = Math.max(1, Math.ceil(perceptionBet * 0.1));
-        if (scanCost > balance) {
+        if (scanCost > getTotalBalance()) {
           setPerceptionStatus('Not enough balance to fund another scan.');
           return;
         }
 
-        balance -= scanCost;
-        updateBalance();
+        spendFromWallet(scanCost);
         perceptionAnalyzesUsed += 1;
         card.analyzed = true;
 
@@ -6780,8 +6925,7 @@
 
         if (allowPayout) {
           payout = perceptionBet * multiplier;
-          balance += payout;
-          updateBalance();
+          addCashWinnings(payout);
           setPerceptionStatus(`Score ${score}. Instinct rewarded with ${multiplier}× ($${payout.toFixed(2)}).`);
           if (perceptionResultEl) {
             perceptionResultEl.textContent = `Payout $${payout.toFixed(2)} (${multiplier}×).`;
@@ -6978,14 +7122,17 @@
           setStatus('Enter a valid bet to begin.');
           return;
         }
-        if (bet > balance) {
+        if (bet > getTotalBalance()) {
           setStatus('Insufficient balance for that wager.');
           return;
         }
 
         currentBet = bet;
-        balance -= currentBet;
-        updateBalance();
+        const debited = spendFromWallet(currentBet);
+        if (!debited) {
+          setStatus('Unable to reserve that wager.');
+          return;
+        }
 
         multiplier = 1;
         ticks = 0;
@@ -7075,8 +7222,7 @@
         }
         cashedOut = true;
         const winnings = currentBet * multiplier;
-        balance += winnings;
-        updateBalance();
+        addCashWinnings(winnings);
 
         setStatus(`You bailed at ${multiplier.toFixed(2)}x for $${winnings.toFixed(2)}.`);
         resultEl.classList.remove('loss');
@@ -7184,14 +7330,17 @@
           setPulseStatus('Enter a valid bet to begin.');
           return;
         }
-        if (bet > balance) {
+        if (bet > getTotalBalance()) {
           setPulseStatus('Insufficient balance for that wager.');
           return;
         }
 
         pulseBet = bet;
-        balance -= pulseBet;
-        updateBalance();
+        const debited = spendFromWallet(pulseBet);
+        if (!debited) {
+          setPulseStatus('Unable to reserve that wager.');
+          return;
+        }
 
         pulseMultiplier = 1;
         pulseTicks = 0;
@@ -7271,8 +7420,7 @@
         }
         pulseCashedOut = true;
         const winnings = pulseBet * pulseMultiplier;
-        balance += winnings;
-        updateBalance();
+        addCashWinnings(winnings);
 
         setPulseStatus(`Cashed at ${pulseMultiplier.toFixed(2)}x for $${winnings.toFixed(2)}.`);
         pulseResultEl.classList.remove('loss');
@@ -7384,14 +7532,17 @@
           setMindStatus('Enter a valid bet to open the mind link.');
           return;
         }
-        if (bet > balance) {
+        if (bet > getTotalBalance()) {
           setMindStatus('Insufficient balance for that wager.');
           return;
         }
 
         mindBet = bet;
-        balance -= mindBet;
-        updateBalance();
+        const debited = spendFromWallet(mindBet);
+        if (!debited) {
+          setMindStatus('Unable to reserve that wager.');
+          return;
+        }
 
         mindMultiplier = 1;
         mindThreshold = applyTierVolatility(randRange(1, settings.maxMultiplier));
@@ -7502,8 +7653,7 @@
         }
         mindCashedOut = true;
         const winnings = mindBet * mindMultiplier;
-        balance += winnings;
-        updateBalance();
+        addCashWinnings(winnings);
 
         setMindStatus(`Disconnected at ${mindMultiplier.toFixed(2)}x for $${winnings.toFixed(2)}.`);
         mindResultEl.classList.remove('loss');

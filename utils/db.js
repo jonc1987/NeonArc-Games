@@ -18,12 +18,33 @@ async function ensureDatabase() {
       username TEXT UNIQUE NOT NULL,
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
+      cash_balance NUMERIC DEFAULT 0,
+      credit_balance NUMERIC DEFAULT 0,
       balance NUMERIC DEFAULT 0,
       joined_at TIMESTAMPTZ NOT NULL,
       last_activity TIMESTAMPTZ NOT NULL,
       view_mode TEXT DEFAULT 'standard',
       dashboard_note TEXT DEFAULT ''
     )`,
+  );
+
+  await pool.query(
+    `ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS cash_balance NUMERIC DEFAULT 0,
+      ADD COLUMN IF NOT EXISTS credit_balance NUMERIC DEFAULT 0`,
+  );
+
+  await pool.query(
+    `UPDATE users
+      SET cash_balance = COALESCE(cash_balance, balance, 0),
+          credit_balance = COALESCE(credit_balance, 0)
+      WHERE cash_balance IS NULL OR credit_balance IS NULL`,
+  );
+
+  await pool.query(
+    `UPDATE users
+      SET balance = COALESCE(cash_balance, 0) + COALESCE(credit_balance, 0)
+      WHERE balance IS NULL OR balance <> COALESCE(cash_balance, 0) + COALESCE(credit_balance, 0)`,
   );
 
   await pool.query(
