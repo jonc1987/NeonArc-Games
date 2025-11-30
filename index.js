@@ -57,6 +57,10 @@ app.get('/confirm', (req, res) => {
   res.render('confirm');
 });
 
+app.get('/stackjack', (req, res) => {
+  res.render('stackjack');
+});
+
 app.get('/management', async (req, res) => {
   const providedKey = req.query?.key;
   const adminKey = process.env.ADMIN_KEY;

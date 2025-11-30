@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#050814" />
+    <title>StackJack · NeonArc</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins:wght@400;600&display=swap');
+
+      :root {
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        background: radial-gradient(circle at 14% 18%, rgba(110, 243, 255, 0.08), transparent 30%),
+          radial-gradient(circle at 74% 62%, rgba(255, 110, 230, 0.12), transparent 30%),
+          #030712;
+        color: #e8f6ff;
+        padding-bottom: 82px;
+      }
+
+      header {
+        padding: 22px clamp(16px, 4vw, 40px) 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: clamp(22px, 4vw, 28px);
+        letter-spacing: 0.16em;
+        font-family: 'Orbitron', sans-serif;
+      }
+
+      .brand p {
+        margin: 0;
+        color: #9eb4d6;
+      }
+
+      .neon-button {
+        border: 1px solid rgba(110, 243, 255, 0.4);
+        background: linear-gradient(115deg, rgba(110, 243, 255, 0.18), rgba(255, 110, 230, 0.12));
+        color: #e8f6ff;
+        padding: 12px 16px;
+        border-radius: 999px;
+        text-decoration: none;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+
+      .neon-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 36px rgba(0, 255, 230, 0.18);
+        border-color: rgba(110, 243, 255, 0.65);
+      }
+
+      .page-shell {
+        padding: 10px clamp(16px, 4vw, 40px) 48px;
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        padding: clamp(18px, 3vw, 26px);
+        border-radius: 24px;
+        border: 1px solid rgba(110, 243, 255, 0.22);
+        background: linear-gradient(140deg, rgba(8, 18, 32, 0.92), rgba(6, 10, 24, 0.92));
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+      }
+
+      .hero h2 {
+        margin: 0 0 8px;
+        font-size: clamp(28px, 5vw, 36px);
+        letter-spacing: 0.12em;
+      }
+
+      .hero p {
+        margin: 0 0 14px;
+        color: #c1d4f4;
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .ghost {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #e8f6ff;
+        padding: 10px 14px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .cta {
+        background: linear-gradient(120deg, #6ef3ff, #ff6ee6);
+        color: #050814;
+        font-weight: 700;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 12px;
+        letter-spacing: 0.06em;
+        text-decoration: none;
+        box-shadow: 0 18px 40px rgba(110, 243, 255, 0.35);
+      }
+
+      .demo-shell {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 16px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .table-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        color: #c1d4f4;
+      }
+
+      .stackjack-table {
+        position: relative;
+        min-height: 220px;
+        border-radius: 16px;
+        border: 1px solid rgba(110, 243, 255, 0.18);
+        background: radial-gradient(circle at 40% 30%, rgba(110, 243, 255, 0.08), transparent 55%),
+          radial-gradient(circle at 76% 70%, rgba(255, 110, 230, 0.08), transparent 52%),
+          rgba(4, 8, 20, 0.9);
+        overflow: hidden;
+        padding: 14px;
+        display: grid;
+        align-items: center;
+      }
+
+      .card-stack {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(90px, 1fr));
+        gap: 12px;
+        align-items: end;
+      }
+
+      .card-column {
+        display: grid;
+        gap: 10px;
+      }
+
+      .card {
+        height: 54px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.25), rgba(255, 110, 230, 0.18));
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      }
+
+      .card.highlight {
+        background: linear-gradient(120deg, rgba(255, 255, 255, 0.85), rgba(110, 243, 255, 0.75));
+        box-shadow: 0 14px 30px rgba(110, 243, 255, 0.25);
+      }
+
+      .control-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .mobile-chip {
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #c1d4f4;
+        font-size: 14px;
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .layout-lab {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+      }
+
+      .lab-card {
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+        display: grid;
+        gap: 14px;
+      }
+
+      .lab-controls {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .lab-button {
+        flex: 1;
+        min-width: 120px;
+        border-radius: 12px;
+        border: 1px solid rgba(110, 243, 255, 0.18);
+        background: rgba(4, 8, 20, 0.8);
+        color: #e8f6ff;
+        padding: 10px 12px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+      }
+
+      .lab-button.active {
+        border-color: rgba(110, 243, 255, 0.55);
+        box-shadow: 0 12px 28px rgba(110, 243, 255, 0.25);
+      }
+
+      .phone-stage {
+        position: relative;
+        border-radius: 22px;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: radial-gradient(circle at 20% 20%, rgba(110, 243, 255, 0.08), transparent 55%),
+          rgba(3, 7, 18, 0.85);
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+      }
+
+      .phone-status {
+        display: flex;
+        justify-content: space-between;
+        color: #9eb4d6;
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+
+      .mobile-table {
+        display: grid;
+        gap: 10px;
+        transition: transform 0.3s ease;
+      }
+
+      .mobile-table.stack {
+        grid-template-columns: 1fr;
+      }
+
+      .mobile-table.spread {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      }
+
+      .mobile-card {
+        border-radius: 14px;
+        padding: 14px;
+        background: linear-gradient(120deg, rgba(255, 255, 255, 0.12), rgba(110, 243, 255, 0.2));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+      }
+
+      .sticky-actions {
+        position: sticky;
+        bottom: 12px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .action-btn {
+        border-radius: 12px;
+        border: 1px solid rgba(110, 243, 255, 0.25);
+        background: rgba(4, 8, 20, 0.9);
+        color: #e8f6ff;
+        padding: 10px 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+      }
+
+      .action-btn.primary {
+        background: linear-gradient(120deg, #6ef3ff, #ff6ee6);
+        color: #050814;
+        box-shadow: 0 14px 30px rgba(110, 243, 255, 0.35);
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+      }
+
+      .feature-card {
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 14px clamp(16px, 4vw, 40px) 18px;
+        background: linear-gradient(180deg, rgba(3, 7, 18, 0.72), rgba(3, 7, 18, 0.92));
+        border-top: 1px solid rgba(110, 243, 255, 0.22);
+        display: flex;
+        justify-content: flex-end;
+        backdrop-filter: blur(10px);
+      }
+
+      .account-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #e8f6ff;
+        text-decoration: none;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(110, 243, 255, 0.35);
+        background: linear-gradient(115deg, rgba(110, 243, 255, 0.2), rgba(255, 110, 230, 0.12));
+      }
+
+      @media (max-width: 720px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .control-row {
+          gap: 8px;
+        }
+
+        .card-stack {
+          grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        }
+
+        footer {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <h1>StackJack Preview</h1>
+        <p>Mobile-first view of the solo table.</p>
+      </div>
+      <a class="neon-button" href="/login">Login with NeonArc</a>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero">
+        <div>
+          <h2>Solo StackJack, tuned for mobile hands.</h2>
+          <p>
+            We isolated StackJack into its own lane so you can practice, iterate, and feel how the controls
+            flex on a phone. Resize or tap between layouts to see how the table reflows while keeping the
+            important taps within thumb reach.
+          </p>
+          <div class="pill-row">
+            <a class="cta" href="/app">Launch StackJack</a>
+            <a class="ghost" href="#mobile-lab">Try the mobile fit</a>
+          </div>
+        </div>
+        <div class="demo-shell">
+          <div class="table-meta">
+            <span>Dealer Shift · 21</span>
+            <span>Hands locked to portrait</span>
+          </div>
+          <div class="stackjack-table">
+            <div class="card-stack">
+              <div class="card-column">
+                <div class="card"></div>
+                <div class="card"></div>
+                <div class="card highlight"></div>
+              </div>
+              <div class="card-column">
+                <div class="card highlight"></div>
+                <div class="card"></div>
+                <div class="card"></div>
+              </div>
+              <div class="card-column">
+                <div class="card"></div>
+                <div class="card highlight"></div>
+                <div class="card"></div>
+              </div>
+            </div>
+          </div>
+          <div class="control-row">
+            <span class="mobile-chip">Thumb zone tuned</span>
+            <span class="mobile-chip">Swipe to split</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="mobile-lab" class="layout-lab">
+        <div class="lab-card">
+          <div class="control-row">
+            <h3 style="margin: 0">Mobile layout lab</h3>
+            <span class="mobile-chip">Test + reposition</span>
+          </div>
+          <p style="margin: 0; color: #c1d4f4">
+            Toggle between stacked and spread layouts to see how StackJack adapts on smaller screens.
+            Use the actions to mimic thumb placement and move the deck where it fits best.
+          </p>
+          <div class="lab-controls">
+            <button class="lab-button active" data-layout="stack">Stacked</button>
+            <button class="lab-button" data-layout="spread">Spread</button>
+          </div>
+          <div class="phone-stage">
+            <div class="phone-status">
+              <span>Portrait · Safe area ready</span>
+              <span id="layoutLabel">Stacked</span>
+            </div>
+            <div class="mobile-table stack" id="mobileTable">
+              <div class="mobile-card">Deck &amp; count preview</div>
+              <div class="mobile-card">Action tokens stay on screen</div>
+              <div class="mobile-card">Chip tray locks to thumb zone</div>
+            </div>
+            <div class="sticky-actions">
+              <button class="action-btn">Peek</button>
+              <button class="action-btn">Hold</button>
+              <button class="action-btn primary">Stack</button>
+            </div>
+          </div>
+        </div>
+        <div class="lab-card">
+          <h3 style="margin: 0">Why it works</h3>
+          <div class="feature-grid">
+            <div class="feature-card">Portrait safe area padding respects notches and dynamic islands.</div>
+            <div class="feature-card">Sticky actions keep hit/hold/stack anchored under the thumb.</div>
+            <div class="feature-card">Cards compress into a stack when space is tight, then fan out on tablets.</div>
+            <div class="feature-card">Microcopy stays visible with restrained gradients for readability.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <a class="account-link" href="/app">View my account</a>
+    </footer>
+
+    <script>
+      const layoutButtons = document.querySelectorAll('[data-layout]');
+      const mobileTable = document.getElementById('mobileTable');
+      const layoutLabel = document.getElementById('layoutLabel');
+
+      layoutButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          layoutButtons.forEach((btn) => btn.classList.remove('active'));
+          button.classList.add('active');
+
+          const layout = button.getAttribute('data-layout');
+          mobileTable.classList.toggle('stack', layout === 'stack');
+          mobileTable.classList.toggle('spread', layout === 'spread');
+          layoutLabel.textContent = layout === 'stack' ? 'Stacked' : 'Spread';
+        });
+      });
+    </script>
+  </body>
+</html>
