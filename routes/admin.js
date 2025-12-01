@@ -10,9 +10,11 @@ const {
 
 const router = express.Router();
 
+const normalizeKey = (value) => value?.toString().trim() || '';
+
 function adminKeyValid(req) {
-  const providedKey = req.body?.key || req.query?.key || req.headers['x-admin-key'];
-  const expectedKey = process.env.ADMIN_KEY;
+  const providedKey = normalizeKey(req.body?.key || req.query?.key || req.headers['x-admin-key']);
+  const expectedKey = normalizeKey(process.env.ADMIN_KEY);
   return Boolean(expectedKey) && providedKey === expectedKey;
 }
 

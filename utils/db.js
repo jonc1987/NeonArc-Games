@@ -1,14 +1,24 @@
 const { Pool } = require('pg');
 
+const host = process.env.PGHOST?.toString().trim() || 'localhost';
+const port = Number(process.env.PGPORT) || 5432;
+const database = process.env.PGDATABASE || 'neonarccasinousers';
+const user = process.env.PGUSER || 'postgres';
+const password = process.env.PGPASSWORD || '';
+
+const localHosts = ['localhost', '127.0.0.1'];
+const ssl =
+  process.env.PGSSLMODE === 'disable' || localHosts.includes(host)
+    ? false
+    : { rejectUnauthorized: false };
+
 const pool = new Pool({
-  host:
-    process.env.PGHOST ||
-    'dpg-d4ichdm3jp1c73a3hkt0-a.virginia-postgres.render.com',
-  port: Number(process.env.PGPORT) || 5432,
-  database: process.env.PGDATABASE || 'neonarccasinousers',
-  user: process.env.PGUSER || 'admin',
-  password: process.env.PGPASSWORD || '9VeBi5cj3jfxyKJoAneabu3JsYB7zmKd',
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  host,
+  port,
+  database,
+  user,
+  password,
+  ssl,
 });
 
 async function ensureDatabase() {

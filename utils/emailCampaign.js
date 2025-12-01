@@ -17,6 +17,14 @@ function readEnvValue(keys = []) {
   return { key: null, value: undefined };
 }
 
+function parseBoolean(value) {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim().toLowerCase();
+  if (['true', '1', 'yes', 'on'].includes(normalized)) return true;
+  if (['false', '0', 'no', 'off'].includes(normalized)) return false;
+  return undefined;
+}
+
 function getMailConfig() {
   const host = readEnvValue(envFallbacks.host);
   const port = readEnvValue(envFallbacks.port);
@@ -37,13 +45,22 @@ function getMailConfig() {
     throw new Error(`Missing required SMTP environment variables: ${missing.join(', ')}`);
   }
 
+  const resolvedPort = Number(port.value);
+  const envSecure = parseBoolean(process.env.SMTP_SECURE);
+  let secure = envSecure ?? resolvedPort === 465;
+
+  // Port 587 expects STARTTLS; force secure=false there even if misconfigured to true.
+  if (resolvedPort === 587 && secure) {
+    secure = false;
+  }
+
+  const requireTLS = !secure && resolvedPort === 587;
+
   return {
     host: host.value,
-    port: Number(port.value),
-    secure:
-      typeof process.env.SMTP_SECURE === 'string'
-        ? process.env.SMTP_SECURE === 'true'
-        : Number(port.value) === 465,
+    port: resolvedPort,
+    secure,
+    requireTLS,
     user: user.value,
     pass: pass.value,
     from: from.value || user.value,
@@ -70,11 +87,12 @@ function getMailConfigStatus() {
 let transporter;
 function getTransporter() {
   if (transporter) return transporter;
-  const { host, port, secure, user, pass } = getMailConfig();
+  const { host, port, secure, requireTLS, user, pass } = getMailConfig();
   transporter = nodemailer.createTransport({
     host,
     port,
     secure,
+    requireTLS,
     auth: {
       user,
       pass,

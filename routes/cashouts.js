@@ -10,6 +10,8 @@ const {
 
 const router = express.Router();
 
+const normalizeKey = (value) => value?.toString().trim() || '';
+
 function sanitizeAmount(value) {
   const numeric = Number(value);
   if (!Number.isFinite(numeric)) return null;
@@ -17,8 +19,8 @@ function sanitizeAmount(value) {
 }
 
 function adminKeyValid(providedKey) {
-  const expected = process.env.ADMIN_KEY;
-  return Boolean(expected) && providedKey === expected;
+  const expected = normalizeKey(process.env.ADMIN_KEY);
+  return Boolean(expected) && normalizeKey(providedKey) === expected;
 }
 
 router.post('/cashout', async (req, res) => {

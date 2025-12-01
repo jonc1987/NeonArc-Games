@@ -62,8 +62,8 @@ app.get('/stackjack', (req, res) => {
 });
 
 app.get('/management', async (req, res) => {
-  const providedKey = req.query?.key;
-  const adminKey = process.env.ADMIN_KEY;
+  const providedKey = req.query?.key?.toString().trim();
+  const adminKey = process.env.ADMIN_KEY?.toString().trim();
 
   if (!adminKey || providedKey !== adminKey) {
     return res.status(403).send('Access Denied');
@@ -86,7 +86,18 @@ const PORT = process.env.PORT || 3000;
 
 ensureDatabase()
   .then(() => {
-    app.listen(PORT, () => console.log(`NeonArc server running on http://localhost:${PORT}`));
+    const adminKey = process.env.ADMIN_KEY?.toString().trim() || '';
+    const masked =
+      adminKey.length > 4 ? `${adminKey.slice(0, 2)}***${adminKey.slice(-2)}` : adminKey || 'NOT SET';
+    app.listen(PORT, () => {
+      console.log(`NeonArc server running on http://localhost:${PORT}`);
+      console.log(`Admin key loaded: ${masked}`);
+      if (!adminKey) {
+        console.warn(
+          'ADMIN_KEY is not set. Management/admin routes will reject all requests. Add ADMIN_KEY to a .env file in project root and restart.',
+        );
+      }
+    });
   })
   .catch((error) => {
     console.error('Database initialization failed', error);
