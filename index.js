@@ -3,7 +3,7 @@ const path = require('path');
 const session = require('express-session');
 const cors = require('cors');
 require('dotenv').config();
-const { ensureDatabase } = require('./utils/db');
+const { ensureDatabase, query } = require('./utils/db');
 const { getUsers, getCashouts } = require('./utils/userStorage');
 
 const app = express();
@@ -61,6 +61,170 @@ app.get('/stackjack', (req, res) => {
   res.render('stackjack');
 });
 
+function sqlLiteral(value) {
+  if (value === null || value === undefined) {
+    return 'NULL';
+  }
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value.toString() : 'NULL';
+  }
+  if (typeof value === 'boolean') {
+    return value ? 'TRUE' : 'FALSE';
+  }
+  return `'${value.toString().replace(/'/g, "''")}'`;
+}
+
+function buildInsertStatement(table, columns, rows = []) {
+  if (!rows.length) return '';
+  const formattedRows = rows
+    .map((row) => {
+      const values = columns.map((column) => sqlLiteral(row[column]));
+      return `(${values.join(', ')})`;
+    })
+    .join(',\n  ');
+  return `INSERT INTO ${table} (${columns.join(', ')}) VALUES\n  ${formattedRows};`;
+}
+
+function buildRecoverySql(users, cashouts, campaigns) {
+  const statements = [];
+
+  const createUsersTable = `CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  username TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  cash_balance NUMERIC DEFAULT 0,
+  credit_balance NUMERIC DEFAULT 0,
+  balance NUMERIC DEFAULT 0,
+  joined_at TIMESTAMPTZ NOT NULL,
+  last_activity TIMESTAMPTZ NOT NULL,
+  view_mode TEXT DEFAULT 'standard',
+  dashboard_note TEXT DEFAULT ''
+);`;
+
+  const createCashoutsTable = `CREATE TABLE IF NOT EXISTS cashouts (
+  id SERIAL PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  username TEXT NOT NULL,
+  amount NUMERIC NOT NULL,
+  paid_amount NUMERIC DEFAULT 0,
+  status TEXT DEFAULT 'pending',
+  requested_at TIMESTAMPTZ DEFAULT NOW(),
+  last_updated TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT fk_cashouts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);`;
+
+  const createCampaignsTable = `CREATE TABLE IF NOT EXISTS email_campaigns (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  subject TEXT NOT NULL,
+  html_content TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  sent_count INT DEFAULT 0,
+  is_active BOOLEAN DEFAULT true
+);`;
+
+  statements.push('BEGIN;');
+  statements.push(createUsersTable);
+  statements.push(createCashoutsTable);
+  statements.push(createCampaignsTable);
+  statements.push('-- Clear existing data before inserting backup records');
+  statements.push('DELETE FROM cashouts;');
+  statements.push('DELETE FROM email_campaigns;');
+  statements.push('DELETE FROM users;');
+
+  const userColumns = [
+    'id',
+    'username',
+    'email',
+    'password',
+    'cash_balance',
+    'credit_balance',
+    'balance',
+    'joined_at',
+    'last_activity',
+    'view_mode',
+    'dashboard_note',
+  ];
+  const userRows = (users || []).map((user) => ({
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    password: user.password,
+    cash_balance: user.cashBalance,
+    credit_balance: user.creditBalance,
+    balance: user.balance,
+    joined_at: user.joinedAt,
+    last_activity: user.lastActivity,
+    view_mode: user.viewMode,
+    dashboard_note: user.dashboardNote,
+  }));
+  const usersStatement = buildInsertStatement('users', userColumns, userRows);
+  if (usersStatement) {
+    statements.push(usersStatement);
+  } else {
+    statements.push('-- No user records to restore.');
+  }
+
+  const cashoutColumns = [
+    'id',
+    'user_id',
+    'username',
+    'amount',
+    'paid_amount',
+    'status',
+    'requested_at',
+    'last_updated',
+  ];
+  const cashoutRows = (cashouts || []).map((entry) => ({
+    id: entry.id,
+    user_id: entry.userId,
+    username: entry.username,
+    amount: entry.amount,
+    paid_amount: entry.paidAmount,
+    status: entry.status,
+    requested_at: entry.requestedAt,
+    last_updated: entry.lastUpdated,
+  }));
+  const cashoutsStatement = buildInsertStatement('cashouts', cashoutColumns, cashoutRows);
+  if (cashoutsStatement) {
+    statements.push(cashoutsStatement);
+  } else {
+    statements.push('-- No cashout records to restore.');
+  }
+
+  const campaignColumns = [
+    'id',
+    'name',
+    'subject',
+    'html_content',
+    'created_at',
+    'updated_at',
+    'sent_count',
+    'is_active',
+  ];
+  const campaignRows = (campaigns || []).map((campaign) => ({
+    id: campaign.id,
+    name: campaign.name,
+    subject: campaign.subject,
+    html_content: campaign.html_content,
+    created_at: campaign.created_at,
+    updated_at: campaign.updated_at,
+    sent_count: campaign.sent_count,
+    is_active: campaign.is_active,
+  }));
+  const campaignsStatement = buildInsertStatement('email_campaigns', campaignColumns, campaignRows);
+  if (campaignsStatement) {
+    statements.push(campaignsStatement);
+  } else {
+    statements.push('-- No campaign records to restore.');
+  }
+
+  statements.push('COMMIT;');
+  return statements.join('\n\n');
+}
+
 app.get('/management', async (req, res) => {
   const providedKey = req.query?.key?.toString().trim();
   const adminKey = process.env.ADMIN_KEY?.toString().trim();
@@ -72,8 +236,9 @@ app.get('/management', async (req, res) => {
   try {
     const users = await getUsers();
     const cashouts = await getCashouts();
-    const recoverySql =
-      'SELECT id, username, email, balance, joined_at, last_activity, view_mode, dashboard_note FROM users ORDER BY joined_at DESC;';
+    const campaignsResult = await query('SELECT * FROM email_campaigns ORDER BY updated_at DESC');
+    const campaigns = campaignsResult.rows || [];
+    const recoverySql = buildRecoverySql(users, cashouts, campaigns);
 
     return res.render('management', { users, cashouts, recoverySql });
   } catch (error) {

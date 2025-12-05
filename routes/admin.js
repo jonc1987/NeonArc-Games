@@ -6,6 +6,8 @@ const {
   setUserDisplayPreferences,
   markUserActivity,
   applyCashoutPayment,
+  resetUserBalanceById,
+  deleteUserById,
 } = require('../utils/userStorage');
 
 const router = express.Router();
@@ -99,6 +101,35 @@ router.post('/display', async (req, res) => {
   }
 
   return res.json({ user: publicUser(updatedUser) });
+});
+
+router.post('/users/:id/reset-balance', async (req, res) => {
+  const userId = req.params?.id;
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required.' });
+  }
+
+  const updatedUser = await resetUserBalanceById(userId);
+  if (!updatedUser) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  const refreshed = (await markUserActivity(updatedUser.username)) || updatedUser;
+  return res.json({ user: publicUser(refreshed) });
+});
+
+router.delete('/users/:id', async (req, res) => {
+  const userId = req.params?.id;
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required.' });
+  }
+
+  const deletedUser = await deleteUserById(userId);
+  if (!deletedUser) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  return res.json({ user: publicUser(deletedUser) });
 });
 
 router.post('/cashouts/:id/pay', async (req, res) => {

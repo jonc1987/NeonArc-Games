@@ -4185,6 +4185,7 @@
       const dailyWheelStatusEl = document.getElementById('dailyWheelStatus');
       const shopInventoryEl = document.getElementById('shopInventory');
       const shopStatusEl = document.getElementById('shopStatus');
+      let shopItems = [];
       const leaderboardStatusEl = document.getElementById('leaderboardStatus');
       const leaderboardBodyEl = document.querySelector('#leaderboardPage tbody');
       const cardPanels = {
@@ -4721,6 +4722,7 @@
         renderAccountDetails();
         updateBalance(false);
         applyViewPreferences(accountData);
+        renderShopItems(shopItems);
         updateAuthVisibility();
         if (openAccountHubBtn) {
           openAccountHubBtn.disabled = false;
@@ -4794,11 +4796,11 @@
           const payload = await response.json();
           if (payload?.user) {
             applyAccountData(payload.user);
-            setAuthStatus(
-              mode === 'login'
-                ? `Welcome back, ${payload.user.username}.`
-                : 'Account created with a $250 starting balance.',
-            );
+          setAuthStatus(
+            mode === 'login'
+              ? `Welcome back, ${payload.user.username}.`
+              : 'Account created with a $100 starting balance.',
+          );
             setAccountStatus('Account ready.');
             closeAuthForms();
           }
@@ -5083,6 +5085,7 @@
       }
 
       function renderShopItems(items = []) {
+        shopItems = items;
         if (!shopInventoryEl) return;
         shopInventoryEl.innerHTML = '';
         if (!items.length) {
@@ -5122,8 +5125,18 @@
           price.className = 'shop-price';
           price.textContent = `${item.price} credits`;
 
+          const priceValue = Number(item.price || 0);
+          const purchaseBtn = document.createElement('button');
+          purchaseBtn.className = 'button';
+          purchaseBtn.type = 'button';
+          purchaseBtn.textContent = 'Purchase';
+          purchaseBtn.disabled =
+            !accountData || priceValue <= 0 || Number(accountData.creditBalance ?? 0) < priceValue;
+          purchaseBtn.addEventListener('click', () => purchaseShopItem(item));
+
           right.appendChild(rarity);
           right.appendChild(price);
+          right.appendChild(purchaseBtn);
 
           li.appendChild(details);
           li.appendChild(right);
@@ -5157,6 +5170,52 @@
             shopStatusEl.textContent = 'Could not reach the shop service.';
             shopStatusEl.style.color = '#ff9bb3';
           }
+        }
+      }
+
+      async function purchaseShopItem(item) {
+        if (!item || !requireActiveSession()) return;
+
+        const price = Number(item.price);
+        if (!Number.isFinite(price) || price <= 0) {
+          setAccountStatus('This item cannot be purchased right now.', true);
+          return;
+        }
+
+        if (Number(accountData?.creditBalance ?? 0) < price) {
+          setAccountStatus('Not enough credits to buy this item.', true);
+          return;
+        }
+
+        try {
+          setAccountStatus(`Purchasing ${item.name}...`);
+          const response = await fetch('/api/shop/purchase', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itemId: item.id }),
+          });
+          const payload = await response.json().catch(() => ({}));
+
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return;
+          }
+
+          if (!response.ok) {
+            setAccountStatus(payload.error || 'Unable to complete purchase.', true);
+            return;
+          }
+
+          const updatedUser = payload.user;
+          if (updatedUser) {
+            applyAccountData(updatedUser);
+            renderShopItems(shopItems);
+            setAccountStatus(`Purchased ${item.name}!`);
+          }
+        } catch (error) {
+          console.error('Failed to purchase item', error);
+          setAccountStatus('Unable to complete purchase right now.', true);
         }
       }
 

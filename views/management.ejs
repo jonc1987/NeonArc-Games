@@ -275,6 +275,18 @@
             <button class="button" type="button" id="saveDisplayBtn" disabled>Save View Preferences</button>
             <span class="badge" id="viewModeBadge">Awaiting selection</span>
           </div>
+          <div class="inline-form" style="justify-content: space-between; align-items: center;">
+            <button class="button" type="button" id="resetBalanceBtn" disabled>Reset Balance</button>
+            <button
+              class="button"
+              type="button"
+              id="deleteAccountBtn"
+              disabled
+              style="background: linear-gradient(120deg, rgba(255, 155, 179, 0.18), rgba(255, 70, 70, 0.14));"
+            >
+              Delete Account
+            </button>
+          </div>
           <p class="muted" id="controlStatus">Choose a user from the table to enable controls.</p>
         </div>
       </div>
@@ -290,9 +302,9 @@
       <div class="card code-card">
         <div class="copy-row">
           <h2 style="margin: 0;">Recovery SQL</h2>
-          <button class="button" type="button" id="copyRecovery">Copy command</button>
+          <button class="button" type="button" id="copyRecovery">Copy recovery script</button>
         </div>
-        <p class="muted" style="margin: 0;">Use this query to export all user records (including emails) for backup.</p>
+        <p class="muted" style="margin: 0;">Run this script on a fresh PostgreSQL database to recreate the schema and repopulate users, cashouts, and campaigns.</p>
         <pre class="code-block" id="recoverySql"><%= recoverySql %></pre>
         <div class="status" id="copyStatus"></div>
       </div>
@@ -376,6 +388,8 @@
       const recoverySql = document.getElementById('recoverySql');
       const copyRecoveryBtn = document.getElementById('copyRecovery');
       const copyStatus = document.getElementById('copyStatus');
+      const resetBalanceBtn = document.getElementById('resetBalanceBtn');
+      const deleteAccountBtn = document.getElementById('deleteAccountBtn');
 
       const adminKey = new URLSearchParams(window.location.search).get('key') || '';
 
@@ -570,7 +584,7 @@
       function syncSelectionControls() {
         const selectedUser = users.find((user) => user.id === selectedUserId) || null;
         const hasSelection = Boolean(selectedUser);
-        [creditBtn, debitBtn, viewModeSelect, dashboardNoteInput, saveDisplayBtn].forEach((el) => {
+        [creditBtn, debitBtn, viewModeSelect, dashboardNoteInput, saveDisplayBtn, resetBalanceBtn, deleteAccountBtn].forEach((el) => {
           if (el) el.disabled = !hasSelection || !adminKey;
         });
         if (creditInput) creditInput.disabled = !hasSelection;
@@ -590,7 +604,7 @@
           dashboardNoteInput.value = selectedUser.dashboardNote || '';
         if (viewModeBadge)
           viewModeBadge.textContent = `${selectedUser.viewMode || 'standard'} view`.replace(/\b\w/g, (m) => m.toUpperCase());
-        setControlStatus('Adjust balance or change what this user sees.');
+        setControlStatus('Adjust balance, reset the wallet, or change what this user sees.');
       }
 
       function selectUser(user) {
@@ -684,6 +698,66 @@
         }
       }
 
+      async function resetSelectedUserBalance() {
+        const selectedUser = users.find((user) => user.id === selectedUserId);
+        if (!selectedUser || !adminKey) return;
+        if (!confirm(`Reset ${selectedUser.username}'s balance to $0.00? This cannot be undone.`)) {
+          return;
+        }
+
+        try {
+          setControlStatus('Resetting user balance...');
+          const response = await fetch(`/api/admin/users/${selectedUser.id}/reset-balance`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({}),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setControlStatus(payload.error || 'Unable to reset balance.', true);
+            return;
+          }
+          const updatedUser = payload.user;
+          if (updatedUser) {
+            users = users.map((user) => (user.id === updatedUser.id ? updatedUser : user));
+            selectedUserId = updatedUser.id;
+            setControlStatus('Balance reset to zero.');
+            applyFilters();
+          }
+        } catch (error) {
+          console.error('Failed to reset balance', error);
+          setControlStatus('Unable to reset balance right now.', true);
+        }
+      }
+
+      async function deleteSelectedUserAccount() {
+        const selectedUser = users.find((user) => user.id === selectedUserId);
+        if (!selectedUser || !adminKey) return;
+        if (!confirm(`Delete ${selectedUser.username}'s account permanently? This action cannot be undone.`)) {
+          return;
+        }
+
+        try {
+          setControlStatus('Deleting user account...');
+          const response = await fetch(`/api/admin/users/${selectedUser.id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setControlStatus(payload.error || 'Unable to delete account.', true);
+            return;
+          }
+          users = users.filter((user) => user.id !== selectedUser.id);
+          selectedUserId = null;
+          setControlStatus('Account deleted.');
+          applyFilters();
+        } catch (error) {
+          console.error('Failed to delete account', error);
+          setControlStatus('Unable to delete account right now.', true);
+        }
+      }
+
       async function saveDisplayPreferences() {
         const selectedUser = users.find((user) => user.id === selectedUserId);
         if (!selectedUser || !adminKey) return;
@@ -747,6 +821,12 @@
 
       if (saveDisplayBtn) {
         saveDisplayBtn.addEventListener('click', saveDisplayPreferences);
+      }
+      if (resetBalanceBtn) {
+        resetBalanceBtn.addEventListener('click', resetSelectedUserBalance);
+      }
+      if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener('click', deleteSelectedUserAccount);
       }
 
       if (copyRecoveryBtn) {

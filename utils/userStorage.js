@@ -170,6 +170,32 @@ async function setUserDisplayPreferences(id, { viewMode, dashboardNote }) {
   return mapUser(rows[0]);
 }
 
+async function resetUserBalanceById(id) {
+  const normalized = id?.toString().trim();
+  if (!normalized) return null;
+
+  const { rows } = await query(
+    `UPDATE users
+      SET cash_balance = 0,
+          credit_balance = 0,
+          balance = 0,
+          last_activity = $1
+      WHERE id = $2
+      RETURNING *`,
+    [new Date().toISOString(), normalized],
+  );
+
+  return mapUser(rows[0]);
+}
+
+async function deleteUserById(id) {
+  const normalized = id?.toString().trim();
+  if (!normalized) return null;
+
+  const { rows } = await query('DELETE FROM users WHERE id = $1 RETURNING *', [normalized]);
+  return mapUser(rows[0]);
+}
+
 async function getCashouts() {
   const { rows } = await query('SELECT * FROM cashouts ORDER BY requested_at DESC');
   return rows.map(mapCashout);
@@ -235,4 +261,6 @@ module.exports = {
   applyCashoutPayment,
   markUserActivity,
   setUserDisplayPreferences,
+  resetUserBalanceById,
+  deleteUserById,
 };
