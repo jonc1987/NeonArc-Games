@@ -1,132 +1,103 @@
-# 🎰 NeonArc Casino
+# NeonArc Games
 
-Welcome to **NeonArc Casino** — a futuristic, skill-based web casino built entirely with **HTML**, **CSS**, and **JavaScript**.  
-Each game is an original creation that blends strategy, timing, and risk into fast-paced arcade tension.  
-
-All games share a single glowing universe — one balance, one aesthetic, endless adrenaline.
+Welcome to **NeonArc Games**, a neon-drenched gaming hub where pilots chase clever skill loops, strategic card matches, and community rewards. Every title shares one universal balance, one aesthetic, and one ledger of **credits** — no real-money wagers, just immersive challenges and collectible flair.
 
 ---
 
-## 🏗️ Overview
+## Overview
 
-NeonArc Casino is designed as a modular environment that hosts multiple original games:
+NeonArc Games serves as a modular arena for a variety of original titles. Each mode plugs into a shared lobby, balance system, and reward fabric.
 
 | Category | Games | Description |
 |-----------|--------|-------------|
-| 💥 **Skill Games** | Rocket · Pulse Cash · Mind Bet · StackJack | Real-time timing & crash games that test nerves and strategy. |
-| 🃏 **Card Games** | Binary Poker *(and more coming)* | Strategic, logic-driven games where every card can turn your fate. |
-
-Each game runs inside its own `<div>` container with a unified balance system and theme.
+| **Skill Games** | Rocket Line · Pulse Cash · Mind Bet · StackJack | Fast decision loops that pressure timing, risk, and momentum. |
+| **Card Games** | Binary Poker · Echo Hand · Fuse · Perception | Strategic, rhythm-based matches built for intuition and experimentation. |
 
 ---
 
-## 🌌 Features
+## Signature Features
 
-- 🧩 **Multiple Game Modes** – Switch between skill and card-based games instantly.  
-- 💰 **Global Wallet System** – One balance shared across all games.  
-- ⚡ **Pure HTML/CSS/JS** – No frameworks or dependencies.  
-- 🎨 **Neon-Cyber Visuals** – Smooth glowing animations and dynamic transitions.  
-- 🧠 **Original Gameplay Concepts** – 100% invented mechanics, not remakes of existing casino titles.  
-- 🧾 **In-Game Instructions** – Built-in help panels for each mode.  
-- 🕹️ **Expandable Architecture** – Easily add new games using consistent structure and shared functions.
+- **Unified Credit Wallet** — One balance of glowing credits powers every game, challenges, and cosmetic unlocks.
+- **Daily Prizes** — Spin the NeonArc prize wheel (and track your winnings) once every 24 hours for extra credits and surprise boosts.
+- **Challenges** — Complete curated challenges for bonus credits, leaderboard status, and status badges.
+- **Avatar Marketplace** — Purchase animated avatars, themes, and badges inside the Shop to express your pilot persona.
+- **Live Neon Visuals** — Neon gradients, animated halos, and ambient synth pulses wrap every interaction.
+- **Expandable Architecture** — New games, daily events, or cosmetic drops plug right into the existing lobby + account system.
 
 ---
 
-## 🕹️ Current Games
+## Current Games
 
-### 💥 Skill Games
+### Skill Games
 | Game | Summary |
 |------|----------|
-| **Rocket** | Classic crash-style rocket launch — cash out before it explodes. |
-| **Pulse Cash** | Rising energy waveform — overload risk grows with multiplier. |
-| **Mind Bet** | Guess when a rogue AI will “change its mind” — moods are fake, odds are real. |
-| **StackJack** | Stack cards up to 21 without collapsing your tower — blackjack meets balance physics. |
+| **Rocket Line** | Classic crash-style ascent — cash out before the line breaks apart. |
+| **Pulse Cash** | Ride a charged rhythm and cash out when the waveform peaks. |
+| **Mind Bet** | Predict the rogue AI’s shifts and profit from its changing mood. |
+| **StackJack** | Stack cards toward 21 without toppling your tower or your nerves. |
 
-### 🃏 Card Games
+### Card Games
 | Game | Summary |
 |------|----------|
-| **Binary Poker** | Match your 4-bit binary cards to a secret target number. Flip bits wisely! |
-| *(More Coming Soon)* | Echo Hand, Fuse, Perception, and more will join the Card Games section. |
+| **Binary Poker** | Align your 4-bit cards with the secret target number. |
+| **Echo Hand** | Chain cards while managing echo events and instability. |
+| **Fuse** | Merge hands for hybrid values while taming escalating instability. |
+| **Perception** | Investigate your opponent’s intent and call the right moment. |
 
 ---
 
-## 🧱 Architecture
+## Architecture
 
 | Path | Description |
 |------|--------------|
-| **index.html** | Main entry point — includes all game modes and layout. |
-| **/css/** | Contains all shared and game-specific stylesheets. |
-| **/js/** | Holds core scripts and modular game logic files. |
-| **/assets/** | Optional folder for icons, glow effects, and sounds. |
-| **README.md** | Documentation for developers and contributors. |
+| **index.js** | Express server entry point — renders every view and mounts the feature routes. |
+| **/views/** | EJS templates for the lobby, home page, account shell, and individual games. |
+| **/routes/** | API handlers for account, profile, vault, shop, campaigns, and daily wheel flows. |
+| **/utils/** | Shared helpers for sessions, database access, and email campaigns. |
+| **/data/** | Seed/mock data for development. |
 
-**Main Shared Functions:**
-- `updateBalance(amount)`
-- `switchMode(modeName)`
-- `resetRound()`
-- `toggleInstructions()`
-
-**Each Game Adds:**
-- A container `<div id="gameName">`  
-- Its own start, play, and result functions  
-- Optional special buttons or animations  
+Shared helpers include:
+- `applyAccountData(payload)`
+- `updateBalance(sync)`
+- `persistBalanceDelta({ cashDelta, creditDelta })`
+- `renderLeaderboardTable(entries)`
 
 ---
 
-## 🧭 How to Run
+## How to Run
 
-1. Download or clone the repository.  
-2. Open `index.html` in your browser — no build step required.  
-3. Play any game using the mode selector at the top.  
-4. Watch your balance rise (or fall 👀).  
-
----
-
-## 🧠 Developer Notes
-
-All games share **one global JavaScript environment**, making it simple to add, remove, or modify game logic.
-
-Each game follows a consistent lifecycle pattern:
-
-    startGame();
-    playTurn();
-    endRound();
-    updateBalance();
-
-### 🎨 UI Design
-
-- **Reusable Components:** Neon buttons, toggles, sliders, and balance displays.
-- **Consistent Aesthetic:** Every game inherits the shared dark-neon theme.
-- **Lightweight Animations:** All transitions and effects use pure CSS (`transform`, `transition`, `keyframes`) — no heavy libraries.
-
-### 📧 Email Campaigns
-
-- SMTP transport accepts either the generic variables (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, optional `SMTP_FROM`, and optional `SMTP_SECURE`) **or** Brevo’s field names (`BREVO_SMTP_HOST`/`BREVO_SMTP_SERVER`, `BREVO_SMTP_PORT`, `BREVO_SMTP_LOGIN`, `BREVO_SMTP_KEY`, optional `BREVO_SMTP_FROM`). If both exist, the generic keys win. `SMTP_SECURE` remains optional (defaults to `true` on port 465).
-- The admin-only API `POST /api/campaigns/send` accepts `{ campaign: "welcome" | "promotion", recipients?: string[], audience?: "all-users", key: <ADMIN_KEY> }` to deliver the provided welcome or credits-promotion HTML to either a supplied list or every stored user email.
-- A quick status check is available at `GET /api/campaigns/status` (requires the same admin key) to report whether the SMTP credentials are present.
-- New registrations automatically receive the welcome campaign when SMTP variables are present; failures are logged without blocking sign-up.
+1. Clone or unzip the repo.
+2. Install dependencies with `npm install`.
+3. Copy `.env.example` to `.env` and configure database/email credentials as needed.
+4. Run `npm start` and open `http://localhost:3000`.
+5. Log in, spin the daily wheel, complete challenges, and browse the avatar shop to spend credits.
 
 ---
 
-## 💡 Future Roadmap
+## Developer Notes
 
-- 🃏 Add more **Card Games** (Echo Hand, Fuse, Perception)  
-- 🪙 Add **Vault & Leaderboard** sections  
-- 🧭 Build **Animated Lobby Hub** for selecting games  
-- 🎵 Include **Selectable Ambient Soundtracks**  
-- 🧬 Create **“Archive Mode”** for experimental prototype games  
-
----
-
-## ⚠️ Disclaimer
-
-This project is for **educational and entertainment purposes only.**  
-NeonArc Casino **does not** handle real currency, nor does it promote gambling of any kind.  
+- Every game writes to the shared account DOM nodes, so keep UI ids consistent before adding new logic.
+- The **Daily Wheel** route (`/api/daily-wheel`) already tracks spins and rewards, making it easy to extend to other prize drops.
+- Challenges are currently driven by client-side logic, so they can be expanded with backend data or global timers.
+- Shop purchases reduce credit balances through `/api/shop/purchase`, which validates inventory items defined in `routes/shop.js`.
 
 ---
 
-## 👨‍💻 Author
+## Roadmap
 
-**Jon**  
-💻 Developer • Inventor • Tech Artist  
-Creator of the **NeonArc Universe & Casino** ✨
+- Add vault leaderboards and premium hubs.
+- Introduce animated ambient soundtracks that sync with each game.
+- Expand the avatar shop with seasonal gear and badges.
+- Launch an experimental “Archive Mode” for lightning prototypes.
+
+---
+
+## Disclaimer
+
+This project is for educational and entertainment use. NeonArc Games does not handle real currency nor promote gambling with actual money.
+
+---
+
+## Author
+
+**Jon** — Creator, NeonArc Games architect, synth artist, and pilot.
