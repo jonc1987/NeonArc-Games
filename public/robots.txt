@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://neonarc-casino.onrender.com/sitemap.xml
