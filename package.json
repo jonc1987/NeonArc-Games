@@ -1,7 +1,7 @@
 {
-  "name": "neonarc-casino",
+  "name": "neonarc-games",
   "version": "1.0.0",
-  "description": "NeonArc Casino backend with Express and EJS",
+  "description": "NeonArc Games backend with Express and EJS",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

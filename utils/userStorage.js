@@ -1,6 +1,16 @@
 const { randomUUID } = require('crypto');
 const { query } = require('./db');
 
+const SKILL_POINTS_PER_LEVEL = 50;
+
+function calculateSkillLevel(points = 0) {
+  const numeric = Number(points) || 0;
+  if (!Number.isFinite(numeric) || numeric < 0) {
+    return 1;
+  }
+  return Math.max(1, Math.floor(numeric / SKILL_POINTS_PER_LEVEL) + 1);
+}
+
 function normalizeAmount(value) {
   const numeric = Number(value);
   if (!Number.isFinite(numeric)) return 0;
@@ -11,6 +21,8 @@ function mapUser(row) {
   if (!row) return null;
   const cashBalance = normalizeAmount(row.cash_balance ?? row.balance ?? 0);
   const creditBalance = normalizeAmount(row.credit_balance ?? 0);
+  const skillPoints = normalizeAmount(row.skill_points ?? 0);
+  const bonusCredits = normalizeAmount(row.bonus_credits ?? 0);
   return {
     id: row.id,
     username: row.username,
@@ -19,6 +31,9 @@ function mapUser(row) {
     balance: normalizeAmount(cashBalance + creditBalance),
     cashBalance,
     creditBalance,
+    skillPoints,
+    bonusCredits,
+    level: calculateSkillLevel(skillPoints),
     joinedAt: row.joined_at ? new Date(row.joined_at).toISOString() : null,
     lastActivity: row.last_activity ? new Date(row.last_activity).toISOString() : null,
     viewMode: row.view_mode || 'standard',
@@ -78,8 +93,8 @@ async function createUser(username, passwordHash, email, balance = 0) {
   const totalBalance = normalizeAmount(startingCash + startingCredit);
 
   await query(
-    `INSERT INTO users (id, username, email, password, cash_balance, credit_balance, balance, joined_at, last_activity, view_mode, dashboard_note)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'standard', '')`,
+    `INSERT INTO users (id, username, email, password, cash_balance, credit_balance, balance, joined_at, last_activity, view_mode, dashboard_note, skill_points, bonus_credits)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'standard', '', $10, $11)`,
     [
       id,
       normalizedUsername,
@@ -90,6 +105,8 @@ async function createUser(username, passwordHash, email, balance = 0) {
       totalBalance,
       nowIso,
       nowIso,
+      0,
+      0,
     ],
   );
 
@@ -121,27 +138,52 @@ async function updateUserWalletById(id, deltas, { allowNegative = false } = {}) 
   const normalized = id?.toString().trim();
   const cashDelta = Number(deltas?.cashDelta || 0);
   const creditDelta = Number(deltas?.creditDelta || 0);
+  const skillDelta = Number(deltas?.skillDelta || 0);
+  const bonusCreditDelta = Number(deltas?.bonusCreditDelta || 0);
 
-  if (!normalized || !Number.isFinite(cashDelta) || !Number.isFinite(creditDelta)) {
+  if (
+    !normalized ||
+    !Number.isFinite(cashDelta) ||
+    !Number.isFinite(creditDelta) ||
+    !Number.isFinite(skillDelta) ||
+    !Number.isFinite(bonusCreditDelta)
+  ) {
     return null;
   }
 
-  const { rows } = await query('SELECT cash_balance, credit_balance FROM users WHERE id = $1 LIMIT 1', [normalized]);
+  const { rows } = await query(
+    'SELECT cash_balance, credit_balance, skill_points, bonus_credits FROM users WHERE id = $1 LIMIT 1',
+    [normalized],
+  );
   if (!rows[0]) return null;
 
   const currentCash = normalizeAmount(rows[0].cash_balance);
   const currentCredit = normalizeAmount(rows[0].credit_balance);
+  const currentSkill = normalizeAmount(rows[0].skill_points);
+  const currentBonus = normalizeAmount(rows[0].bonus_credits);
 
   const nextCashRaw = currentCash + cashDelta;
   const nextCreditRaw = currentCredit + creditDelta;
+  const nextSkillRaw = currentSkill + skillDelta;
+  const nextBonusRaw = currentBonus + bonusCreditDelta;
 
   const nextCash = allowNegative ? nextCashRaw : Math.max(0, nextCashRaw);
   const nextCredit = allowNegative ? nextCreditRaw : Math.max(0, nextCreditRaw);
+  const nextSkill = allowNegative ? nextSkillRaw : Math.max(0, nextSkillRaw);
+  const nextBonus = allowNegative ? nextBonusRaw : Math.max(0, nextBonusRaw);
   const totalBalance = normalizeAmount(nextCash + nextCredit);
 
   const { rows: updated } = await query(
-    `UPDATE users SET cash_balance = $1, credit_balance = $2, balance = $3, last_activity = $4 WHERE id = $5 RETURNING *`,
-    [normalizeAmount(nextCash), normalizeAmount(nextCredit), totalBalance, new Date().toISOString(), normalized],
+    `UPDATE users SET cash_balance = $1, credit_balance = $2, balance = $3, skill_points = $4, bonus_credits = $5, last_activity = $6 WHERE id = $7 RETURNING *`,
+    [
+      normalizeAmount(nextCash),
+      normalizeAmount(nextCredit),
+      totalBalance,
+      normalizeAmount(nextSkill),
+      normalizeAmount(nextBonus),
+      new Date().toISOString(),
+      normalized,
+    ],
   );
   return mapUser(updated[0]);
 }
@@ -247,6 +289,79 @@ async function applyCashoutPayment(cashoutId, paymentAmount) {
   return mapCashout(rows[0]);
 }
 
+async function getFriendIds(userId) {
+  const normalized = userId?.toString().trim();
+  if (!normalized) return [];
+  const { rows } = await query(
+    `SELECT user_id, friend_id FROM friendships WHERE user_id = $1 OR friend_id = $1`,
+    [normalized],
+  );
+  const ids = new Set();
+  rows.forEach((row) => {
+    if (row.user_id && row.user_id !== normalized) ids.add(row.user_id);
+    if (row.friend_id && row.friend_id !== normalized) ids.add(row.friend_id);
+  });
+  return Array.from(ids);
+}
+
+async function getFriendCount(userId) {
+  const ids = await getFriendIds(userId);
+  return ids.length;
+}
+
+async function areFriends(userAId, userBId) {
+  const normalizedA = userAId?.toString().trim();
+  const normalizedB = userBId?.toString().trim();
+  if (!normalizedA || !normalizedB) return false;
+  const [left, right] = normalizedA < normalizedB ? [normalizedA, normalizedB] : [normalizedB, normalizedA];
+  const { rows } = await query(
+    'SELECT 1 FROM friendships WHERE user_id = $1 AND friend_id = $2 LIMIT 1',
+    [left, right],
+  );
+  return rows.length > 0;
+}
+
+async function addFriendship(userAId, userBId) {
+  const normalizedA = userAId?.toString().trim();
+  const normalizedB = userBId?.toString().trim();
+  if (!normalizedA || !normalizedB || normalizedA === normalizedB) {
+    return false;
+  }
+  const [left, right] = normalizedA < normalizedB ? [normalizedA, normalizedB] : [normalizedB, normalizedA];
+  const existing = await query(
+    'SELECT 1 FROM friendships WHERE user_id = $1 AND friend_id = $2 LIMIT 1',
+    [left, right],
+  );
+  if (existing.rows.length) return false;
+  await query('INSERT INTO friendships (user_id, friend_id) VALUES ($1, $2)', [left, right]);
+  return true;
+}
+
+async function searchUsersByName(input, limit = 12) {
+  const queryTerm = input?.toString().trim();
+  if (!queryTerm) return [];
+  const pattern = `%${queryTerm.toLowerCase().replace(/%/g, '')}%`;
+  const { rows } = await query(
+    `SELECT id, username, joined_at, skill_points, bonus_credits FROM users
+     WHERE LOWER(username) LIKE $1
+     ORDER BY balance DESC
+     LIMIT $2`,
+    [pattern, Math.max(1, Number(limit) || 12)],
+  );
+  return rows.map((row) => {
+    const skillPoints = normalizeAmount(row.skill_points ?? 0);
+    const bonusCredits = normalizeAmount(row.bonus_credits ?? 0);
+    return {
+      id: row.id,
+      username: row.username,
+      joinedAt: row.joined_at ? new Date(row.joined_at).toISOString() : null,
+      skillPoints,
+      bonusCredits,
+      level: calculateSkillLevel(skillPoints),
+    };
+  });
+}
+
 module.exports = {
   getUsers,
   findUser,
@@ -263,4 +378,10 @@ module.exports = {
   setUserDisplayPreferences,
   resetUserBalanceById,
   deleteUserById,
+  calculateSkillLevel,
+  getFriendIds,
+  getFriendCount,
+  areFriends,
+  addFriendship,
+  searchUsersByName,
 };

@@ -31,6 +31,7 @@ app.use('/api/profile', require('./routes/profile'));
 app.use('/api/vault', require('./routes/vault'));
 app.use('/api/shop', require('./routes/shop'));
 app.use('/api/daily-wheel', require('./routes/dailyWheel'));
+app.use('/api/quests', require('./routes/quests'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
 app.use('/api', require('./routes/account'));
 app.use('/api', require('./routes/cashouts'));
@@ -146,6 +147,8 @@ function buildRecoverySql(users, cashouts, campaigns) {
     'last_activity',
     'view_mode',
     'dashboard_note',
+    'skill_points',
+    'bonus_credits',
   ];
   const userRows = (users || []).map((user) => ({
     id: user.id,
@@ -159,6 +162,8 @@ function buildRecoverySql(users, cashouts, campaigns) {
     last_activity: user.lastActivity,
     view_mode: user.viewMode,
     dashboard_note: user.dashboardNote,
+    skill_points: user.skillPoints,
+    bonus_credits: user.bonusCredits,
   }));
   const usersStatement = buildInsertStatement('users', userColumns, userRows);
   if (usersStatement) {

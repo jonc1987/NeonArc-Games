@@ -1,1 +1,1 @@
-console.log('NeonArc Casino frontend assets ready');
+console.log('NeonArc Games frontend assets ready');

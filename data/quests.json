@@ -1,0 +1,61 @@
+{
+  "users": {
+    "dsjosdn123456": {
+      "date": "2025-12-07",
+      "progress": {
+        "prize-hunter": {
+          "value": 1,
+          "claimed": false,
+          "completedAt": "2025-12-07T13:32:22.677Z",
+          "claimedAt": null,
+          "updatedAt": "2025-12-07T13:32:22.677Z"
+        }
+      }
+    },
+    "dfnj32872joni": {
+      "date": "2025-12-07",
+      "progress": {
+        "prize-hunter": {
+          "value": 1,
+          "claimed": true,
+          "completedAt": "2025-12-07T13:47:14.280Z",
+          "claimedAt": "2025-12-07T13:47:22.353Z",
+          "updatedAt": "2025-12-07T13:47:14.280Z"
+        }
+      }
+    },
+    "hj": {
+      "date": "2025-12-07",
+      "progress": {
+        "prize-hunter": {
+          "value": 1,
+          "claimed": true,
+          "completedAt": "2025-12-07T15:26:58.813Z",
+          "claimedAt": "2025-12-07T15:29:19.044Z",
+          "updatedAt": "2025-12-07T15:26:58.813Z"
+        },
+        "neon-trainee": {
+          "value": 3,
+          "claimed": true,
+          "completedAt": "2025-12-07T15:28:19.643Z",
+          "claimedAt": "2025-12-07T15:29:21.634Z",
+          "updatedAt": "2025-12-07T15:28:19.643Z"
+        },
+        "profit-surge": {
+          "value": 120,
+          "claimed": true,
+          "completedAt": "2025-12-07T15:28:17.492Z",
+          "claimedAt": "2025-12-07T15:29:20.241Z",
+          "updatedAt": "2025-12-07T15:28:17.492Z"
+        },
+        "gear-collector": {
+          "value": 1,
+          "claimed": true,
+          "completedAt": "2025-12-07T15:28:50.813Z",
+          "claimedAt": "2025-12-07T15:29:17.545Z",
+          "updatedAt": "2025-12-07T15:28:50.813Z"
+        }
+      }
+    }
+  }
+}

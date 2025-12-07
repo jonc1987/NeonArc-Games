@@ -6,10 +6,10 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="NeonArc Casino" />
+    <meta name="apple-mobile-web-app-title" content="NeonArc Games" />
     <meta name="theme-color" content="#050814" />
     <meta name="format-detection" content="telephone=no" />
-    <title>Register · NeonArc Casino</title>
+    <title>Register · NeonArc Games</title>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;500&display=swap');
       :root {
@@ -99,7 +99,7 @@
     <div class="panel">
       <div>
         <h1>Register</h1>
-        <p>Start with a lean bankroll and build your own NeonArc journey.</p>
+        <p>Create your pilot identity, earn credits, and unlock daily prizes in NeonArc Games.</p>
       </div>
       <form id="registerForm">
         <div>
@@ -118,7 +118,7 @@
         <div class="actions">
           <button type="submit">Create account</button>
           <a class="button" href="/login">Back to Login</a>
-          <a class="button" href="/app">Enter Casino</a>
+          <a class="button" href="/app">Enter the Lobby</a>
         </div>
       </form>
       <div class="status" id="status">Minimum 6 characters for passwords.</div>
@@ -151,9 +151,13 @@
             statusEl.style.color = '#ff9bb3';
             return;
           }
-          statusEl.textContent = `Welcome, ${payload.user?.username || 'pilot'}. Starting with $${
-            payload.user?.balance ?? 0
-          } ready.`;
+          {
+            const starting = Number(payload.user?.balance ?? 0).toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+            statusEl.textContent = `Welcome, ${payload.user?.username || 'pilot'}. Starting with ${starting} credits ready.`;
+          }
           setTimeout(() => (window.location.href = '/app'), 650);
         } catch (error) {
           console.error('Registration failed', error);

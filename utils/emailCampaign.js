@@ -124,7 +124,7 @@ async function sendEmail({ to, subject, html }) {
     console.log(`[EMAIL] Sending: ${subject} → ${recipient}`);
     
     const info = await mailer.sendMail({
-      from: `NeonArc Casino <${from}>`,
+      from: `NeonArc Games <${from}>`,
       to: recipient,
       subject,
       html,
@@ -160,7 +160,7 @@ const welcomeHtml = `
                   margin:0;
                   text-shadow:0 0 10px #00ffff;
                 ">
-                  WELCOME TO NEONARC CASINO
+                  WELCOME TO NEONARC GAMES
                 </h1>
 
                 <p style="
@@ -277,9 +277,9 @@ const welcomeHtml = `
               <td style="background:#0a0015; padding:25px; text-align:center;">
 
                 <div style="color:#bbbbbb; font-size:12px; line-height:18px;">
-                  NeonArc Casino — designed by innovators, powered by you.
+                  NeonArc Games — designed by innovators, powered by you.
                   <br><br>
-                  <a href="mailto:neonarccasino@outlook.com" style="color:#00ffff; text-decoration:none;">
+                  <a href="mailto:neonarcgames@outlook.com" style="color:#00ffff; text-decoration:none;">
                     Support
                   </a>
                 </div>
@@ -494,10 +494,10 @@ const promoHtml = `<!DOCTYPE html>
             <tr>
               <td style="padding:30px; text-align:center; background:#0a0015; color:#bbbbbb; font-size:12px;">
 
-                NeonArc Casino — where credits turn into legends.
+                NeonArc Games — where credits turn into legends.
                 <br><br>
 
-                <a href="mailto:neonarccasino@outlook.com" style="color:#00ffff; text-decoration:none;">
+                <a href="mailto:neonarcgames@outlook.com" style="color:#00ffff; text-decoration:none;">
                   Support
                 </a>
 
@@ -516,7 +516,7 @@ const promoHtml = `<!DOCTYPE html>
 
 async function sendWelcomeEmail(to) {
   console.log(`[EMAIL] Welcome email queued for: ${to}`);
-  return sendEmail({ to, subject: 'Welcome to NeonArc Casino', html: welcomeHtml });
+  return sendEmail({ to, subject: 'Welcome to NeonArc Games', html: welcomeHtml });
 }
 
 async function sendCreditPromoEmail(to) {

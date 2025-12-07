@@ -6,10 +6,10 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="NeonArc Casino" />
+    <meta name="apple-mobile-web-app-title" content="NeonArc Games" />
     <meta name="theme-color" content="#050814" />
     <meta name="format-detection" content="telephone=no" />
-    <title>NeonArc Casino Games - Your Favorite Gaming Hub</title>
+    <title>NeonArc Games Lobby · Your Favorite Arcade Hub</title>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@400;500&display=swap');
 
@@ -93,59 +93,24 @@
         gap: clamp(16px, 3vw, 28px);
       }
 
-      .floating-controls {
-        position: fixed;
-        top: 18px;
-        right: 18px;
-        z-index: 10;
-        display: flex;
-        gap: 10px;
-      }
-
-      .sound-toggle {
-        width: 48px;
-        height: 48px;
-        border-radius: 16px;
-        border: 1px solid rgba(110, 243, 255, 0.55);
-        background: radial-gradient(circle at 30% 30%, rgba(110, 243, 255, 0.5), rgba(4, 12, 24, 1));
-        color: #6ef3ff;
-        font-size: 20px;
-        cursor: pointer;
-        box-shadow: 0 12px 30px rgba(0, 255, 230, 0.18);
-        transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease, color 0.25s ease, filter 0.25s ease;
-      }
-
-      .sound-toggle:hover {
-        box-shadow: 0 18px 38px rgba(0, 255, 230, 0.35);
-        transform: translateY(-2px);
-        filter: drop-shadow(0 0 12px rgba(110, 243, 255, 0.75));
-      }
-
-      .sound-toggle.muted {
-        border-color: rgba(120, 80, 160, 0.5);
-        background: radial-gradient(circle at 30% 30%, rgba(120, 80, 160, 0.45), rgba(4, 6, 20, 1));
-        color: #b89bff;
-        box-shadow: 0 10px 24px rgba(120, 80, 160, 0.25);
-      }
-
-      .sound-toggle.muted:hover {
-        box-shadow: 0 14px 30px rgba(120, 80, 160, 0.35);
-        filter: drop-shadow(0 0 12px rgba(184, 155, 255, 0.55));
-      }
-
-      .top-bar {
+      .hero-section {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: clamp(12px, 2vw, 28px);
         flex-wrap: wrap;
-        gap: 18px;
-        text-transform: uppercase;
-        letter-spacing: 0.16em;
+        padding-bottom: 6px;
       }
 
-      .account-cta {
+      .hero-meta {
         display: flex;
-        justify-content: flex-end;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .hero-actions {
+        display: flex;
+        align-items: center;
       }
 
       .account-button {
@@ -166,6 +131,193 @@
         transform: translateY(-2px);
         box-shadow: 0 14px 32px rgba(0, 255, 230, 0.16);
         border-color: rgba(110, 243, 255, 0.5);
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: clamp(16px, 3vw, 24px);
+        margin-bottom: 12px;
+      }
+
+      .highlight-grid {
+        margin-top: 14px;
+      }
+
+      .credit-packs {
+        padding: 24px;
+        border-radius: 26px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .credit-packs h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .credit-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+
+      .credit-card {
+        padding: 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .credit-card button {
+        align-self: flex-start;
+        border-radius: 10px;
+        border: 1px solid rgba(110, 243, 255, 0.4);
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.15), rgba(255, 110, 230, 0.2));
+        color: #eaf9ff;
+        padding: 8px 14px;
+        cursor: pointer;
+        letter-spacing: 0.08em;
+      }
+
+      .quest-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .quest-card {
+        padding: 12px 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(3, 10, 20, 0.85);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .quest-card strong {
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #9dd8ff;
+      }
+
+      .quest-progress {
+        width: 100%;
+        height: 8px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+      }
+
+      .quest-progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(120deg, #00f0ff, #ff78c3);
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      .quest-card button {
+        align-self: flex-start;
+        border-radius: 10px;
+        border: 1px solid rgba(110, 243, 255, 0.4);
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.15), rgba(255, 110, 230, 0.2));
+        color: #eaf9ff;
+        padding: 8px 12px;
+        cursor: pointer;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .quest-card button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+
+      .feature-card {
+        padding: 18px;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 230px;
+      }
+
+      .feature-card h3 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 0.08em;
+      }
+
+      .feature-card p {
+        margin: 0;
+        color: #c6d8f3;
+      }
+
+      .feature-status {
+        font-size: 14px;
+        color: #9ed7ff;
+      }
+
+      .feature-card ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .feature-card li {
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .feature-card li button {
+        padding: 6px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(110, 243, 255, 0.4);
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.12), rgba(255, 110, 230, 0.12));
+        color: #eaf9ff;
+        cursor: pointer;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .feature-card li button:hover {
+        border-color: rgba(110, 243, 255, 0.8);
+        transform: translateY(-1px);
+      }
+
+      .feature-card button.primary {
+        padding: 10px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(120deg, rgba(110, 243, 255, 0.2), rgba(255, 110, 230, 0.2));
+        color: #eaf9ff;
+        letter-spacing: 0.1em;
+        cursor: pointer;
       }
 
       .lobby-system {
@@ -662,6 +814,21 @@
         color: rgba(234, 249, 255, 0.9);
       }
 
+      .shop-item-bonus {
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        margin-top: 4px;
+      }
+
+      .shop-item-bonus.bonus-skill {
+        color: #9ffdff;
+      }
+
+      .shop-item-bonus.bonus-credit {
+        color: #ffd57a;
+      }
+
       .shop-badge {
         padding: 4px 8px;
         border-radius: 999px;
@@ -678,6 +845,76 @@
         font-size: 13px;
         letter-spacing: 0.08em;
         color: rgba(255, 255, 255, 0.55);
+      }
+
+      .community-search {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+
+      .community-search-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      .community-search-row input {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(110, 243, 255, 0.25);
+        background: rgba(0, 0, 0, 0.35);
+        color: rgba(234, 249, 255, 0.92);
+      }
+
+      .community-results {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .community-result {
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(110, 243, 255, 0.15);
+        background: rgba(255, 255, 255, 0.04);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .community-result-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+      }
+
+      .community-result-heading strong {
+        font-size: 16px;
+        letter-spacing: 0.1em;
+      }
+
+      .community-result-heading span {
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .community-meta {
+        font-size: 13px;
+        color: rgba(234, 249, 255, 0.65);
+        letter-spacing: 0.08em;
+      }
+
+      .community-result button.button {
+        align-self: flex-start;
+        padding: 6px 14px;
+        letter-spacing: 0.1em;
       }
 
       .lobby-view,
@@ -3018,19 +3255,13 @@
       }
 
       @media (max-width: 768px) {
-        .floating-controls {
-          position: fixed;
-          inset: auto 0 18px;
-          justify-content: center;
-        }
-
         .app-shell {
           gap: 16px;
         }
 
-        .top-bar {
-          justify-content: center;
-          text-align: center;
+        .hero-section {
+          flex-direction: column;
+          align-items: flex-start;
         }
 
         .balance,
@@ -3063,7 +3294,7 @@
       }
 
       @media (max-width: 600px) {
-        .top-bar {
+        .hero-section {
           flex-direction: column;
           align-items: flex-start;
         }
@@ -3099,20 +3330,40 @@
       }
     </style>
   </head>
-  <body>
-    <audio id="lobbyMusic" src="audio.mp3" preload="auto" loop></audio>
-    <div class="floating-controls">
-      <button class="sound-toggle active" id="soundToggle" type="button" aria-label="Toggle ambient sound">🔊</button>
-    </div>
+    <body>
+
     <div class="app-shell">
-      
-<header class="top-bar">
-  <div class="title" id="sectionTitle">Welcome to PlayNow Games</div>
-  <div class="balance">Balance: $<span id="balance">1,000.00</span></div>
-</header>
-<nav class="account-cta">
-  <button class="account-button" id="openAccountHub" type="button">Account Hub</button>
-</nav>
+
+      <section class="hero-section">
+
+        <div class="hero-meta">
+
+          <div class="title" id="sectionTitle">Welcome to NeonArc Games</div>
+
+          <div class="balance">Balance: <span id="balance">1,000.00</span> credits</div>
+
+        </div>
+
+        <div class="hero-actions">
+          <button class="account-button" id="openAccountHub" type="button" onclick="openAccountHub()">Account Hub</button>
+        </div>
+
+      </section>
+
+<section class="feature-grid" id="featureHighlights">
+  <article class="feature-card">
+    <h3>Daily Prizes</h3>
+    <p>Daily wheel spins deliver credit boosts and surprise drops.</p>
+  </article>
+  <article class="feature-card">
+    <h3>Challenges</h3>
+    <p>Track missions inside the Quest Board and claim rewards there.</p>
+  </article>
+  <article class="feature-card">
+    <h3>Avatars & Gear</h3>
+    <p>Visit the shop to configure avatars, badges, and themes.</p>
+  </article>
+</section>
 <section class="auth-panel" id="authPanel">
   <div class="auth-actions">
     <button class="account-action" id="showLogin" type="button">Login</button>
@@ -3137,6 +3388,31 @@
   </form>
   <p class="api-note" id="authStatus">Login or register to access the account hub.</p>
 </section>
+    <section class="feature-grid highlight-grid" id="featureHighlightsPanel">
+      <article class="feature-card">
+        <h3>Daily Prizes</h3>
+        <p>Spin the wheel, track the status, and watch the prize glow update with every refresh.</p>
+        <div class="feature-status">Last reward: <strong id="dailyPrizeValue">--</strong></div>
+          <button class="primary" type="button" id="spinDailyPrizeBtn">Spin Today's Wheel</button>
+      </article>
+      <article class="feature-card">
+        <h3>Challenges</h3>
+        <p>Complete missions on the Quest Board and claim progress straight from this panel.</p>
+        <div class="feature-status">Quests refresh daily · progress persists.</div>
+          <button class="primary" type="button" id="openQuestsFromFeature" onclick="openAccountHub('questsPage')">Open Quest Board</button>
+      </article>
+      <article class="feature-card">
+        <h3>Avatars & Gear</h3>
+        <p>Purchase cosmetic upgrades via code or UI and show your pilot the way you like.</p>
+        <div class="feature-status">Featured: Neon Pilot Avatar · 120 credits</div>
+          <button class="primary" type="button" id="openShopFromFeature" onclick="openAccountHub('shopPage')">Browse Avatars</button>
+      </article>
+    </section>
+    <section class="credit-packs" id="creditPacksSection">
+      <h3>Credit Packs</h3>
+      <div class="credit-grid" id="creditPackGrid"></div>
+      <p class="api-note" id="creditPackStatus">Select a pack and apply credits instantly. Login required.</p>
+    </section>
 <main class="lobby-system">
   <section class="lobby-view active" id="mainLobby" aria-label="Main Lobby">
     <div class="category-grid">
@@ -3146,6 +3422,7 @@
         data-category-button="skill"
         data-limited-disable="true"
         type="button"
+        onclick="enterCategory('skill')"
       >
         <span class="category-label">Skill Games</span>
         <span class="category-status">LIVE · Test Your Skills</span>
@@ -3157,6 +3434,7 @@
         data-category-button="card"
         data-limited-disable="true"
         type="button"
+        onclick="enterCategory('card')"
       >
         <span class="category-label">Card Games</span>
         <span class="category-status">LIVE · Classic Fun</span>
@@ -3171,22 +3449,22 @@
     </div>
     <p class="lobby-subtitle">Select a live NeonArc skill run.</p>
     <div class="game-grid">
-      <button class="game-tile" data-game="rocket" type="button">
+      <button class="game-tile" data-game="rocket" type="button" onclick="enterGame('rocket')">
         <span class="game-title">Rocket Line</span>
         <span class="game-status">LIVE · Popular</span>
         <p class="game-description">Watch your earnings climb as the multiplier grows—know when to cash out.</p>
       </button>
-      <button class="game-tile" data-game="pulse" type="button">
+      <button class="game-tile" data-game="pulse" type="button" onclick="enterGame('pulse')">
         <span class="game-title">Pulse Cash</span>
         <span class="game-status">LIVE · Fast Action</span>
         <p class="game-description">Time your moves perfectly and ride the wave to bigger wins.</p>
       </button>
-      <button class="game-tile" data-game="mind" type="button">
+      <button class="game-tile" data-game="mind" type="button" onclick="enterGame('mind')">
         <span class="game-title">Mind Bet</span>
         <span class="game-status">LIVE · Prediction Game</span>
         <p class="game-description">Use your instincts to predict patterns and win big.</p>
       </button>
-      <button class="game-tile" data-game="stack" type="button">
+      <button class="game-tile" data-game="stack" type="button" onclick="enterGame('stack')">
         <span class="game-title">StackJack</span>
         <span class="game-status">LIVE · Build & Win</span>
         <p class="game-description">Build your stack carefully and keep your balance—collect the prize.</p>
@@ -3200,22 +3478,22 @@
     </div>
     <p class="card-intro">Pick a card game and test your strategy against real competition.</p>
     <div class="game-grid">
-      <button class="game-tile" data-game="binaryPoker" type="button">
+      <button class="game-tile" data-game="binaryPoker" type="button" onclick="enterGame('binaryPoker')">
         <span class="game-title">Binary Poker</span>
         <span class="game-status">LIVE · Strategy</span>
         <p class="game-description">Make the right card choices and beat the target hand.</p>
       </button>
-      <button class="game-tile" data-game="echoHand" type="button">
+      <button class="game-tile" data-game="echoHand" type="button" onclick="enterGame('echoHand')">
         <span class="game-title">Echo Hand</span>
         <span class="game-status">LIVE · Timing Game</span>
         <p class="game-description">Link your cards together and stop at just the right moment.</p>
       </button>
-      <button class="game-tile" data-game="fuse" type="button">
+      <button class="game-tile" data-game="fuse" type="button" onclick="enterGame('fuse')">
         <span class="game-title">Fuse</span>
         <span class="game-status">LIVE · Combo Game</span>
         <p class="game-description">Combine cards smartly and manage your hand to win.</p>
       </button>
-      <button class="game-tile" data-game="perception" type="button">
+      <button class="game-tile" data-game="perception" type="button" onclick="enterGame('perception')">
         <span class="game-title">Perception</span>
         <span class="game-status">LIVE · Decision Game</span>
         <p class="game-description">Read your opponent and make the call when it matters.</p>
@@ -3226,11 +3504,13 @@
     <div class="account-shell">
       <aside class="account-nav">
         <h3>Account Pages</h3>
-        <button class="account-nav-button active" data-account-target="profilePage" type="button">Profile</button>
-        <button class="account-nav-button" data-account-target="dailyWheelPage" type="button">Daily Wheel</button>
-        <button class="account-nav-button" data-account-target="shopPage" type="button">Shop</button>
-        <button class="account-nav-button" data-account-target="leaderboardPage" type="button">Leaderboard</button>
-        <button class="account-nav-button" id="accountBackToLobby" type="button">Back to Lobby</button>
+        <button class="account-nav-button active" data-account-target="profilePage" type="button" onclick="openAccountHub('profilePage')">Profile</button>
+        <button class="account-nav-button" data-account-target="dailyWheelPage" type="button" onclick="openAccountHub('dailyWheelPage')">Daily Prizes</button>
+        <button class="account-nav-button" data-account-target="shopPage" type="button" onclick="openAccountHub('shopPage')">Shop</button>
+        <button class="account-nav-button" data-account-target="questsPage" type="button" onclick="openAccountHub('questsPage')">Quest Board</button>
+        <button class="account-nav-button" data-account-target="leaderboardPage" type="button" onclick="openAccountHub('leaderboardPage')">Leaderboard</button>
+        <button class="account-nav-button" data-account-target="communityPage" type="button" onclick="openAccountHub('communityPage')">Community</button>
+        <button class="account-nav-button" id="accountBackToLobby" type="button" onclick="backToMainLobby()">Back to Lobby</button>
       </aside>
       <div class="account-content" id="accountPageContainer">
         <div class="account-page accent-blue active" id="profilePage">
@@ -3239,16 +3519,16 @@
           <div class="account-meta">
             <div class="account-card">
               <div class="label">Total Balance</div>
-              <div class="value" id="profileBalance">$0.00</div>
+          <div class="value" id="profileBalance">0.00 credits</div>
               <div class="balance-breakdown">
                 <div class="breakdown-card">
                   <div class="breakdown-label">Cash Out Available</div>
-                  <div class="breakdown-value" id="profileCashBalance">$0.00</div>
+                  <div class="breakdown-value" id="profileCashBalance">0.00 credits</div>
                   <p class="balance-subtext">Winnings that can be withdrawn.</p>
                 </div>
                 <div class="breakdown-card muted">
                   <div class="breakdown-label">Non-Cashable Credits</div>
-                  <div class="breakdown-value" id="profileCreditBalance">$0.00</div>
+                  <div class="breakdown-value" id="profileCreditBalance">0.00 credits</div>
                   <p class="balance-subtext">Purchased credits usable for wagers.</p>
                 </div>
               </div>
@@ -3267,6 +3547,17 @@
             <button class="account-action secondary" id="refreshAccountBtn" type="button">Refresh Account</button>
           </div>
           <div class="account-card">
+            <div class="label">Skill Status</div>
+            <div class="value" id="profileLevelDisplay">Level 1</div>
+            <p class="balance-subtext" id="profileSkillPointsDisplay">0 skill points</p>
+            <p class="balance-subtext" id="profileBonusCreditsDisplay">0 bonus credits</p>
+          </div>
+          <div class="account-card">
+            <div class="label">Crew Connections</div>
+            <div class="value" id="profileFriendCountDisplay">0 friends</div>
+            <p class="balance-subtext">Use the community hub to find new allies.</p>
+          </div>
+          <div class="account-card">
             <div class="label">Experience Mode</div>
             <div class="value"><span class="view-badge" id="viewModeDisplay" data-mode="standard">Standard</span></div>
             <p class="view-note" id="viewNote">Default experience enabled. Your lobby shows all content.</p>
@@ -3283,8 +3574,8 @@
           <p class="api-note" id="accountStatus">Initializing account...</p>
         </div>
         <div class="account-page accent-green" id="dailyWheelPage">
-          <h2>Daily Wheel</h2>
-          <p>Spin the neon wheel each day for rewards.</p>
+          <h2>Daily Prizes</h2>
+          <p>Spin the neon wheel every day for credit boosts, avatar tokens, and special prizes.</p>
           <div class="glow-wheel" id="glowWheel">
             <div class="glow-wheel-inner"></div>
             <div class="glow-wheel-spokes"></div>
@@ -3306,7 +3597,7 @@
             <div class="label">Last Reward</div>
             <div class="value" id="dailyWheelReward">--</div>
           </div>
-          <p class="api-note" id="dailyWheelStatus">Daily wheel is ready.</p>
+          <p class="api-note" id="dailyWheelStatus">Daily prize is ready.</p>
         </div>
         <div class="account-page accent-pink" id="shopPage">
           <h2>Shop</h2>
@@ -3321,6 +3612,12 @@
           </div>
           <p class="api-note" id="shopStatus">Loading shop inventory...</p>
         </div>
+        <div class="account-page accent-yellow" id="questsPage">
+          <h2>Quest Board</h2>
+          <p>Complete daily missions, track progress, and redeem rewards.</p>
+          <ul class="quest-list" id="questList"></ul>
+          <p class="api-note" id="questStatus">Complete a mission to unlock credits.</p>
+        </div>
         <div class="account-page accent-purple" id="leaderboardPage">
           <h2>Leaderboard</h2>
           <p>Live rankings sorted by current account balances.</p>
@@ -3333,6 +3630,19 @@
             </tbody>
           </table>
           <p class="api-note" id="leaderboardStatus">Fetching leaderboard...</p>
+        </div>
+        <div class="account-page accent-teal" id="communityPage">
+          <h2>Community</h2>
+          <p>Locate other pilots, review their levels, and send friend invites.</p>
+          <form class="community-search" id="communitySearchForm">
+            <label for="communitySearchInput">Pilot username</label>
+            <div class="community-search-row">
+              <input id="communitySearchInput" name="username" type="search" placeholder="Search by handle" />
+              <button class="button primary" type="submit">Search</button>
+            </div>
+          </form>
+          <p class="api-note" id="communityStatus">Search to discover pilots.</p>
+          <ul class="community-results" id="communityResults"></ul>
         </div>
       </div>
     </div>
@@ -3362,7 +3672,7 @@
                   </div>
                   <div class="track-glow" id="rocketTrackGlow"></div>
                   <ul class="history" id="history"></ul>
-                  <div class="potential-readout" id="potential">Potential: $0.00</div>
+                  <div class="potential-readout" id="potential">Potential: 0.00 credits</div>
                   <div class="multiplier-readout">
                     <div id="multiplier">1.00x</div>
                     <div id="roundResult">Enter a bet to play.</div>
@@ -3410,7 +3720,7 @@
                     <div class="pulse-line" id="pulseLine"></div>
                   </div>
                   <ul class="history" id="pulseHistory"></ul>
-                  <div class="potential-readout" id="pulsePotential">Potential: $0.00</div>
+                  <div class="potential-readout" id="pulsePotential">Potential: 0.00 credits</div>
                   <div class="multiplier-readout">
                     <div id="pulseMultiplier">1.00x</div>
                     <div id="pulseRoundResult">Enter a bet to play.</div>
@@ -3452,7 +3762,7 @@
                     </div>
                     <div class="mind-mood" id="mindMood">AI calm and observant.</div>
                     <ul class="history" id="mindHistory"></ul>
-                    <div class="potential-readout" id="mindPotential">Potential: $0.00</div>
+                    <div class="potential-readout" id="mindPotential">Potential: 0.00 credits</div>
                     <div class="multiplier-readout">
                       <div id="mindMultiplier">1.00x</div>
                       <div id="mindRoundResult">Sync a wager to begin.</div>
@@ -3501,7 +3811,7 @@
                         </div>
                         <div>
                           Potential
-                          <strong id="stackPotential">$0.00</strong>
+                          <strong id="stackPotential">0.00 credits</strong>
                         </div>
                       </div>
                     </div>
@@ -3908,12 +4218,6 @@
         resetDelay: 1700,
       };
 
-      const ambientVolumes = {
-        lobby: 0.3,
-        account: 0.26,
-        game: 0.18,
-      };
-
       // ---------------- Shared state ----------------
       let balance = 0;
       let cashBalance = 0;
@@ -3921,11 +4225,6 @@
       let accountData = null;
       let balanceSyncInFlight = false;
       const historyItems = [];
-      let soundOn = true;
-      let ambientReady = false;
-      let ambientTarget = 0.3;
-      let ambientFadeFrame = null;
-      let ambientPrimed = false;
       let glowWheelSpinTimer = null;
 
       function normalizeCurrency(value, { clamp = true } = {}) {
@@ -3967,6 +4266,7 @@
         cashBalance = normalizeCurrency(cashBalance + gain);
         balance = getTotalBalance();
         updateBalance();
+        recordQuestEvent('win', { amount: gain });
         return gain;
       }
 
@@ -4125,9 +4425,10 @@
       };
 
       // ---------------- Elements ----------------
-      const baseTitle = 'NeonArc Casino';
+      const baseTitle = 'NeonArc Games';
       const titleEl = document.getElementById('sectionTitle');
       const balanceEl = document.getElementById('balance');
+      const dailyPrizeValueEl = document.getElementById('dailyPrizeValue');
       const profileBalanceEl = document.getElementById('profileBalance');
       const profileCashBalanceEl = document.getElementById('profileCashBalance');
       const profileCreditBalanceEl = document.getElementById('profileCreditBalance');
@@ -4150,9 +4451,14 @@
       const personalizedTitle = document.getElementById('personalizedTitle');
       const personalizedCopy = document.getElementById('personalizedCopy');
       const personalizedList = document.getElementById('personalizedRecommendations');
-      const ambientAudio = document.getElementById('lobbyMusic');
-      const soundToggle = document.getElementById('soundToggle');
       const openAccountHubBtn = document.getElementById('openAccountHub');
+      const spinDailyPrizeBtn = document.getElementById('spinDailyPrizeBtn');
+      const openShopFromFeatureBtn = document.getElementById('openShopFromFeature');
+      const openQuestsFromFeatureBtn = document.getElementById('openQuestsFromFeature');
+      const creditPackGrid = document.getElementById('creditPackGrid');
+      const creditPackStatusEl = document.getElementById('creditPackStatus');
+      const questListEl = document.getElementById('questList');
+      const questStatusEl = document.getElementById('questStatus');
       const lobbyViews = {
         main: document.getElementById('mainLobby'),
         skill: document.getElementById('skillGamesLobby'),
@@ -4186,6 +4492,15 @@
       const shopInventoryEl = document.getElementById('shopInventory');
       const shopStatusEl = document.getElementById('shopStatus');
       let shopItems = [];
+      let creditPackCache = [];
+      const profileLevelEl = document.getElementById('profileLevelDisplay');
+      const profileSkillPointsEl = document.getElementById('profileSkillPointsDisplay');
+      const profileBonusCreditsEl = document.getElementById('profileBonusCreditsDisplay');
+      const profileFriendCountEl = document.getElementById('profileFriendCountDisplay');
+      const communitySearchForm = document.getElementById('communitySearchForm');
+      const communitySearchInput = document.getElementById('communitySearchInput');
+      const communityStatusEl = document.getElementById('communityStatus');
+      const communityResultsEl = document.getElementById('communityResults');
       const leaderboardStatusEl = document.getElementById('leaderboardStatus');
       const leaderboardBodyEl = document.querySelector('#leaderboardPage tbody');
       const cardPanels = {
@@ -4198,7 +4513,9 @@
         profilePage: document.getElementById('profilePage'),
         dailyWheelPage: document.getElementById('dailyWheelPage'),
         shopPage: document.getElementById('shopPage'),
+        questsPage: document.getElementById('questsPage'),
         leaderboardPage: document.getElementById('leaderboardPage'),
+        communityPage: document.getElementById('communityPage'),
       };
       const viewRegistry = [
         lobbyViews.main,
@@ -4376,17 +4693,6 @@
         toggleFuseInstructions(false);
         showView(lobbyViews.main);
         setTitle('Main Lobby');
-        setSoundIcon(soundOn);
-        refreshAmbientVolume(lobbyViews.main);
-        ensureAmbientPlaying();
-
-        ['pointerdown', 'keydown', 'touchstart'].forEach((event) => {
-          document.addEventListener(event, primeAmbientAudioOnce, { once: true });
-        });
-
-        if (soundToggle) {
-          soundToggle.addEventListener('click', toggleSound);
-        }
         if (openAccountHubBtn) {
           openAccountHubBtn.addEventListener('click', () => {
             if (!accountData) {
@@ -4399,6 +4705,42 @@
         }
         if (accountBackToLobbyBtn) {
           accountBackToLobbyBtn.addEventListener('click', () => backToMainLobby());
+        }
+        if (spinDailyPrizeBtn) {
+          spinDailyPrizeBtn.addEventListener('click', () => {
+            if (!accountData) {
+              setAccountStatus('Login to claim the daily prize.', true);
+              toggleAuthForm('login');
+              return;
+            }
+            spinDailyWheel();
+          });
+        }
+        if (openShopFromFeatureBtn) {
+          openShopFromFeatureBtn.addEventListener('click', () => {
+            if (!accountData) {
+              setAccountStatus('Login to browse avatars.', true);
+              toggleAuthForm('login');
+              return;
+            }
+            openAccountHub('shopPage');
+          });
+        }
+        if (openQuestsFromFeatureBtn) {
+          openQuestsFromFeatureBtn.addEventListener('click', () => {
+            if (!accountData) {
+              setAccountStatus('Login to view the quest board.', true);
+              toggleAuthForm('login');
+              return;
+            }
+            openAccountHub('questsPage');
+          });
+        }
+        if (communitySearchForm) {
+          communitySearchForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            searchCommunity(communitySearchInput?.value || '');
+          });
         }
         if (showLoginBtn) {
           showLoginBtn.addEventListener('click', () => {
@@ -4541,6 +4883,7 @@
         stackHoldBtn.addEventListener('click', holdStackJack);
         stackBalanceBtn.addEventListener('click', balanceTower);
         resetStackJack(true);
+        await loadCreditPacks();
       }
 
       // ---------------- Shared helpers ----------------
@@ -4579,11 +4922,19 @@
         }
       }
 
-      function formatCurrency(value) {
-        return `$${Number(value || 0).toLocaleString(undefined, {
+      function formatCredits(value) {
+        return `${Number(value || 0).toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-        })}`;
+        })} credits`;
+      }
+
+      function formatStatValue(value) {
+        const numeric = Number(value || 0);
+        if (!Number.isFinite(numeric)) {
+          return '0';
+        }
+        return numeric.toLocaleString(undefined, { maximumFractionDigits: 0 });
       }
 
       function formatDate(value) {
@@ -4620,8 +4971,21 @@
         }
         if (transactionPlaceholderEl) {
           transactionPlaceholderEl.textContent = accountData
-            ? 'No transactions yet — stay tuned.'
+            ? 'No transactions yet - stay tuned.'
             : 'Login to load your transaction history.';
+        }
+        if (profileLevelEl) {
+          const levelLabel = accountData?.level ? `Level ${accountData.level}` : 'Level 1';
+          profileLevelEl.textContent = levelLabel;
+        }
+        if (profileSkillPointsEl) {
+          profileSkillPointsEl.textContent = `${formatStatValue(accountData?.skillPoints)} skill points`;
+        }
+        if (profileBonusCreditsEl) {
+          profileBonusCreditsEl.textContent = `${formatStatValue(accountData?.bonusCredits)} bonus credits`;
+        }
+        if (profileFriendCountEl) {
+          profileFriendCountEl.textContent = `${accountData?.friendCount ?? 0} friends`;
         }
       }
 
@@ -4723,6 +5087,7 @@
         updateBalance(false);
         applyViewPreferences(accountData);
         renderShopItems(shopItems);
+        renderCreditPacks(creditPackCache);
         updateAuthVisibility();
         if (openAccountHubBtn) {
           openAccountHubBtn.disabled = false;
@@ -4737,9 +5102,10 @@
         updateBalance(false);
         applyViewPreferences({ viewMode: 'standard', dashboardNote: '' });
         updateAuthVisibility();
+        renderCreditPacks(creditPackCache);
         if (openAccountHubBtn) {
-          openAccountHubBtn.disabled = true;
-          openAccountHubBtn.textContent = 'Login Required';
+          openAccountHubBtn.disabled = false;
+          openAccountHubBtn.textContent = 'Account Hub';
         }
         setAccountStatus(message, isError);
       }
@@ -4799,7 +5165,7 @@
           setAuthStatus(
             mode === 'login'
               ? `Welcome back, ${payload.user.username}.`
-              : 'Account created with a $100 starting balance.',
+              : 'Account created with a 100 credit starting balance.',
           );
             setAccountStatus('Account ready.');
             closeAuthForms();
@@ -4967,9 +5333,16 @@
       function updateDailyWheelUI(data) {
         if (dailyWheelRewardEl) {
           if (data?.lastReward !== undefined && data?.lastReward !== null) {
-            dailyWheelRewardEl.textContent = formatCurrency(data.lastReward);
+            dailyWheelRewardEl.textContent = formatCredits(data.lastReward);
           } else {
             dailyWheelRewardEl.textContent = '--';
+          }
+        }
+        if (dailyPrizeValueEl) {
+          if (data?.lastReward !== undefined && data?.lastReward !== null) {
+            dailyPrizeValueEl.textContent = formatCredits(data.lastReward);
+          } else {
+            dailyPrizeValueEl.textContent = '--';
           }
         }
         if (dailyWheelStatusEl) {
@@ -4978,12 +5351,12 @@
               data.nextEligibleAt,
             ).toLocaleString()}.`;
           } else {
-            dailyWheelStatusEl.textContent = 'Daily wheel is ready.';
+            dailyWheelStatusEl.textContent = 'Daily prize is ready.';
           }
           dailyWheelStatusEl.style.color = 'rgba(234, 249, 255, 0.72)';
         }
         if (data?.lastReward !== undefined && data?.lastReward !== null) {
-          setGlowWheelLabel(formatCurrency(data.lastReward));
+          setGlowWheelLabel(formatCredits(data.lastReward));
         } else if (data?.nextEligibleAt) {
           setGlowWheelLabel('Locked');
         } else {
@@ -5069,9 +5442,10 @@
             nextEligibleAt: payload?.nextEligibleAt,
           });
           if (dailyWheelStatusEl) {
-            dailyWheelStatusEl.textContent = `Wheel awarded ${formatCurrency(payload?.reward)}.`;
+            dailyWheelStatusEl.textContent = `Wheel awarded ${formatCredits(payload?.reward)}.`;
           }
-          celebrateGlowWheel(formatCurrency(payload?.reward));
+          celebrateGlowWheel(formatCredits(payload?.reward));
+          recordQuestEvent('daily_spin');
           await refreshAccountFromServer();
         } catch (error) {
           console.error('Failed to spin daily wheel', error);
@@ -5110,6 +5484,14 @@
 
           details.appendChild(title);
           details.appendChild(meta);
+          if (item.skillBonus || item.creditBonus) {
+            const bonus = document.createElement('span');
+            bonus.className = `shop-item-bonus ${item.skillBonus ? 'bonus-skill' : 'bonus-credit'}`;
+            bonus.textContent = item.skillBonus
+              ? `Skill +${item.skillBonus}`
+              : `Bonus +${item.creditBonus}`;
+            details.appendChild(bonus);
+          }
 
           const right = document.createElement('div');
           right.style.display = 'flex';
@@ -5123,7 +5505,7 @@
 
           const price = document.createElement('span');
           price.className = 'shop-price';
-          price.textContent = `${item.price} credits`;
+          price.textContent = formatCredits(item.price);
 
           const priceValue = Number(item.price || 0);
           const purchaseBtn = document.createElement('button');
@@ -5131,7 +5513,7 @@
           purchaseBtn.type = 'button';
           purchaseBtn.textContent = 'Purchase';
           purchaseBtn.disabled =
-            !accountData || priceValue <= 0 || Number(accountData.creditBalance ?? 0) < priceValue;
+            !accountData || priceValue <= 0 || Number(accountData.cashBalance ?? 0) < priceValue;
           purchaseBtn.addEventListener('click', () => purchaseShopItem(item));
 
           right.appendChild(rarity);
@@ -5143,6 +5525,126 @@
 
           shopInventoryEl.appendChild(li);
         });
+      }
+
+      function setCommunityStatus(message, isError = false) {
+        if (!communityStatusEl) return;
+        communityStatusEl.textContent = message;
+        communityStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(234, 249, 255, 0.72)';
+      }
+
+      function renderCommunityResults(results = []) {
+        if (!communityResultsEl) return;
+        communityResultsEl.innerHTML = '';
+        if (!results.length) {
+          const empty = document.createElement('li');
+          empty.className = 'community-result';
+          empty.textContent = 'No crew members match that search yet.';
+          communityResultsEl.appendChild(empty);
+          return;
+        }
+
+        results.forEach((profile) => {
+          const card = document.createElement('li');
+          card.className = 'community-result';
+
+          const heading = document.createElement('div');
+          heading.className = 'community-result-heading';
+
+          const name = document.createElement('strong');
+          name.textContent = profile.username;
+
+          const levelTag = document.createElement('span');
+          levelTag.textContent = `Level ${profile.level}`;
+
+          heading.appendChild(name);
+          heading.appendChild(levelTag);
+
+          const meta = document.createElement('p');
+          meta.className = 'community-meta';
+          meta.textContent = `Skill ${formatStatValue(profile.skillPoints)} · Bonus ${formatStatValue(
+            profile.bonusCredits,
+          )} · Friends ${profile.friendCount ?? 0}`;
+
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'button primary';
+          if (profile.isSelf) {
+            button.textContent = 'You';
+            button.disabled = true;
+          } else if (profile.isFriend) {
+            button.textContent = 'Friends';
+            button.disabled = true;
+          } else {
+            button.textContent = 'Add Friend';
+            button.addEventListener('click', () => sendFriendRequest(profile.username));
+          }
+
+          card.appendChild(heading);
+          card.appendChild(meta);
+          card.appendChild(button);
+          communityResultsEl.appendChild(card);
+        });
+      }
+
+      async function searchCommunity(query) {
+        if (!communityStatusEl || !communityResultsEl) return;
+        const trimmed = query?.toString().trim();
+        if (!trimmed) {
+          renderCommunityResults([]);
+          setCommunityStatus('Enter a username to search pilots.');
+          return;
+        }
+
+        setCommunityStatus('Searching pilots...');
+        communityResultsEl.innerHTML = '';
+
+        try {
+          const response = await fetch(`/api/profile/search?q=${encodeURIComponent(trimmed)}`);
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setCommunityStatus(payload.error || 'Unable to search pilots.', true);
+            return;
+          }
+
+          const results = Array.isArray(payload?.results) ? payload.results : [];
+          renderCommunityResults(results);
+          setCommunityStatus(
+            results.length ? `${results.length} pilot(s) found.` : 'No pilots matched that search.',
+          );
+        } catch (error) {
+          console.error('Community search failed', error);
+          setCommunityStatus('Community search failed.', true);
+        }
+      }
+
+      async function sendFriendRequest(username) {
+        if (!username) return;
+        setCommunityStatus(`Sending request to ${username}...`);
+        try {
+          const response = await fetch('/api/profile/friend', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            if (response.status === 401) {
+              setCommunityStatus('Please log in to send friend requests.', true);
+            } else {
+              setCommunityStatus(payload.error || 'Unable to send friend request.', true);
+            }
+            return;
+          }
+
+          setCommunityStatus(`${username} added to your crew.`);
+          if (communitySearchInput?.value?.trim()) {
+            searchCommunity(communitySearchInput.value);
+          }
+        } catch (error) {
+          console.error('Friend request failed', error);
+          setCommunityStatus('Unable to send friend request.', true);
+        }
       }
 
       async function loadShopInventory() {
@@ -5182,8 +5684,9 @@
           return;
         }
 
-        if (Number(accountData?.creditBalance ?? 0) < price) {
-          setAccountStatus('Not enough credits to buy this item.', true);
+        const availableCash = Number(accountData?.cashBalance ?? 0);
+        if (availableCash < price) {
+          setAccountStatus('Not enough cash credits to buy this item.', true);
           return;
         }
 
@@ -5212,10 +5715,314 @@
             applyAccountData(updatedUser);
             renderShopItems(shopItems);
             setAccountStatus(`Purchased ${item.name}!`);
+            recordQuestEvent('shop_purchase');
           }
         } catch (error) {
           console.error('Failed to purchase item', error);
           setAccountStatus('Unable to complete purchase right now.', true);
+        }
+      }
+
+      function renderQuestList(quests = [], nextReset) {
+        if (!questListEl) return;
+        questListEl.innerHTML = '';
+        if (!Array.isArray(quests) || quests.length === 0) {
+          const empty = document.createElement('li');
+          empty.textContent = 'Quest board is empty.';
+          empty.style.opacity = '0.6';
+          questListEl.appendChild(empty);
+          if (questStatusEl) {
+            questStatusEl.textContent = nextReset
+              ? `Resets ${new Date(nextReset).toLocaleString()}.`
+              : 'Quest board refreshing.';
+          }
+          return;
+        }
+
+        quests.forEach((quest) => {
+          const card = document.createElement('li');
+          card.className = 'quest-card';
+
+          const header = document.createElement('div');
+          header.style.display = 'flex';
+          header.style.justifyContent = 'space-between';
+          header.style.alignItems = 'baseline';
+          header.style.gap = '12px';
+
+          const title = document.createElement('strong');
+          title.textContent = quest.title;
+
+          const statusBadge = document.createElement('span');
+          statusBadge.textContent = quest.claimed ? 'Claimed' : quest.completed ? 'Ready' : 'In Progress';
+          statusBadge.style.fontSize = '11px';
+          statusBadge.style.letterSpacing = '0.2em';
+          statusBadge.style.textTransform = 'uppercase';
+          statusBadge.style.color = quest.claimed ? '#f7c6ff' : '#9dd8ff';
+
+          header.appendChild(title);
+          header.appendChild(statusBadge);
+          card.appendChild(header);
+
+          const desc = document.createElement('p');
+          desc.textContent = quest.description;
+          desc.style.margin = '4px 0';
+          card.appendChild(desc);
+
+          const reward = document.createElement('div');
+          reward.textContent = `Reward: ${formatCredits(quest.reward)}`;
+          reward.style.fontSize = '13px';
+          reward.style.color = 'rgba(234, 249, 255, 0.8)';
+          card.appendChild(reward);
+
+          const progressWrap = document.createElement('div');
+          progressWrap.className = 'quest-progress';
+          const progressFill = document.createElement('div');
+          progressFill.className = 'quest-progress-fill';
+          const percent = Math.min(100, Math.max(0, quest.percent || 0));
+          progressFill.style.width = `${percent}%`;
+          progressWrap.appendChild(progressFill);
+          card.appendChild(progressWrap);
+
+          const progressText = document.createElement('div');
+          progressText.style.fontSize = '13px';
+          progressText.style.color = '#c6d8f3';
+          progressText.textContent = `${quest.progress}/${quest.goal} ${quest.rewardLabel}`;
+          card.appendChild(progressText);
+
+          const button = document.createElement('button');
+          button.type = 'button';
+          if (quest.claimed) {
+            button.textContent = 'Claimed';
+            button.disabled = true;
+          } else if (quest.completed) {
+            button.textContent = 'Claim Reward';
+            button.addEventListener('click', () => claimQuestReward(quest));
+          } else {
+            button.textContent = 'In Progress';
+            button.disabled = true;
+          }
+          card.appendChild(button);
+
+          questListEl.appendChild(card);
+        });
+
+        if (questStatusEl) {
+          questStatusEl.textContent = nextReset
+            ? `Resets ${new Date(nextReset).toLocaleString()}.`
+            : 'Quest board ready.';
+        }
+      }
+
+      async function loadQuestBoard() {
+        if (!questListEl) return;
+        if (!accountData) {
+          questListEl.innerHTML = '<li class="muted">Login to view quests.</li>';
+          if (questStatusEl) {
+            questStatusEl.textContent = 'Log in to unlock quests.';
+          }
+          return;
+        }
+        questListEl.innerHTML = '<li>Loading quests...</li>';
+        if (questStatusEl) {
+          questStatusEl.textContent = 'Loading quests...';
+        }
+        try {
+          const response = await fetch('/api/quests');
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return;
+          }
+          if (!response.ok) {
+            questListEl.innerHTML = '<li>Unable to load quests.</li>';
+            if (questStatusEl) {
+              questStatusEl.textContent = 'Unable to load the quest board.';
+            }
+            return;
+          }
+          const payload = await response.json();
+          renderQuestList(payload?.quests, payload?.nextReset);
+        } catch (error) {
+          console.error('Failed to load quests', error);
+          questListEl.innerHTML = '<li>Unable to load quests.</li>';
+          if (questStatusEl) {
+            questStatusEl.textContent = 'Quest board offline.';
+          }
+        }
+      }
+
+      async function claimQuestReward(quest) {
+        if (!quest?.id) return;
+        if (!requireActiveSession()) return;
+        setAccountStatus(`Claiming ${quest.title} reward...`);
+        if (questStatusEl) {
+          questStatusEl.textContent = `Claiming ${quest.title}...`;
+        }
+        try {
+          const response = await fetch('/api/quests/claim', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ questId: quest.id }),
+          });
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return;
+          }
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setAccountStatus(payload.error || 'Unable to claim quest reward.', true);
+            if (questStatusEl) {
+              questStatusEl.textContent = payload.error || 'Quest claim failed.';
+            }
+            return;
+          }
+          if (payload?.user) {
+            applyAccountData(payload.user);
+          }
+          renderQuestList(payload?.quests, payload?.nextReset);
+          const message = payload?.message || `Quest claimed: ${quest.title}.`;
+          setAccountStatus(message);
+          if (questStatusEl) {
+            questStatusEl.textContent = message;
+          }
+        } catch (error) {
+          console.error('Failed to claim quest', error);
+          setAccountStatus('Unable to claim that quest right now.', true);
+        }
+      }
+
+      async function recordQuestEvent(eventName, payload = {}) {
+        if (!eventName || !accountData) return;
+        try {
+          const body = { event: eventName };
+          if (Number.isFinite(Number(payload.amount))) {
+            body.amount = Number(payload.amount);
+          }
+          const response = await fetch('/api/quests/progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return;
+          }
+          if (!response.ok) return;
+          const data = await response.json().catch(() => ({}));
+          if (data?.quests) {
+            renderQuestList(data.quests, data?.nextReset);
+          }
+          if (data?.message && questStatusEl) {
+            questStatusEl.textContent = data.message;
+          }
+        } catch (error) {
+          console.error('Quest progress failed', error);
+        }
+      }
+
+      function renderCreditPacks(packs = []) {
+        if (!creditPackGrid) return;
+        creditPackGrid.innerHTML = '';
+        if (!Array.isArray(packs) || packs.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'credit-card';
+          empty.textContent = 'Credit packs unavailable.';
+          creditPackGrid.appendChild(empty);
+          return;
+        }
+        const loggedIn = Boolean(accountData);
+        packs.forEach((pack) => {
+          const card = document.createElement('div');
+          card.className = 'credit-card';
+          const title = document.createElement('strong');
+          title.textContent = pack.title;
+          const description = document.createElement('p');
+          description.textContent = pack.description;
+          const value = document.createElement('div');
+          value.textContent = formatCredits(pack.amount ?? 0);
+          value.style.fontSize = '20px';
+          value.style.color = '#8cf0ff';
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = loggedIn ? 'Apply Credits' : 'Login to apply';
+          button.disabled = !loggedIn;
+          button.addEventListener('click', () => purchaseCreditPack(pack));
+          card.appendChild(title);
+          card.appendChild(description);
+          card.appendChild(value);
+          if (pack.bonus) {
+            const bonus = document.createElement('small');
+            bonus.textContent = `Bonus: ${formatCredits(pack.bonus)}`;
+            card.appendChild(bonus);
+          }
+          card.appendChild(button);
+          creditPackGrid.appendChild(card);
+        });
+      }
+
+      async function loadCreditPacks() {
+        if (creditPackStatusEl) {
+          creditPackStatusEl.textContent = 'Loading credit packs...';
+        }
+        try {
+          const response = await fetch('/api/shop/credit-packs');
+          if (!response.ok) {
+            if (creditPackStatusEl) {
+              creditPackStatusEl.textContent = 'Unable to load credit packs.';
+            }
+            return;
+          }
+          const payload = await response.json();
+          creditPackCache = payload?.packs || [];
+          renderCreditPacks(creditPackCache);
+          if (creditPackStatusEl) {
+            creditPackStatusEl.textContent = 'Credit packs ready.';
+          }
+        } catch (error) {
+          console.error('Failed to load credit packs', error);
+          if (creditPackStatusEl) {
+            creditPackStatusEl.textContent = 'Could not load credit packs.';
+          }
+        }
+      }
+
+      async function purchaseCreditPack(pack) {
+        if (!pack || !requireActiveSession()) return;
+        if (creditPackStatusEl) {
+          creditPackStatusEl.textContent = `Applying ${pack.title}...`;
+        }
+        try {
+          const response = await fetch('/api/shop/purchase-credits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ packId: pack.id }),
+          });
+          if (response.status === 401) {
+            clearAccountData('Session expired. Please log in again.', true);
+            setAuthStatus('Session expired. Please log in again.', true);
+            return;
+          }
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            if (creditPackStatusEl) {
+              creditPackStatusEl.textContent = payload.error || 'Unable to apply that pack.';
+            }
+            return;
+          }
+          if (payload?.user) {
+            applyAccountData(payload.user);
+          }
+          if (creditPackStatusEl) {
+            creditPackStatusEl.textContent = payload?.message || `${pack.title} applied!`;
+          }
+          renderCreditPacks(creditPackCache);
+        } catch (error) {
+          console.error('Failed to apply credit pack', error);
+          if (creditPackStatusEl) {
+            creditPackStatusEl.textContent = 'Could not apply pack right now.';
+          }
         }
       }
 
@@ -5239,7 +6046,7 @@
           const player = document.createElement('td');
           player.textContent = entry.player;
           const balanceCell = document.createElement('td');
-          balanceCell.textContent = formatCurrency(entry.balance);
+          balanceCell.textContent = formatCredits(entry.balance);
           const joined = document.createElement('td');
           joined.textContent = formatDate(entry.joinedAt);
 
@@ -5315,13 +6122,13 @@
           maximumFractionDigits: 2,
         });
         if (profileBalanceEl) {
-          profileBalanceEl.textContent = formatCurrency(balance);
+          profileBalanceEl.textContent = formatCredits(balance);
         }
         if (profileCashBalanceEl) {
-          profileCashBalanceEl.textContent = formatCurrency(cashBalance);
+          profileCashBalanceEl.textContent = formatCredits(cashBalance);
         }
         if (profileCreditBalanceEl) {
-          profileCreditBalanceEl.textContent = formatCurrency(creditBalance);
+          profileCreditBalanceEl.textContent = formatCredits(creditBalance);
         }
 
         if (sync && accountData) {
@@ -5333,89 +6140,6 @@
             persistBalanceDelta({ cashDelta, creditDelta });
           }
         }
-      }
-
-      function setSoundIcon(active) {
-        if (!soundToggle) return;
-        soundToggle.classList.toggle('muted', !active);
-        soundToggle.textContent = active ? '🔊' : '🔇';
-      }
-
-      function ensureAmbientPlaying() {
-        if (!ambientAudio || !soundOn) return;
-        ambientAudio.volume = ambientTarget;
-        ambientAudio.play().catch(() => {});
-        ambientReady = true;
-        ambientPrimed = true;
-      }
-
-      function primeAmbientAudioOnce() {
-        if (ambientPrimed) return;
-        ensureAmbientPlaying();
-      }
-
-      function fadeToVolume(targetVolume, pauseWhenDone = false) {
-        if (!ambientAudio) return;
-        const startVolume = ambientAudio.volume;
-        const duration = 400;
-        const start = performance.now();
-        if (ambientFadeFrame) cancelAnimationFrame(ambientFadeFrame);
-
-        const step = (now) => {
-          const progress = Math.min((now - start) / duration, 1);
-          ambientAudio.volume = startVolume + (targetVolume - startVolume) * progress;
-          if (progress < 1) {
-            ambientFadeFrame = requestAnimationFrame(step);
-          } else if (pauseWhenDone && targetVolume === 0) {
-            ambientAudio.pause();
-          }
-        };
-
-        ambientFadeFrame = requestAnimationFrame(step);
-      }
-
-      function fadeInSound(volume = ambientTarget) {
-        if (!ambientAudio || !soundOn) return;
-        ambientTarget = Math.max(0, Math.min(volume, 1));
-        ensureAmbientPlaying();
-        fadeToVolume(ambientTarget);
-      }
-
-      function fadeOutSound() {
-        if (!ambientAudio) return;
-        ambientTarget = 0;
-        fadeToVolume(0, true);
-      }
-
-      function determineAmbientVolume(view) {
-        if (!view) return ambientVolumes.lobby;
-        if (view.classList.contains('game-view')) return ambientVolumes.game;
-        if (view.id === 'accountPages') return ambientVolumes.account;
-        return ambientVolumes.lobby;
-      }
-
-      function refreshAmbientVolume(view) {
-        if (!soundOn) return;
-        const nextVolume = determineAmbientVolume(view);
-        fadeInSound(nextVolume);
-      }
-
-      function toggleSound() {
-        soundOn = !soundOn;
-        setSoundIcon(soundOn);
-        if (soundOn) {
-          refreshAmbientVolume(getActiveView());
-          ensureAmbientPlaying();
-        } else {
-          fadeOutSound();
-          if (ambientAudio) {
-            ambientAudio.pause();
-          }
-        }
-      }
-
-      function getActiveView() {
-        return viewRegistry.find((view) => view && view.classList.contains('active'));
       }
 
       function showAccountPage(pageId) {
@@ -5431,8 +6155,14 @@
           case 'shopPage':
             loadShopInventory();
             break;
+          case 'questsPage':
+            loadQuestBoard();
+            break;
           case 'leaderboardPage':
             loadLeaderboard();
+            break;
+          case 'communityPage':
+            setCommunityStatus('Enter a username to search pilots.');
             break;
           default:
             break;
@@ -5469,7 +6199,6 @@
         if (!view) return;
         hideAllViews();
         view.classList.add('active');
-        refreshAmbientVolume(view);
       }
 
       function enterCategory(category) {
@@ -5605,6 +6334,11 @@
         }
       }
 
+      window.openAccountHub = openAccountHub;
+      window.enterCategory = enterCategory;
+      window.enterGame = enterGame;
+      window.backToMainLobby = backToMainLobby;
+
       // ---------------- StackJack helpers ----------------
       function startStackJack() {
         if (stackRunning) return;
@@ -5626,6 +6360,7 @@
           setStackStatus('Unable to reserve that wager.');
           return;
         }
+        recordQuestEvent('wager');
         stackBet = bet;
         stackRunning = true;
         stackCollapsed = false;
@@ -5690,11 +6425,10 @@
 
         if (opponentResult.bust || stackTotal > opponentResult.total) {
           addCashWinnings(payout);
-          setStackStatus(
-            opponentResult.bust
-              ? `AI tower overbalanced. You secured $${payout.toFixed(2)}.`
-              : `You beat the AI's ${opponentResult.total}. Won $${payout.toFixed(2)}.`,
-          );
+          const stackMessage = opponentResult.bust
+            ? `AI tower overbalanced. You secured ${formatCredits(payout)}.`
+            : `You beat the AI's ${opponentResult.total}. Won ${formatCredits(payout)}.`;
+          setStackStatus(stackMessage);
         } else if (stackTotal === opponentResult.total) {
           addCashWinnings(stackBet);
           setStackStatus(`Push with the AI at ${stackTotal}. Bet returned.`);
@@ -5751,7 +6485,7 @@
         const potential = stackCards.length === 0 || stackTotal > 21
           ? 0
           : stackBet * (stackTotal / 21) * 2 * (stackBalanceUsed ? 0.5 : 1);
-        stackPotentialEl.textContent = `$${potential.toFixed(2)}`;
+        stackPotentialEl.textContent = formatCredits(potential);
       }
 
       function drawStackCard() {
@@ -6040,6 +6774,7 @@
           setBinaryStatus('Unable to reserve that wager.');
           return;
         }
+        recordQuestEvent('wager');
 
         binaryRunning = true;
         binaryFlipsLeft = 1;
@@ -6209,7 +6944,7 @@
             winnings = binaryBet * multiplierWin;
             addCashWinnings(winnings);
             setBinaryStatus(
-              `Distance ${distance}. Payout ${multiplierWin.toFixed(2)}x = $${winnings.toFixed(2)}.`
+              `Distance ${distance}. Payout ${multiplierWin.toFixed(2)}x = ${formatCredits(winnings)}.`
             );
           }
         } else {
@@ -6281,6 +7016,7 @@
           setEchoStatus('Unable to reserve that wager.');
           return;
         }
+        recordQuestEvent('wager');
 
         echoBet = wager;
         echoRunning = true;
@@ -6456,10 +7192,10 @@
         }
         addCashWinnings(payout);
         setEchoStatus(
-          `Stabilized at ${echoTotal}. Resonance bonus ${resonanceBonus.toFixed(2)}× paid $${payout.toFixed(2)}.`,
+          `Stabilized at ${echoTotal}. Resonance bonus ${resonanceBonus.toFixed(2)}× paid ${formatCredits(payout)}.`,
         );
         if (echoResultEl) {
-          echoResultEl.textContent = `Payout $${payout.toFixed(2)} · Final ${echoTotal}/21 · Resonance ${echoResonance.toFixed(
+          echoResultEl.textContent = `Payout ${formatCredits(payout)} · Final ${echoTotal}/21 · Resonance ${echoResonance.toFixed(
             1,
           )}`;
         }
@@ -6678,6 +7414,7 @@
           setFuseStatus('Unable to reserve that wager.');
           return;
         }
+        recordQuestEvent('wager');
 
         fuseRunning = true;
         fuseExploded = false;
@@ -6849,7 +7586,7 @@
           if (fuseResultEl) {
             fuseResultEl.textContent =
               payout > 0
-                ? `Payout $${payout.toFixed(2)} from score ${finalScore.toFixed(1)}.`
+                ? `Payout ${formatCredits(payout)} from score ${finalScore.toFixed(1)}.`
                 : `No payout · score ${finalScore.toFixed(1)} after instability.`;
           }
         }
@@ -7101,6 +7838,7 @@
           setPerceptionStatus('Unable to reserve that wager.');
           return;
         }
+        recordQuestEvent('wager');
 
         perceptionRunning = true;
         perceptionLocked = false;
@@ -7181,7 +7919,7 @@
           perceptionScoreEl.textContent = 'Score: --';
         }
         if (perceptionResultEl) {
-          perceptionResultEl.textContent = `Walked away · Recovered $${refund.toFixed(2)}`;
+          perceptionResultEl.textContent = `Walked away · Recovered ${formatCredits(refund)}`;
         }
         setPerceptionStatus('You chose not to trust the grid. Smaller recovery issued.');
         if (perceptionStage) {
@@ -7246,9 +7984,9 @@
         if (allowPayout) {
           payout = perceptionBet * multiplier;
           addCashWinnings(payout);
-          setPerceptionStatus(`Score ${score}. Instinct rewarded with ${multiplier}× ($${payout.toFixed(2)}).`);
+          setPerceptionStatus(`Score ${score}. Instinct rewarded with ${multiplier}× (${formatCredits(payout)}).`);
           if (perceptionResultEl) {
-            perceptionResultEl.textContent = `Payout $${payout.toFixed(2)} (${multiplier}×).`;
+            perceptionResultEl.textContent = `Payout ${formatCredits(payout)} (${multiplier}×).`;
           }
         } else if (!payoutBlocked) {
           setPerceptionStatus(`Score ${score}. Illusions consumed the wager.`);
@@ -7456,6 +8194,7 @@
           setStatus('Unable to reserve that wager.');
           return;
         }
+        recordQuestEvent('wager');
 
         multiplier = 1;
         ticks = 0;
@@ -7495,9 +8234,9 @@
         multiplierEl.textContent = `${rounded}x`;
         if (inFlight) {
           const potential = currentBet * multiplier;
-          potentialEl.textContent = `Potential: $${potential.toFixed(2)}`;
+          potentialEl.textContent = `Potential: ${formatCredits(potential)}`;
         } else {
-          potentialEl.textContent = 'Potential: $0.00';
+          potentialEl.textContent = 'Potential: 0.00 credits';
         }
       }
 
@@ -7547,10 +8286,10 @@
         const winnings = currentBet * multiplier;
         addCashWinnings(winnings);
 
-        setStatus(`You bailed at ${multiplier.toFixed(2)}x for $${winnings.toFixed(2)}.`);
+        setStatus(`You bailed at ${multiplier.toFixed(2)}x for ${formatCredits(winnings)}.`);
         resultEl.classList.remove('loss');
         resultEl.classList.add('win');
-        resultEl.textContent = `Won = $${winnings.toFixed(2)}`;
+        resultEl.textContent = `Won = ${formatCredits(winnings)}`;
         roundTag.textContent = 'Cashed Out';
         recordHistory(true, multiplier);
         endFlight();
@@ -7594,7 +8333,7 @@
         rocketSprite.style.left = `${settings.rocketArc.floorX}%`;
         rocketSprite.style.bottom = `${settings.rocketArc.floorY}%`;
         rocketSprite.style.transform = 'translate(-50%, 0) rotate(-6deg)';
-        potentialEl.textContent = 'Potential: $0.00';
+        potentialEl.textContent = 'Potential: 0.00 credits';
         roundTag.textContent = 'Idle';
         launchBtn.disabled = false;
         betInput.disabled = false;
@@ -7664,6 +8403,7 @@
           setPulseStatus('Unable to reserve that wager.');
           return;
         }
+        recordQuestEvent('wager');
 
         pulseMultiplier = 1;
         pulseTicks = 0;
@@ -7707,9 +8447,9 @@
         pulseMultiplierEl.textContent = `${rounded}x`;
         if (pulseRunning) {
           const potential = pulseBet * pulseMultiplier;
-          pulsePotentialEl.textContent = `Potential: $${potential.toFixed(2)}`;
+          pulsePotentialEl.textContent = `Potential: ${formatCredits(potential)}`;
         } else {
-          pulsePotentialEl.textContent = 'Potential: $0.00';
+          pulsePotentialEl.textContent = 'Potential: 0.00 credits';
         }
       }
 
@@ -7745,10 +8485,10 @@
         const winnings = pulseBet * pulseMultiplier;
         addCashWinnings(winnings);
 
-        setPulseStatus(`Cashed at ${pulseMultiplier.toFixed(2)}x for $${winnings.toFixed(2)}.`);
+        setPulseStatus(`Cashed at ${pulseMultiplier.toFixed(2)}x for ${formatCredits(winnings)}.`);
         pulseResultEl.classList.remove('loss');
         pulseResultEl.classList.add('win');
-        pulseResultEl.textContent = `Won = $${winnings.toFixed(2)}`;
+        pulseResultEl.textContent = `Won = ${formatCredits(winnings)}`;
         pulseRoundTag.textContent = 'Cashed Out';
         recordHistory(true, pulseMultiplier);
         endPulse();
@@ -7797,7 +8537,7 @@
         pulseResultEl.classList.remove('win', 'loss');
         pulseResultEl.textContent = 'Enter a bet to play.';
         pulseRoundTag.textContent = 'Idle';
-        pulsePotentialEl.textContent = 'Potential: $0.00';
+        pulsePotentialEl.textContent = 'Potential: 0.00 credits';
         updatePulseRiskMessaging();
         if (initial) {
           pulseStatusEl.textContent = 'Pulse core stable.';
@@ -7866,6 +8606,7 @@
           setMindStatus('Unable to reserve that wager.');
           return;
         }
+        recordQuestEvent('wager');
 
         mindMultiplier = 1;
         mindThreshold = applyTierVolatility(randRange(1, settings.maxMultiplier));
@@ -7926,9 +8667,9 @@
         mindMultiplierEl.textContent = `${mindMultiplier.toFixed(2)}x`;
         if (mindRunning) {
           const potential = mindBet * mindMultiplier;
-          mindPotentialEl.textContent = `Potential: $${potential.toFixed(2)}`;
+          mindPotentialEl.textContent = `Potential: ${formatCredits(potential)}`;
         } else {
-          mindPotentialEl.textContent = 'Potential: $0.00';
+          mindPotentialEl.textContent = 'Potential: 0.00 credits';
         }
       }
 
@@ -7978,10 +8719,10 @@
         const winnings = mindBet * mindMultiplier;
         addCashWinnings(winnings);
 
-        setMindStatus(`Disconnected at ${mindMultiplier.toFixed(2)}x for $${winnings.toFixed(2)}.`);
+        setMindStatus(`Disconnected at ${mindMultiplier.toFixed(2)}x for ${formatCredits(winnings)}.`);
         mindResultEl.classList.remove('loss');
         mindResultEl.classList.add('win');
-        mindResultEl.textContent = `Won = $${winnings.toFixed(2)}`;
+        mindResultEl.textContent = `Won = ${formatCredits(winnings)}`;
         mindRoundTag.textContent = 'Cashed Out';
         recordHistory(true, mindMultiplier);
         endMindBet();
@@ -8033,7 +8774,7 @@
         mindStage.classList.remove('live', 'exploded', 'near-flip', 'mood-thinking', 'mood-worried', 'mood-erratic');
         mindStage.classList.add('idle', 'mood-calm');
         mindMultiplierEl.textContent = '1.00x';
-        mindPotentialEl.textContent = 'Potential: $0.00';
+        mindPotentialEl.textContent = 'Potential: 0.00 credits';
         mindResultEl.classList.remove('win', 'loss');
         mindResultEl.textContent = 'Sync a wager to begin.';
         mindRoundTag.textContent = 'Idle';

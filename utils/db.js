@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 
 const host = process.env.PGHOST?.toString().trim() || 'localhost';
 const port = Number(process.env.PGPORT) || 5432;
-const database = process.env.PGDATABASE || 'neonarccasinousers';
+const database = process.env.PGDATABASE || 'neonarcgamesusers';
 const user = process.env.PGUSER || 'postgres';
 const password = process.env.PGPASSWORD || '';
 
@@ -34,7 +34,9 @@ async function ensureDatabase() {
       joined_at TIMESTAMPTZ NOT NULL,
       last_activity TIMESTAMPTZ NOT NULL,
       view_mode TEXT DEFAULT 'standard',
-      dashboard_note TEXT DEFAULT ''
+      dashboard_note TEXT DEFAULT '',
+      skill_points NUMERIC DEFAULT 0,
+      bonus_credits NUMERIC DEFAULT 0
     )`,
   );
 
@@ -42,6 +44,12 @@ async function ensureDatabase() {
     `ALTER TABLE users
       ADD COLUMN IF NOT EXISTS cash_balance NUMERIC DEFAULT 0,
       ADD COLUMN IF NOT EXISTS credit_balance NUMERIC DEFAULT 0`,
+  );
+
+  await pool.query(
+    `ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS skill_points NUMERIC DEFAULT 0,
+      ADD COLUMN IF NOT EXISTS bonus_credits NUMERIC DEFAULT 0`,
   );
 
   await pool.query(
@@ -55,6 +63,12 @@ async function ensureDatabase() {
     `UPDATE users
       SET balance = COALESCE(cash_balance, 0) + COALESCE(credit_balance, 0)
       WHERE balance IS NULL OR balance <> COALESCE(cash_balance, 0) + COALESCE(credit_balance, 0)`,
+  );
+  await pool.query(
+    `UPDATE users
+      SET skill_points = COALESCE(skill_points, 0),
+          bonus_credits = COALESCE(bonus_credits, 0)
+      WHERE skill_points IS NULL OR bonus_credits IS NULL`,
   );
 
   await pool.query(
@@ -88,6 +102,18 @@ async function ensureDatabase() {
       updated_at TIMESTAMPTZ DEFAULT NOW(),
       sent_count INT DEFAULT 0,
       is_active BOOLEAN DEFAULT true
+    )`,
+  );
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS friendships (
+      id SERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      friend_id TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      CONSTRAINT fk_friend_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      CONSTRAINT fk_friend_target FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE,
+      CONSTRAINT unique_friend_pair UNIQUE (user_id, friend_id)
     )`,
   );
 

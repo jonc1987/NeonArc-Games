@@ -1,167 +1,1171 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="NeonArc Games" />
-    <meta name="theme-color" content="#050814" />
-    <meta name="format-detection" content="telephone=no" />
-    <title>NeonArc Games</title>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins:wght@400;500;600&display=swap');
-      :root {
-        color-scheme: dark;
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeonArc Games - Welcome</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&amp;display=swap" rel="stylesheet">
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: #0a0015;
+      color: #00ffff;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .page-wrapper {
+      width: 100%;
+      min-height: 100%;
+      position: relative;
+    }
+
+    .animated-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #0a0015 0%, #1a0030 50%, #0a0015 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      z-index: 0;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #00ffff;
+      border-radius: 50%;
+      box-shadow: 0 0 15px #00ffff;
+      animation: float 20s infinite ease-in-out;
+      opacity: 0.7;
+    }
+
+    .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; animation-duration: 18s; }
+    .particle:nth-child(2) { left: 25%; top: 60%; animation-delay: 2s; animation-duration: 22s; }
+    .particle:nth-child(3) { left: 45%; top: 30%; animation-delay: 4s; animation-duration: 20s; }
+    .particle:nth-child(4) { left: 65%; top: 70%; animation-delay: 1s; animation-duration: 19s; }
+    .particle:nth-child(5) { left: 80%; top: 40%; animation-delay: 3s; animation-duration: 21s; }
+    .particle:nth-child(6) { left: 15%; top: 80%; animation-delay: 5s; animation-duration: 23s; }
+    .particle:nth-child(7) { left: 55%; top: 15%; animation-delay: 2.5s; animation-duration: 17s; }
+    .particle:nth-child(8) { left: 75%; top: 85%; animation-delay: 4.5s; animation-duration: 24s; }
+    .particle:nth-child(9) { left: 35%; top: 50%; animation-delay: 1.5s; animation-duration: 19s; }
+    .particle:nth-child(10) { left: 90%; top: 25%; animation-delay: 3.5s; animation-duration: 21s; }
+    .particle:nth-child(11) { left: 5%; top: 45%; animation-delay: 6s; animation-duration: 20s; }
+    .particle:nth-child(12) { left: 50%; top: 90%; animation-delay: 2s; animation-duration: 18s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+      25% { transform: translate(30px, -40px) scale(1.3); opacity: 0.9; }
+      50% { transform: translate(-20px, 30px) scale(0.9); opacity: 0.5; }
+      75% { transform: translate(35px, 20px) scale(1.2); opacity: 0.8; }
+    }
+
+    header {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 0, 21, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid #8000ff;
+      box-shadow: 0 5px 30px rgba(128, 0, 255, 0.3);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: 0.2rem;
+      color: #00ffff;
+      text-shadow: 0 0 20px #00ffff, 0 0 40px #8000ff;
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      color: #8000ff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.05rem;
+      text-transform: uppercase;
+      padding: 0.6rem 1.2rem;
+      border: 2px solid transparent;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #00ffff;
+      border-color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    }
+
+    .hero-section {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      min-height: 90%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .logo-title {
+      font-size: 4rem;
+      font-weight: 900;
+      letter-spacing: 0.3rem;
+      text-transform: uppercase;
+      color: #00ffff;
+      text-shadow: 
+        0 0 10px #00ffff,
+        0 0 20px #00ffff,
+        0 0 30px #00ffff,
+        0 0 50px #8000ff,
+        0 0 80px #8000ff;
+      margin-bottom: 1.5rem;
+      animation: flicker 3s ease-in-out 1;
+      position: relative;
+    }
+
+    .logo-title::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #00ffff, transparent);
+      box-shadow: 0 0 15px #00ffff;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      10% { opacity: 0.8; }
+      20% { opacity: 1; }
+      30% { opacity: 0.6; }
+      40% { opacity: 1; }
+      50% { opacity: 0.9; }
+      60% { opacity: 1; }
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      color: #8000ff;
+      text-shadow: 0 0 15px #8000ff;
+      margin-bottom: 3.5rem;
+      font-weight: 400;
+      letter-spacing: 0.1rem;
+      max-width: 700px;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 1.5rem 4.5rem;
+      font-size: 1.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.25rem;
+      color: #000000;
+      background: #00ffff;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 
+        0 0 25px #00ffff,
+        0 0 50px #00ffff,
+        inset 0 0 25px rgba(0, 255, 255, 0.3);
+      transition: all 0.3s ease;
+      animation: pulse 2s ease-in-out infinite;
+      margin-bottom: 3rem;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    @keyframes pulse {
+      0%, 100% { 
+        box-shadow: 
+          0 0 25px #00ffff,
+          0 0 50px #00ffff,
+          inset 0 0 25px rgba(0, 255, 255, 0.3);
       }
-      * {
-        box-sizing: border-box;
+      50% { 
+        box-shadow: 
+          0 0 35px #00ffff,
+          0 0 70px #00ffff,
+          0 0 100px #00ffff,
+          inset 0 0 35px rgba(0, 255, 255, 0.5);
       }
-      body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-        background: radial-gradient(circle at 12% 18%, rgba(110, 243, 255, 0.08), transparent 30%),
-          radial-gradient(circle at 80% 60%, rgba(255, 110, 230, 0.12), transparent 30%),
-          #030712;
-        color: #e8f6ff;
+    }
+
+    .cta-button:hover {
+      transform: scale(1.1);
+      box-shadow: 
+        0 0 50px #00ffff,
+        0 0 100px #00ffff,
+        0 0 150px #00ffff,
+        inset 0 0 40px rgba(0, 255, 255, 0.6);
+    }
+
+    .why-play-intro {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      padding: 5rem 2rem;
+      background: rgba(10, 0, 21, 0.8);
+      backdrop-filter: blur(10px);
+      text-align: center;
+    }
+
+    .section-title {
+      font-size: 3.5rem;
+      font-weight: 900;
+      text-align: center;
+      color: #00ffff;
+      text-shadow: 0 0 20px #00ffff, 0 0 40px #8000ff;
+      margin-bottom: 2rem;
+      letter-spacing: 0.15rem;
+      text-transform: uppercase;
+      animation: fadeInDown 1s ease;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
       }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .intro-text {
+      font-size: 1.2rem;
+      color: #8000ff;
+      text-shadow: 0 0 10px #8000ff;
+      max-width: 800px;
+      margin: 0 auto 3rem;
+      line-height: 1.8;
+    }
+
+    .scroll-indicator {
+      display: inline-block;
+      color: #00ffff;
+      font-size: 2rem;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-15px);
+      }
+      60% {
+        transform: translateY(-7px);
+      }
+    }
+
+    .feature-section {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 2rem;
+      scroll-snap-align: start;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .feature-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feature-section:nth-child(odd) {
+      background: linear-gradient(135deg, rgba(10, 0, 21, 0.9) 0%, rgba(26, 0, 48, 0.7) 100%);
+    }
+
+    .feature-section:nth-child(even) {
+      background: linear-gradient(135deg, rgba(26, 0, 48, 0.7) 0%, rgba(10, 0, 21, 0.9) 100%);
+    }
+
+    .feature-content {
+      max-width: 1200px;
+      display: flex;
+      align-items: center;
+      gap: 4rem;
+      width: 100%;
+    }
+
+    .feature-section:nth-child(even) .feature-content {
+      flex-direction: row-reverse;
+    }
+
+    .feature-visual {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .feature-icon-large {
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      border: 4px solid #00ffff;
+      box-shadow: 
+        0 0 40px rgba(0, 255, 255, 0.6),
+        inset 0 0 60px rgba(0, 255, 255, 0.2);
+      animation: float-icon 4s ease-in-out infinite;
+      transition: transform 0.3s ease;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-icon-large::before {
+      content: '';
+      position: absolute;
+      width: 60%;
+      height: 60%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
+      animation: pulse-circle 3s ease-in-out infinite;
+    }
+
+    .feature-icon-large::after {
+      content: '';
+      position: absolute;
+      width: 80%;
+      height: 80%;
+      border: 2px solid rgba(128, 0, 255, 0.4);
+      border-radius: 50%;
+      animation: rotate-ring 8s linear infinite;
+    }
+
+    @keyframes pulse-circle {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+
+    @keyframes rotate-ring {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .feature-section:hover .feature-icon-large {
+      transform: scale(1.1);
+      box-shadow: 
+        0 0 60px rgba(0, 255, 255, 0.8),
+        inset 0 0 80px rgba(0, 255, 255, 0.3);
+    }
+
+    @keyframes float-icon {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    .feature-text {
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .feature-number {
+      font-size: 1rem;
+      color: #8000ff;
+      text-transform: uppercase;
+      letter-spacing: 0.2rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .feature-title {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #00ffff;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+      letter-spacing: 0.1rem;
+      line-height: 1.2;
+    }
+
+    .feature-description {
+      font-size: 1.3rem;
+      color: #b8b8ff;
+      line-height: 1.8;
+      font-weight: 400;
+      text-shadow: 0 0 5px rgba(184, 184, 255, 0.3);
+    }
+
+    .feature-glow-box {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border: 3px solid #8000ff;
+      border-radius: 50%;
+      animation: rotate-glow 10s linear infinite;
+      box-shadow: 0 0 40px rgba(128, 0, 255, 0.5), inset 0 0 40px rgba(128, 0, 255, 0.2);
+    }
+
+    @keyframes rotate-glow {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .progress-indicator {
+      position: fixed;
+      top: 50%;
+      right: 2rem;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .progress-line {
+      width: 3px;
+      height: 100%;
+      background: rgba(128, 0, 255, 0.3);
+      position: relative;
+    }
+
+    .progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(180deg, #00ffff 0%, #8000ff 100%);
+      box-shadow: 0 0 20px #00ffff;
+      transition: height 0.5s ease;
+      height: 0%;
+    }
+
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(128, 0, 255, 0.5);
+      border: 2px solid #8000ff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 2;
+      margin: 0.8rem 0;
+    }
+
+    .progress-dot.active {
+      background: #00ffff;
+      border-color: #00ffff;
+      box-shadow: 0 0 20px #00ffff;
+      transform: scale(1.8);
+    }
+
+    .progress-dot:hover {
+      background: #00ffff;
+      border-color: #00ffff;
+      box-shadow: 0 0 15px #00ffff;
+      transform: scale(1.4);
+    }
+
+    .cta-section {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #00ffff;
+      text-shadow: 0 0 20px #00ffff;
+      margin-bottom: 2rem;
+      letter-spacing: 0.1rem;
+    }
+
+    .cta-section p {
+      font-size: 1.2rem;
+      color: #8000ff;
+      text-shadow: 0 0 10px #8000ff;
+      margin-bottom: 3rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    footer {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.95rem;
+      color: #8000ff;
+      text-shadow: 0 0 5px #8000ff;
+      letter-spacing: 0.05rem;
+      background: rgba(10, 0, 21, 0.8);
+      border-top: 2px solid #8000ff;
+      box-shadow: 0 -5px 30px rgba(128, 0, 255, 0.3);
+    }
+
+    @media (max-width: 768px) {
       header {
-        padding: 28px clamp(18px, 4vw, 48px);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-      }
-      .brand {
-        display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
       }
-      .brand h1 {
-        margin: 0;
-        font-family: 'Orbitron', sans-serif;
-        letter-spacing: 0.18em;
-      }
-      .brand p {
-        margin: 0;
-        color: #9eb4d6;
-      }
+
       nav {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: center;
       }
-      .pill {
-        border: 1px solid rgba(110, 243, 255, 0.35);
-        background: linear-gradient(120deg, rgba(110, 243, 255, 0.12), rgba(255, 110, 230, 0.08));
-        color: #e8f6ff;
-        padding: 10px 16px;
-        border-radius: 999px;
-        text-decoration: none;
-        letter-spacing: 0.08em;
-        font-weight: 600;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+      .logo-title {
+        font-size: 2.2rem;
+        letter-spacing: 0.15rem;
       }
-      .pill:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-        border-color: rgba(110, 243, 255, 0.65);
+
+      .subtitle {
+        font-size: 1rem;
+        margin-bottom: 2.5rem;
       }
-      main {
-        padding: 10px clamp(18px, 4vw, 48px) 48px;
-        display: grid;
-        gap: 24px;
+
+      .cta-button {
+        padding: 1.2rem 3rem;
+        font-size: 1.4rem;
       }
-      .hero {
-        display: grid;
-        gap: 16px;
-        padding: clamp(18px, 3vw, 28px);
-        border-radius: 24px;
-        border: 1px solid rgba(110, 243, 255, 0.2);
-        background: linear-gradient(135deg, rgba(8, 18, 32, 0.9), rgba(6, 10, 24, 0.92));
-        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+
+      .section-title {
+        font-size: 2rem;
       }
-      .hero h2 {
-        margin: 0;
-        font-size: clamp(26px, 5vw, 34px);
-        letter-spacing: 0.12em;
+
+      .feature-content {
+        flex-direction: column !important;
+        gap: 2rem;
       }
-      .hero p {
-        margin: 0;
-        color: #c1d4f4;
+
+      .feature-icon-large {
+        width: 180px;
+        height: 180px;
       }
-      .cta-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+
+      .feature-title {
+        font-size: 2rem;
       }
-      .card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 18px;
+
+      .feature-description {
+        font-size: 1.1rem;
       }
-      .card {
-        padding: 16px;
-        border-radius: 18px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: rgba(255, 255, 255, 0.03);
-        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+
+      .feature-glow-box {
+        width: 200px;
+        height: 200px;
       }
-      .card h3 {
-        margin-top: 0;
+
+      .progress-indicator {
+        right: 1rem;
       }
-      .card p {
-        margin-bottom: 6px;
-        color: #c7d6f0;
+
+      .cta-section h2 {
+        font-size: 1.8rem;
       }
-      footer {
-        padding: 18px clamp(18px, 4vw, 48px) 32px;
-        color: #9eb4d6;
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 1.3rem;
       }
-    </style>
-  </head>
-  <body>
-    <header>
-      <div class="brand">
-        <h1>NeonArc Games</h1>
-        <p>Precision-built game loops, glowing challenges, and a shared credit ledger.</p>
+
+      .logo-title {
+        font-size: 1.6rem;
+        letter-spacing: 0.1rem;
+      }
+
+      .subtitle {
+        font-size: 0.9rem;
+      }
+
+      .cta-button {
+        padding: 1rem 2.5rem;
+        font-size: 1.2rem;
+      }
+
+      .section-title {
+        font-size: 1.6rem;
+      }
+
+      .feature-icon-large {
+        width: 140px;
+        height: 140px;
+      }
+
+      .feature-title {
+        font-size: 1.5rem;
+      }
+
+      .feature-description {
+        font-size: 1rem;
+      }
+
+      .feature-number {
+        font-size: 0.85rem;
+      }
+
+      .progress-indicator {
+        display: none;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="page-wrapper">
+   <div class="animated-background"></div>
+   <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+   </div>
+   <header>
+    <div class="logo">
+     NEONARC
+    </div>
+    <nav><a href="/app" class="nav-link" id="navExplore" target="_blank" rel="noopener noreferrer">Explore Games</a> <a href="/app" class="nav-link" id="navLeaderboard" target="_blank" rel="noopener noreferrer">Leaderboard</a> <a href="/login" class="nav-link" id="navLogin" target="_blank" rel="noopener noreferrer">Login</a>
+    </nav>
+   </header>
+   <section class="hero-section">
+    <h1 class="logo-title" id="mainTitle">WELCOME TO NEONARC GAMES</h1>
+    <p class="subtitle" id="subtitle">Your first 100 credits await. Power on. Play bright.</p><a href="/register" class="cta-button" id="ctaButton" target="_blank" rel="noopener noreferrer">JOIN TODAY</a>
+   </section>
+   <section class="why-play-intro">
+    <h2 class="section-title" id="whyPlayTitle">Why You Should Play on NeonArc Games</h2>
+    <p class="intro-text">Discover ten powerful reasons why NeonArc Games is the ultimate futuristic gaming destination</p>
+    <div class="scroll-indicator">
+     ↓
+    </div>
+   </section>
+   <section class="feature-section" data-feature="1">
+    <div class="feature-content">
+     <div class="feature-visual">
+      <div class="feature-glow-box"></div>
+      <div class="feature-icon-large"></div>
+     </div>
+     <div class="feature-text">
+      <div class="feature-number">
+       Reason 01
       </div>
-      <nav>
-        <a class="pill" href="/login">Login</a>
-        <a class="pill" href="/register">Register</a>
-        <a class="pill" href="/app">Enter the Neon Lobby</a>
-      </nav>
-    </header>
-    <main>
-      <section class="hero">
-        <h2>Welcome to the NeonArc Games lobby.</h2>
-        <p>
-          Experience a constellation of original skill and card titles driven by glowing credits,
-          daily prizes, and community challenges. Spin the wheel, lock in a mission, and outfit a
-          custom avatar before you play.
-        </p>
-        <div class="cta-row">
-          <a class="pill" href="/app">Play the live games</a>
-          <a class="pill" href="/register">Create an account</a>
-        </div>
-      </section>
-      <section class="card-grid">
-        <article class="card">
-          <h3>Daily Prizes</h3>
-          <p>Spin the NeonArc wheel each day for credits, boosts, and surprise drops.</p>
-        </article>
-        <article class="card">
-          <h3>Challenges</h3>
-          <p>Quick missions track your wins, push you toward badges, and reward bonus credits.</p>
-        </article>
-        <article class="card">
-          <h3>Avatars & Gear</h3>
-          <p>Spend credits on animated avatars, table themes, and synth badges inside the shop.</p>
-        </article>
-      </section>
-    </main>
-    <footer>Need a custom setup? <a class="pill" href="mailto:neonarcgames@outlook.com">Contact support</a> and we will craft your NeonArc Games lobby.</footer>
-  </body>
+      <h3 class="feature-title" id="feature1Title">Skill Meets Light</h3>
+      <p class="feature-description" id="feature1Desc">Every game blends timing, reflex, and logic — it's not just luck; it's how fast your mind reacts when the lights pulse.</p>
+     </div>
+    </div>
+   </section>
+   <section class="feature-section" data-feature="2">
+    <div class="feature-content">
+     <div class="feature-visual">
+      <div class="feature-glow-box"></div>
+      <div class="feature-icon-large"></div>
+     </div>
+     <div class="feature-text">
+      <div class="feature-number">
+       Reason 02
+      </div>
+      <h3 class="feature-title" id="feature2Title">Earn Credits, Not Just Points</h3>
+      <p class="feature-description" id="feature2Desc">Every spin, tap, or play earns you real in-game credits that unlock new modes, bonuses, and ranks.</p>
+     </div>
+    </div>
+   </section>
+   <section class="feature-section" data-feature="3">
+    <div class="feature-content">
+     <div class="feature-visual">
+      <div class="feature-glow-box"></div>
+      <div class="feature-icon-large"></div>
+     </div>
+     <div class="feature-text">
+      <div class="feature-number">
+       Reason 03
+      </div>
+      <h3 class="feature-title" id="feature3Title">Exclusive Futuristic Titles</h3>
+      <p class="feature-description" id="feature3Desc">From Rocket Rush to StackJack and Pulse Cash, every title is original — built to glow, thrill, and challenge you.</p>
+     </div>
+    </div>
+   </section>
+   <section class="feature-section" data-feature="4">
+    <div class="feature-content">
+     <div class="feature-visual">
+      <div class="feature-glow-box"></div>
+      <div class="feature-icon-large"></div>
+     </div>
+     <div class="feature-text">
+      <div class="feature-number">
+       Reason 04
+      </div>
+      <h3 class="feature-title">Games That Think Back</h3>
+      <p class="feature-description">Challenge AI-powered systems like Mind Bet that simulate intuition — it's like gaming against a digital mind.</p>
+     </div>
+    </div>
+   </section>
+   <section class="feature-section" data-feature="5">
+    <div class="feature-content">
+     <div class="feature-visual">
+      <div class="feature-glow-box"></div>
+      <div class="feature-icon-large"></div>
+     </div>
+     <div class="feature-text">
+      <div class="feature-number">
+       Reason 05
+      </div>
+      <h3 class="feature-title">Your 100-Credit Welcome Boost</h3>
+      <p class="feature-description">Every new player starts with 100 credits — no deposit, no hassle, just jump straight into the neon.</p>
+     </div>
+    </div>
+   </section>
+   <section class="feature-section" data-feature="6">
+    <div class="feature-content">
+     <div class="feature-visual">
+      <div class="feature-glow-box"></div>
+      <div class="feature-icon-large"></div>
+     </div>
+     <div class="feature-text">
+      <div class="feature-number">
+       Reason 06
+      </div>
+      <h3 class="feature-title">Immersive Design</h3>
+      <p class="feature-description">You're not clicking buttons — you're stepping into a holographic casino universe alive with sound and motion.</p>
+     </div>
+    </div>
+   </section>
+   <section class="feature-section" data-feature="7">
+    <div class="feature-content">
+     <div class="feature-visual">
+      <div class="feature-glow-box"></div>
+      <div class="feature-icon-large"></div>
+     </div>
+     <div class="feature-text">
+      <div class="feature-number">
+       Reason 07
+      </div>
+      <h3 class="feature-title">Daily Wheel Rewards</h3>
+      <p class="feature-description">Spin every day for random bonuses, credit boosts, or free plays. The wheel never sleeps.</p>
+     </div>
+    </div>
+   </section>
+   <section class="feature-section" data-feature="8">
+    <div class="feature-content">
+     <div class="feature-visual">
+      <div class="feature-glow-box"></div>
+      <div class="feature-icon-large"></div>
+     </div>
+     <div class="feature-text">
+      <div class="feature-number">
+       Reason 08
+      </div>
+      <h3 class="feature-title">Fair Play Engine</h3>
+      <p class="feature-description">Every outcome is transparent, balanced, and generated by verifiable algorithms — pure skill, pure fairness.</p>
+     </div>
+    </div>
+   </section>
+   <section class="feature-section" data-feature="9">
+    <div class="feature-content">
+     <div class="feature-visual">
+      <div class="feature-glow-box"></div>
+      <div class="feature-icon-large"></div>
+     </div>
+     <div class="feature-text">
+      <div class="feature-number">
+       Reason 09
+      </div>
+      <h3 class="feature-title">Seamless Account Hub</h3>
+      <p class="feature-description">Track your credits, view bonuses, and claim your rewards through a glowing, unified dashboard.</p>
+     </div>
+    </div>
+   </section>
+   <section class="feature-section" data-feature="10">
+    <div class="feature-content">
+     <div class="feature-visual">
+      <div class="feature-glow-box"></div>
+      <div class="feature-icon-large"></div>
+     </div>
+     <div class="feature-text">
+      <div class="feature-number">
+       Reason 10
+      </div>
+      <h3 class="feature-title">Play With Sound &amp; Style</h3>
+      <p class="feature-description">Ambient audio, reactive visuals, and glowing transitions make every second feel cinematic.</p>
+     </div>
+    </div>
+   </section>
+   <div class="progress-indicator" id="progressIndicator">
+    <div class="progress-dot" data-section="0"></div>
+    <div class="progress-dot" data-section="1"></div>
+    <div class="progress-dot" data-section="2"></div>
+    <div class="progress-dot" data-section="3"></div>
+    <div class="progress-dot" data-section="4"></div>
+    <div class="progress-dot" data-section="5"></div>
+    <div class="progress-dot" data-section="6"></div>
+    <div class="progress-dot" data-section="7"></div>
+    <div class="progress-dot" data-section="8"></div>
+    <div class="progress-dot" data-section="9"></div>
+    <div class="progress-dot" data-section="10"></div>
+   </div>
+   <section class="cta-section">
+    <h2>Ready to Enter the Arena?</h2>
+    <p>Join thousands of players in the neon universe. Your 100 credits are waiting.</p><a href="/register" class="cta-button" target="_blank" rel="noopener noreferrer">START PLAYING NOW</a>
+   </section>
+   <footer id="footer">
+    © 2025 NeonArc Games — Powered by Light and Logic ⚡
+   </footer>
+  </div>
+  <script>
+    const defaultConfig = {
+      main_title: "WELCOME TO NEONARC GAMES",
+      subtitle: "Your first 100 credits await. Power on. Play bright.",
+      cta_button_text: "JOIN TODAY",
+      explore_link_text: "Explore Games",
+      leaderboard_link_text: "Leaderboard",
+      login_link_text: "Login",
+      why_play_title: "Why You Should Play on NeonArc Games",
+      feature_1_title: "Skill Meets Light",
+      feature_1_desc: "Every game blends timing, reflex, and logic — it's not just luck; it's how fast your mind reacts when the lights pulse.",
+      feature_2_title: "Earn Credits, Not Just Points",
+      feature_2_desc: "Every spin, tap, or play earns you real in-game credits that unlock new modes, bonuses, and ranks.",
+      feature_3_title: "Exclusive Futuristic Titles",
+      feature_3_desc: "From Rocket Rush to StackJack and Pulse Cash, every title is original — built to glow, thrill, and challenge you.",
+      footer_text: "© 2025 NeonArc Games — Powered by Light and Logic ⚡",
+      background_color: "#0a0015",
+      surface_color: "#8000ff",
+      text_color: "#b8b8ff",
+      primary_glow_color: "#00ffff",
+      accent_color: "#8000ff"
+    };
+
+    async function onConfigChange(config) {
+      const mainTitleEl = document.getElementById('mainTitle');
+      const subtitleEl = document.getElementById('subtitle');
+      const ctaButtons = document.querySelectorAll('.cta-button');
+      const navExploreEl = document.getElementById('navExplore');
+      const navLeaderboardEl = document.getElementById('navLeaderboard');
+      const navLoginEl = document.getElementById('navLogin');
+      const whyPlayTitleEl = document.getElementById('whyPlayTitle');
+      const feature1TitleEl = document.getElementById('feature1Title');
+      const feature1DescEl = document.getElementById('feature1Desc');
+      const feature2TitleEl = document.getElementById('feature2Title');
+      const feature2DescEl = document.getElementById('feature2Desc');
+      const feature3TitleEl = document.getElementById('feature3Title');
+      const feature3DescEl = document.getElementById('feature3Desc');
+      const footerEl = document.getElementById('footer');
+
+      mainTitleEl.textContent = config.main_title || defaultConfig.main_title;
+      subtitleEl.textContent = config.subtitle || defaultConfig.subtitle;
+      ctaButtons.forEach(btn => {
+        if (btn.id === 'ctaButton') {
+          btn.textContent = config.cta_button_text || defaultConfig.cta_button_text;
+        }
+      });
+      navExploreEl.textContent = config.explore_link_text || defaultConfig.explore_link_text;
+      navLeaderboardEl.textContent = config.leaderboard_link_text || defaultConfig.leaderboard_link_text;
+      navLoginEl.textContent = config.login_link_text || defaultConfig.login_link_text;
+      whyPlayTitleEl.textContent = config.why_play_title || defaultConfig.why_play_title;
+      feature1TitleEl.textContent = config.feature_1_title || defaultConfig.feature_1_title;
+      feature1DescEl.textContent = config.feature_1_desc || defaultConfig.feature_1_desc;
+      feature2TitleEl.textContent = config.feature_2_title || defaultConfig.feature_2_title;
+      feature2DescEl.textContent = config.feature_2_desc || defaultConfig.feature_2_desc;
+      feature3TitleEl.textContent = config.feature_3_title || defaultConfig.feature_3_title;
+      feature3DescEl.textContent = config.feature_3_desc || defaultConfig.feature_3_desc;
+      footerEl.innerHTML = config.footer_text || defaultConfig.footer_text;
+
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryGlow = config.primary_glow_color || defaultConfig.primary_glow_color;
+      const accentColor = config.accent_color || defaultConfig.accent_color;
+
+      document.body.style.background = backgroundColor;
+      document.querySelector('.animated-background').style.background = `linear-gradient(45deg, ${backgroundColor} 0%, #1a0030 50%, ${backgroundColor} 100%)`;
+
+      mainTitleEl.style.color = primaryGlow;
+      mainTitleEl.style.textShadow = `0 0 10px ${primaryGlow}, 0 0 20px ${primaryGlow}, 0 0 30px ${primaryGlow}, 0 0 50px ${accentColor}, 0 0 80px ${accentColor}`;
+
+      subtitleEl.style.color = accentColor;
+      subtitleEl.style.textShadow = `0 0 15px ${accentColor}`;
+
+      ctaButtons.forEach(btn => {
+        btn.style.backgroundColor = primaryGlow;
+      });
+
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.style.color = accentColor;
+      });
+
+      const sectionTitles = document.querySelectorAll('.section-title');
+      sectionTitles.forEach(title => {
+        title.style.color = primaryGlow;
+        title.style.textShadow = `0 0 20px ${primaryGlow}, 0 0 40px ${accentColor}`;
+      });
+
+      const featureTitles = document.querySelectorAll('.feature-title');
+      featureTitles.forEach(title => {
+        title.style.color = primaryGlow;
+        title.style.textShadow = `0 0 10px ${primaryGlow}`;
+      });
+
+      const featureDescriptions = document.querySelectorAll('.feature-description');
+      featureDescriptions.forEach(desc => {
+        desc.style.color = textColor;
+      });
+
+      const featureCards = document.querySelectorAll('.feature-card');
+      featureCards.forEach(card => {
+        card.style.borderColor = surfaceColor;
+        card.style.background = `rgba(128, 0, 255, 0.1)`;
+      });
+
+      footerEl.style.color = accentColor;
+      footerEl.style.textShadow = `0 0 5px ${accentColor}`;
+
+      const particles = document.querySelectorAll('.particle');
+      particles.forEach(particle => {
+        particle.style.background = primaryGlow;
+        particle.style.boxShadow = `0 0 15px ${primaryGlow}`;
+      });
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_glow_color || defaultConfig.primary_glow_color,
+            set: (value) => {
+              config.primary_glow_color = value;
+              window.elementSdk.setConfig({ primary_glow_color: value });
+            }
+          },
+          {
+            get: () => config.accent_color || defaultConfig.accent_color,
+            set: (value) => {
+              config.accent_color = value;
+              window.elementSdk.setConfig({ accent_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["main_title", config.main_title || defaultConfig.main_title],
+        ["subtitle", config.subtitle || defaultConfig.subtitle],
+        ["cta_button_text", config.cta_button_text || defaultConfig.cta_button_text],
+        ["explore_link_text", config.explore_link_text || defaultConfig.explore_link_text],
+        ["leaderboard_link_text", config.leaderboard_link_text || defaultConfig.leaderboard_link_text],
+        ["login_link_text", config.login_link_text || defaultConfig.login_link_text],
+        ["why_play_title", config.why_play_title || defaultConfig.why_play_title],
+        ["feature_1_title", config.feature_1_title || defaultConfig.feature_1_title],
+        ["feature_1_desc", config.feature_1_desc || defaultConfig.feature_1_desc],
+        ["feature_2_title", config.feature_2_title || defaultConfig.feature_2_title],
+        ["feature_2_desc", config.feature_2_desc || defaultConfig.feature_2_desc],
+        ["feature_3_title", config.feature_3_title || defaultConfig.feature_3_title],
+        ["feature_3_desc", config.feature_3_desc || defaultConfig.feature_3_desc],
+        ["footer_text", config.footer_text || defaultConfig.footer_text]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    // Scroll animations and progress indicator
+    const featureSections = document.querySelectorAll('.feature-section');
+    const progressDots = document.querySelectorAll('.progress-dot');
+    const allSections = [document.querySelector('.hero-section'), ...featureSections];
+
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.3
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          
+          // Update progress indicator
+          const featureNum = entry.target.dataset.feature;
+          if (featureNum) {
+            progressDots.forEach(dot => dot.classList.remove('active'));
+            const activeDot = document.querySelector(`.progress-dot[data-section="${featureNum}"]`);
+            if (activeDot) activeDot.classList.add('active');
+          } else if (entry.target.classList.contains('hero-section')) {
+            progressDots.forEach(dot => dot.classList.remove('active'));
+            progressDots[0].classList.add('active');
+          }
+        }
+      });
+    }, observerOptions);
+
+    // Observe all feature sections
+    featureSections.forEach(section => observer.observe(section));
+    observer.observe(document.querySelector('.hero-section'));
+
+    // Progress dot click navigation
+    progressDots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        const sectionIndex = parseInt(dot.dataset.section);
+        if (sectionIndex === 0) {
+          document.querySelector('.hero-section').scrollIntoView({ behavior: 'smooth' });
+        } else {
+          const targetSection = document.querySelector(`.feature-section[data-feature="${sectionIndex}"]`);
+          if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      });
+    });
+
+    // Smooth scroll for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Parallax effect for particles on scroll
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      const particles = document.querySelectorAll('.particle');
+      
+      particles.forEach((particle, index) => {
+        const speed = (index % 3 + 1) * 0.1;
+        const yPos = -(currentScroll * speed);
+        particle.style.transform = `translateY(${yPos}px)`;
+      });
+
+      lastScroll = currentScroll;
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9aa477250431c3eb',t:'MTc2NTExNTE0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

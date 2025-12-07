@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 
-const { createUser, findUser, updateUserWallet, markUserActivity } = require('../utils/userStorage');
+const { createUser, findUser, updateUserWallet, markUserActivity, getFriendCount } = require('../utils/userStorage');
 const { isEmailConfigured, sendWelcomeEmail } = require('../utils/emailCampaign');
 
 const router = express.Router();
@@ -53,7 +53,8 @@ router.post('/register', async (req, res) => {
       );
     }
 
-    return res.status(201).json({ user: publicUser(user) });
+    const friendCount = await getFriendCount(user.id);
+    return res.status(201).json({ user: { ...publicUser(user), friendCount } });
   } catch (error) {
     console.error('Failed to register user', error);
     return res.status(500).json({ error: 'Unable to register user.' });
@@ -80,7 +81,8 @@ router.post('/login', async (req, res) => {
 
   const refreshedUser = (await markUserActivity(user.username)) || user;
   req.session.user = { username: refreshedUser.username };
-  return res.json({ user: publicUser(refreshedUser) });
+  const friendCount = await getFriendCount(refreshedUser.id);
+  return res.json({ user: { ...publicUser(refreshedUser), friendCount } });
 });
 
 router.post('/logout', (req, res) => {
@@ -104,7 +106,8 @@ router.get('/account', async (req, res) => {
     return res.status(404).json({ error: 'Account not found.' });
   }
 
-  return res.json({ user: publicUser(user) });
+  const friendCount = await getFriendCount(user.id);
+  return res.json({ user: { ...publicUser(user), friendCount } });
 });
 
 router.post('/update-balance', async (req, res) => {
@@ -144,7 +147,8 @@ router.post('/update-balance', async (req, res) => {
     return res.status(500).json({ error: 'Unable to update balance.' });
   }
 
-  return res.json({ user: publicUser(updatedUser) });
+  const friendCount = await getFriendCount(updatedUser.id);
+  return res.json({ user: { ...publicUser(updatedUser), friendCount } });
 });
 
 module.exports = router;
