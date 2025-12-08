@@ -9,6 +9,27 @@
           "completedAt": "2025-12-07T13:32:22.677Z",
           "claimedAt": null,
           "updatedAt": "2025-12-07T13:32:22.677Z"
+        },
+        "gear-collector": {
+          "value": 1,
+          "claimed": false,
+          "completedAt": "2025-12-07T17:28:44.357Z",
+          "claimedAt": null,
+          "updatedAt": "2025-12-07T17:28:44.357Z"
+        },
+        "neon-trainee": {
+          "value": 3,
+          "claimed": false,
+          "completedAt": "2025-12-07T17:48:27.972Z",
+          "claimedAt": null,
+          "updatedAt": "2025-12-07T17:48:27.972Z"
+        },
+        "profit-surge": {
+          "value": 120,
+          "claimed": false,
+          "completedAt": "2025-12-07T17:49:50.944Z",
+          "claimedAt": null,
+          "updatedAt": "2025-12-07T17:49:50.944Z"
         }
       }
     },

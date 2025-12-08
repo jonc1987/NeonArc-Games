@@ -59,6 +59,20 @@ function mapCashout(row) {
   };
 }
 
+function mapFriendRequest(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    requesterId: row.requester_id,
+    recipientId: row.recipient_id,
+    requesterUsername: row.requester_username || null,
+    recipientUsername: row.recipient_username || null,
+    status: row.status || 'pending',
+    createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
+    updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : null,
+  };
+}
+
 async function getUsers() {
   const { rows } = await query('SELECT * FROM users ORDER BY username ASC');
   return rows.map(mapUser);
@@ -337,6 +351,138 @@ async function addFriendship(userAId, userBId) {
   return true;
 }
 
+async function getFriendList(userId) {
+  const normalized = userId?.toString().trim();
+  if (!normalized) return [];
+  const { rows } = await query(
+    `SELECT u.id, u.username, u.skill_points, u.bonus_credits, u.joined_at
+     FROM users u
+     JOIN friendships f ON (f.user_id = $1 AND f.friend_id = u.id) OR (f.friend_id = $1 AND f.user_id = u.id)
+     ORDER BY u.username ASC`,
+    [normalized],
+  );
+  return rows.map((row) => {
+    const skillPoints = normalizeAmount(row.skill_points ?? 0);
+    const bonusCredits = normalizeAmount(row.bonus_credits ?? 0);
+    return {
+      id: row.id,
+      username: row.username,
+      skillPoints,
+      bonusCredits,
+      level: calculateSkillLevel(skillPoints),
+      joinedAt: row.joined_at ? new Date(row.joined_at).toISOString() : null,
+    };
+  });
+}
+
+async function getOutgoingFriendRequests(userId) {
+  const normalized = userId?.toString().trim();
+  if (!normalized) return [];
+  const { rows } = await query(
+    `SELECT fr.*, requester.username AS requester_username, recipient.username AS recipient_username
+     FROM friend_requests fr
+     JOIN users requester ON requester.id = fr.requester_id
+     JOIN users recipient ON recipient.id = fr.recipient_id
+     WHERE fr.requester_id = $1 AND fr.status = 'pending'
+     ORDER BY fr.created_at DESC`,
+    [normalized],
+  );
+  return rows.map(mapFriendRequest);
+}
+
+async function getIncomingFriendRequests(userId) {
+  const normalized = userId?.toString().trim();
+  if (!normalized) return [];
+  const { rows } = await query(
+    `SELECT fr.*, requester.username AS requester_username, recipient.username AS recipient_username
+     FROM friend_requests fr
+     JOIN users requester ON requester.id = fr.requester_id
+     JOIN users recipient ON recipient.id = fr.recipient_id
+     WHERE fr.recipient_id = $1 AND fr.status = 'pending'
+     ORDER BY fr.created_at DESC`,
+    [normalized],
+  );
+  return rows.map(mapFriendRequest);
+}
+
+async function findPendingFriendRequestBetween(userAId, userBId) {
+  const normalizedA = userAId?.toString().trim();
+  const normalizedB = userBId?.toString().trim();
+  if (!normalizedA || !normalizedB) return null;
+  const { rows } = await query(
+    `SELECT fr.*, requester.username AS requester_username, recipient.username AS recipient_username
+     FROM friend_requests fr
+     JOIN users requester ON requester.id = fr.requester_id
+     JOIN users recipient ON recipient.id = fr.recipient_id
+     WHERE ((fr.requester_id = $1 AND fr.recipient_id = $2) OR (fr.requester_id = $2 AND fr.recipient_id = $1))
+       AND fr.status = 'pending'
+     LIMIT 1`,
+    [normalizedA, normalizedB],
+  );
+  return mapFriendRequest(rows[0]);
+}
+
+async function findFriendRequestById(requestId) {
+  if (!requestId) return null;
+  const { rows } = await query(
+    `SELECT fr.*, requester.username AS requester_username, recipient.username AS recipient_username
+     FROM friend_requests fr
+     JOIN users requester ON requester.id = fr.requester_id
+     JOIN users recipient ON recipient.id = fr.recipient_id
+     WHERE fr.id = $1
+     LIMIT 1`,
+    [requestId],
+  );
+  return mapFriendRequest(rows[0]);
+}
+
+async function createFriendRequest(requesterId, recipientId) {
+  const normalizedRequester = requesterId?.toString().trim();
+  const normalizedRecipient = recipientId?.toString().trim();
+  if (!normalizedRequester || !normalizedRecipient || normalizedRequester === normalizedRecipient) {
+    return null;
+  }
+  const now = new Date().toISOString();
+  const { rows } = await query(
+    `INSERT INTO friend_requests (requester_id, recipient_id, status, created_at, updated_at)
+     VALUES ($1, $2, 'pending', $3, $3)
+     RETURNING *`,
+    [normalizedRequester, normalizedRecipient, now],
+  );
+  return mapFriendRequest(rows[0]);
+}
+
+async function acceptFriendRequest(requestId, recipientId) {
+  const normalizedRecipient = recipientId?.toString().trim();
+  if (!requestId || !normalizedRecipient) return false;
+  const request = await findFriendRequestById(requestId);
+  if (!request || request.status !== 'pending' || request.recipientId !== normalizedRecipient) {
+    return false;
+  }
+  await addFriendship(request.requesterId, request.recipientId);
+  await query(
+    `UPDATE friend_requests SET status = $1, updated_at = $2 WHERE id = $3`,
+    ['accepted', new Date().toISOString(), requestId],
+  );
+  return true;
+}
+
+async function declineFriendRequest(requestId, userId) {
+  const normalizedUser = userId?.toString().trim();
+  if (!requestId || !normalizedUser) return false;
+  const request = await findFriendRequestById(requestId);
+  if (!request || request.status !== 'pending') {
+    return false;
+  }
+  const isParticipant = request.requesterId === normalizedUser || request.recipientId === normalizedUser;
+  if (!isParticipant) return false;
+  await query(
+    `UPDATE friend_requests SET status = $1, updated_at = $2 WHERE id = $3`,
+    ['declined', new Date().toISOString(), requestId],
+  );
+  return true;
+}
+
 async function searchUsersByName(input, limit = 12) {
   const queryTerm = input?.toString().trim();
   if (!queryTerm) return [];
@@ -383,5 +529,13 @@ module.exports = {
   getFriendCount,
   areFriends,
   addFriendship,
+  getFriendList,
+  getIncomingFriendRequests,
+  getOutgoingFriendRequests,
+  findPendingFriendRequestBetween,
+  findFriendRequestById,
+  createFriendRequest,
+  acceptFriendRequest,
+  declineFriendRequest,
   searchUsersByName,
 };

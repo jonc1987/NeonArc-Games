@@ -2,11 +2,26 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const cors = require('cors');
+const http = require('http');
+const { URL } = require('url');
+const WebSocket = require('ws');
 require('dotenv').config();
 const { ensureDatabase, query } = require('./utils/db');
 const { getUsers, getCashouts } = require('./utils/userStorage');
+const { addChatMessage } = require('./utils/chatStorage');
+const { getMultiplayerSession, touchMultiplayerSession } = require('./utils/multiplayerStorage');
 
 const app = express();
+
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET || 'neonarc-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+  },
+});
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -15,17 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'neonarc-session-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      sameSite: 'lax',
-    },
-  }),
-);
+app.use(sessionMiddleware);
 
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/vault', require('./routes/vault'));
@@ -37,6 +42,8 @@ app.use('/api', require('./routes/account'));
 app.use('/api', require('./routes/cashouts'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/campaigns', require('./routes/campaigns'));
+app.use('/api/chat', require('./routes/chat'));
+app.use('/api/multiplayer', require('./routes/multiplayer'));
 
 app.get('/', (req, res) => {
   res.render('home');
@@ -60,6 +67,183 @@ app.get('/confirm', (req, res) => {
 
 app.get('/stackjack', (req, res) => {
   res.render('stackjack');
+});
+
+const server = http.createServer(app);
+
+const chatWss = new WebSocket.Server({ noServer: true });
+const sessionWss = new WebSocket.Server({ noServer: true });
+
+const chatClients = new Set();
+const sessionClients = new Map();
+
+function broadcastChatMessage(message) {
+  if (!message) return;
+  const payload = JSON.stringify({ type: 'chat.message', message });
+  chatClients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(payload);
+    }
+  });
+}
+
+chatWss.on('connection', (ws, request) => {
+  const user = request.session?.user;
+  if (!user) {
+    ws.close();
+    return;
+  }
+  chatClients.add(ws);
+
+  ws.on('message', async (raw) => {
+    let payload;
+    try {
+      payload = JSON.parse(raw.toString());
+    } catch (error) {
+      console.error('Malformed chat payload', error);
+      return;
+    }
+    if (payload?.type !== 'chat.message') return;
+    const saved = await addChatMessage({ userId: user.id, username: user.username, message: payload.message });
+    if (saved) {
+      broadcastChatMessage(saved);
+    }
+  });
+
+  ws.on('close', () => {
+    chatClients.delete(ws);
+  });
+
+  ws.send(JSON.stringify({ type: 'chat.ready' }));
+function broadcastSessionParticipants(sessionId, room = {}) {
+  const message = JSON.stringify({
+    type: 'session.participants',
+    participants: {
+      host: room.host?.username || null,
+      guest: room.guest?.username || null,
+    },
+    game: room.game || null,
+    status: room.status || 'waiting',
+  });
+  [room.host, room.guest].forEach((entry) => {
+    if (entry?.ws?.readyState === WebSocket.OPEN) {
+      entry.ws.send(message);
+    }
+  });
+}
+
+function forwardSessionToPartner(sessionId, senderRole, payload) {
+  const room = sessionClients.get(sessionId);
+  if (!room) return;
+  const partnerRole = senderRole === 'host' ? 'guest' : 'host';
+  const partner = room[partnerRole];
+  if (partner?.ws?.readyState === WebSocket.OPEN) {
+    partner.ws.send(JSON.stringify(payload));
+  }
+}
+
+sessionWss.on('connection', async (ws, request) => {
+  const user = request.session?.user;
+  const hostHeader = request.headers.host || 'localhost';
+  let sessionId;
+  try {
+    const parsedUrl = new URL(request.url, `http://${hostHeader}`);
+    sessionId = parsedUrl.searchParams.get('session');
+  } catch (error) {
+    sessionId = null;
+  }
+  if (!user || !sessionId) {
+    ws.close();
+    return;
+  }
+  const session = await getMultiplayerSession(sessionId);
+  if (!session) {
+    ws.close();
+    return;
+  }
+  const role = user.id === session.host_id ? 'host' : user.id === session.guest_id ? 'guest' : null;
+  if (!role) {
+    ws.close();
+    return;
+  }
+  await touchMultiplayerSession(sessionId);
+  const room = sessionClients.get(sessionId) || {
+    host: null,
+    guest: null,
+    game: session.game,
+    status: session.status,
+  };
+  room.game = session.game;
+  room.status = session.status;
+  room[role] = { ws, userId: user.id, username: user.username };
+  sessionClients.set(sessionId, room);
+
+  ws.role = role;
+  ws.sessionId = sessionId;
+  ws.user = user;
+
+  ws.on('message', (raw) => {
+    let payload;
+    try {
+      payload = JSON.parse(raw.toString());
+    } catch (error) {
+      console.error('Session signaling error', error);
+      return;
+    }
+    if (!payload?.type) return;
+    payload.origin = user.username;
+    if (payload.type.startsWith('signal.') || payload.type === 'game.event') {
+      forwardSessionToPartner(sessionId, role, payload);
+    }
+  });
+
+  ws.on('close', () => {
+    const current = sessionClients.get(sessionId) || {
+      host: null,
+      guest: null,
+      game: session.game,
+      status: session.status,
+    };
+    if (current[role]?.ws === ws) {
+      current[role] = null;
+    }
+    if (!current.host && !current.guest) {
+      sessionClients.delete(sessionId);
+    } else {
+      sessionClients.set(sessionId, current);
+      broadcastSessionParticipants(sessionId, current);
+    }
+  });
+
+  broadcastSessionParticipants(sessionId, room);
+  ws.send(
+    JSON.stringify({
+      type: 'session.ready',
+      role,
+      sessionId,
+      game: session.game,
+    }),
+  );
+});
+
+server.on('upgrade', (request, socket, head) => {
+  sessionMiddleware(request, {}, () => {
+    const hostname = request.headers.host || 'localhost';
+    let pathname;
+    try {
+      pathname = new URL(request.url, `http://${hostname}`).pathname;
+    } catch (error) {
+      socket.destroy();
+      return;
+    }
+    if (pathname === '/ws/chat') {
+      chatWss.handleUpgrade(request, socket, head, (ws) => chatWss.emit('connection', ws, request));
+    } else if (pathname === '/ws/multiplayer') {
+      sessionWss.handleUpgrade(request, socket, head, (ws) => sessionWss.emit('connection', ws, request));
+    } else {
+      socket.destroy();
+    }
+  });
 });
 
 function sqlLiteral(value) {
@@ -259,7 +443,7 @@ ensureDatabase()
     const adminKey = process.env.ADMIN_KEY?.toString().trim() || '';
     const masked =
       adminKey.length > 4 ? `${adminKey.slice(0, 2)}***${adminKey.slice(-2)}` : adminKey || 'NOT SET';
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`NeonArc server running on http://localhost:${PORT}`);
       console.log(`Admin key loaded: ${masked}`);
       if (!adminKey) {

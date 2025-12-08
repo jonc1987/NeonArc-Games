@@ -917,6 +917,285 @@
         letter-spacing: 0.1em;
       }
 
+      .community-friend-requests {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(110, 243, 255, 0.2);
+        background: rgba(10, 16, 32, 0.8);
+      }
+
+      .friend-request-header,
+      .friendly-session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+      }
+
+      .friend-request-grid {
+        margin-top: 12px;
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .friend-request-column h4 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #6ef3ff;
+      }
+
+      .friend-request-list {
+        margin: 8px 0 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .friend-request-card {
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .friend-request-card strong {
+        font-size: 15px;
+        letter-spacing: 0.1em;
+      }
+
+      .friend-request-meta {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .friend-request-actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .friend-request-actions .button {
+        font-size: 11px;
+        padding: 6px 10px;
+        letter-spacing: 0.12em;
+      }
+
+      .friendly-session-panel {
+        margin-top: 16px;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(110, 243, 255, 0.2);
+        background: rgba(10, 16, 32, 0.85);
+      }
+
+      .stackjack-duel-panel {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(4, 7, 18, 0.9);
+      }
+
+      .stackjack-duel-controls {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+
+      .stackjack-duel-controls select {
+        flex: 1;
+        min-width: 180px;
+      }
+
+      .stackjack-duel-link {
+        margin-top: 12px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px dashed rgba(110, 243, 255, 0.3);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .stackjack-link-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+      }
+
+      .stackjack-link-row input {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .floating-chat-toggle {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        z-index: 500;
+        border-radius: 24px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #6ef3ff, #ff6ee6);
+        color: #050814;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+      }
+
+      .floating-chat-toggle span {
+        background: #050814;
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 12px;
+      }
+
+      .floating-chat-panel {
+        position: fixed;
+        bottom: 90px;
+        right: 28px;
+        width: min(320px, calc(100vw - 40px));
+        max-height: 420px;
+        border-radius: 18px;
+        background: rgba(4, 7, 18, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        box-shadow: 0 24px 40px rgba(0, 0, 0, 0.45);
+        z-index: 490;
+      }
+
+      .floating-chat-panel ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .floating-chat-entry {
+        padding: 8px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .floating-chat-entry strong {
+        font-size: 12px;
+        letter-spacing: 0.08em;
+      }
+
+      .floating-chat-entry time {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.4);
+        display: block;
+        margin-top: 2px;
+      }
+
+      .floating-chat-panel form {
+        display: flex;
+        gap: 6px;
+      }
+
+      .floating-chat-panel input {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.4);
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .floating-chat-panel .floating-chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+      }
+
+      .floating-chat-header span {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .floating-chat-close {
+        border: none;
+        background: none;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      .friendly-session-panel .friendly-session-banner {
+        margin: 6px 0;
+        font-size: 13px;
+      }
+
+      .friendly-controls {
+        display: grid;
+        gap: 8px;
+        margin: 12px 0;
+      }
+
+      .friendly-controls label {
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      .friendly-controls select {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(110, 243, 255, 0.3);
+        background: rgba(0, 0, 0, 0.3);
+        color: rgba(234, 249, 255, 0.92);
+      }
+
+      .friendly-link {
+        margin-top: 14px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .friendly-link-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+      }
+
+      .friendly-link-row input {
+        flex: 1;
+        min-width: 200px;
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.25);
+        color: rgba(255, 255, 255, 0.9);
+      }
+
       .lobby-view,
       .game-view {
         display: none;
@@ -3643,6 +3922,68 @@
           </form>
           <p class="api-note" id="communityStatus">Search to discover pilots.</p>
           <ul class="community-results" id="communityResults"></ul>
+          <div class="community-friend-requests" id="communityFriendRequests">
+            <div class="friend-request-header">
+              <h3>Friend Requests</h3>
+              <p class="api-note" id="friendRequestStatus">Pending requests load when you log in.</p>
+            </div>
+            <div class="friend-request-grid">
+              <div class="friend-request-column">
+                <h4>Incoming</h4>
+                <p class="api-note">Respond to pilots who want to crew up.</p>
+                <ul class="friend-request-list" id="incomingFriendRequests"></ul>
+              </div>
+              <div class="friend-request-column">
+                <h4>Outgoing</h4>
+                <p class="api-note">Requests you have sent.</p>
+                <ul class="friend-request-list" id="outgoingFriendRequests"></ul>
+              </div>
+            </div>
+          </div>
+          <div class="friendly-session-panel" id="friendlySessionPanel">
+            <div class="friendly-session-header">
+              <h3>Friendly Sessions</h3>
+              <p class="api-note friendly-session-banner" id="friendlySessionBanner">Invite friends to share a run against the computer.</p>
+            </div>
+            <div class="friendly-controls">
+              <label for="friendlySessionFriend">Friend</label>
+              <select id="friendlySessionFriend">
+                <option value="">Loading friends...</option>
+              </select>
+              <label for="friendlySessionGame">Game</label>
+              <select id="friendlySessionGame"></select>
+            </div>
+            <button class="button primary" type="button" id="friendlySessionLaunch">Prepare shared challenge</button>
+            <p class="api-note" id="friendlySessionStatus">Pick a crew member to start playing together.</p>
+            <div class="friendly-link" id="friendlySessionLinkContainer" hidden>
+              <label for="friendlySessionLink">Shareable session link</label>
+              <div class="friendly-link-row">
+                <input id="friendlySessionLink" type="text" readonly />
+                <button class="button ghost-button" type="button" id="friendlySessionLinkCopy">Copy</button>
+              </div>
+              <p class="api-note">Send this to a friend to sync your run.</p>
+            </div>
+          </div>
+          <div class="stackjack-duel-panel" id="stackjackDuelPanel">
+            <div class="stackjack-duel-header">
+              <h3>StackJack Duel</h3>
+              <p class="api-note" id="stackjackDuelStatus">Invite a friend to split the Deck.</p>
+            </div>
+            <div class="stackjack-duel-controls">
+              <label for="stackjackDuelFriend">Crewmate</label>
+              <select id="stackjackDuelFriend">
+                <option value="">Loading friends...</option>
+              </select>
+              <button class="button primary" type="button" id="stackjackDuelCreate">Invite to StackJack</button>
+            </div>
+            <div class="stackjack-duel-link" id="stackjackDuelLink" hidden>
+              <label for="stackjackDuelLinkInput">Session link</label>
+              <div class="stackjack-link-row">
+                <input id="stackjackDuelLinkInput" type="text" readonly />
+                <button class="button ghost-button" type="button" id="stackjackDuelLinkCopy">Copy</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -4202,6 +4543,22 @@
 </main>
 </div>
 
+    <button class="floating-chat-toggle" id="floatingChatToggle" type="button">
+      Crew Chat <span id="floatingChatUnreadCount" hidden>0</span>
+    </button>
+    <div class="floating-chat-panel" id="floatingChatPanel" hidden>
+      <div class="floating-chat-header">
+        <strong>NeonArc Crew Chat</strong>
+        <span id="floatingChatStatus">Connecting...</span>
+        <button class="floating-chat-close" id="floatingChatClose" type="button">×</button>
+      </div>
+      <ul id="floatingChatMessages"></ul>
+      <form id="floatingChatForm">
+        <input id="floatingChatInput" type="text" placeholder="Send a message to the crew" autocomplete="off" />
+        <button class="button primary" type="submit">Send</button>
+      </form>
+    </div>
+
     <script>
       // ---------------- Configurable parameters ----------------
       const settings = {
@@ -4226,6 +4583,56 @@
       let balanceSyncInFlight = false;
       const historyItems = [];
       let glowWheelSpinTimer = null;
+
+      const FRIENDLY_GAMES = [
+        { value: 'rocket', label: 'Rocket Line' },
+        { value: 'pulse', label: 'Pulse Cash' },
+        { value: 'mind', label: 'Mind Bet' },
+        { value: 'stack', label: 'StackJack' },
+        { value: 'binaryPoker', label: 'Binary Poker' },
+        { value: 'echoHand', label: 'Echo Hand' },
+        { value: 'fuse', label: 'Fuse' },
+        { value: 'perception', label: 'Perception' },
+      ];
+      const FRIENDLY_GAME_ALIASES = new Map([
+        ['stackjack', 'stack'],
+        ['stack-jack', 'stack'],
+        ['stack_jack', 'stack'],
+      ]);
+      const FRIENDLY_GAME_CANONICAL = new Map(
+        FRIENDLY_GAMES.map((entry) => [entry.value.toLowerCase(), entry.value]),
+      );
+
+      function resolveFriendlyGame(value) {
+        if (!value) return null;
+        const normalized = value?.toString().trim();
+        if (!normalized) return null;
+        const key = normalized.toLowerCase();
+        if (FRIENDLY_GAME_CANONICAL.has(key)) {
+          return FRIENDLY_GAME_CANONICAL.get(key);
+        }
+        if (FRIENDLY_GAME_ALIASES.has(key)) {
+          return FRIENDLY_GAME_ALIASES.get(key);
+        }
+        return null;
+      }
+
+      function scheduleFriendlyGameLaunch(game) {
+        if (!game || typeof enterGame !== 'function') return;
+        const runner = () => enterGame(game);
+        if (window.requestAnimationFrame) {
+          window.requestAnimationFrame(runner);
+        } else {
+          setTimeout(runner, 0);
+        }
+      }
+      const initialFriendlyParams = {
+        friend: null,
+        game: null,
+      };
+      const urlParams = new URLSearchParams(window.location.search);
+      initialFriendlyParams.friend = urlParams.get('friend')?.trim() || null;
+      initialFriendlyParams.game = resolveFriendlyGame(urlParams.get('game'));
 
       function normalizeCurrency(value, { clamp = true } = {}) {
         const numeric = Number(value);
@@ -4501,6 +4908,31 @@
       const communitySearchInput = document.getElementById('communitySearchInput');
       const communityStatusEl = document.getElementById('communityStatus');
       const communityResultsEl = document.getElementById('communityResults');
+      const incomingFriendRequestsEl = document.getElementById('incomingFriendRequests');
+      const outgoingFriendRequestsEl = document.getElementById('outgoingFriendRequests');
+      const friendRequestStatusEl = document.getElementById('friendRequestStatus');
+      const friendlySessionBannerEl = document.getElementById('friendlySessionBanner');
+      const friendlySessionFriendSelect = document.getElementById('friendlySessionFriend');
+      const friendlySessionGameSelect = document.getElementById('friendlySessionGame');
+      const friendlySessionLaunchBtn = document.getElementById('friendlySessionLaunch');
+      const friendlySessionStatusEl = document.getElementById('friendlySessionStatus');
+      const friendlySessionLinkContainer = document.getElementById('friendlySessionLinkContainer');
+      const friendlySessionLinkInput = document.getElementById('friendlySessionLink');
+      const friendlySessionLinkCopyBtn = document.getElementById('friendlySessionLinkCopy');
+      const stackjackDuelFriendSelect = document.getElementById('stackjackDuelFriend');
+      const stackjackDuelCreateBtn = document.getElementById('stackjackDuelCreate');
+      const stackjackDuelStatusEl = document.getElementById('stackjackDuelStatus');
+      const stackjackDuelLinkContainer = document.getElementById('stackjackDuelLink');
+      const stackjackDuelLinkInput = document.getElementById('stackjackDuelLinkInput');
+      const stackjackDuelLinkCopyBtn = document.getElementById('stackjackDuelLinkCopy');
+      const chatToggleBtn = document.getElementById('floatingChatToggle');
+      const chatPanel = document.getElementById('floatingChatPanel');
+      const chatMessagesEl = document.getElementById('floatingChatMessages');
+      const chatForm = document.getElementById('floatingChatForm');
+      const chatInput = document.getElementById('floatingChatInput');
+      const chatStatusEl = document.getElementById('floatingChatStatus');
+      const chatUnreadBadge = document.getElementById('floatingChatUnreadCount');
+      const chatCloseBtn = document.getElementById('floatingChatClose');
       const leaderboardStatusEl = document.getElementById('leaderboardStatus');
       const leaderboardBodyEl = document.querySelector('#leaderboardPage tbody');
       const cardPanels = {
@@ -5093,6 +5525,7 @@
           openAccountHubBtn.disabled = false;
           openAccountHubBtn.textContent = 'Account Hub';
         }
+        connectChatSocket();
       }
 
       function clearAccountData(message = 'Login or register to access the account hub.', isError = false) {
@@ -5108,6 +5541,7 @@
           openAccountHubBtn.textContent = 'Account Hub';
         }
         setAccountStatus(message, isError);
+        shutdownChatSocket();
       }
 
       async function initializeAccount() {
@@ -5575,6 +6009,14 @@
           } else if (profile.isFriend) {
             button.textContent = 'Friends';
             button.disabled = true;
+          } else if (profile.incomingRequestId) {
+            button.textContent = 'Accept Request';
+            button.addEventListener('click', () =>
+              respondToFriendRequest(profile.incomingRequestId, 'accept', profile.username),
+            );
+          } else if (profile.outgoingRequestId) {
+            button.textContent = 'Request Sent';
+            button.disabled = true;
           } else {
             button.textContent = 'Add Friend';
             button.addEventListener('click', () => sendFriendRequest(profile.username));
@@ -5618,29 +6060,558 @@
         }
       }
 
-      async function sendFriendRequest(username) {
-        if (!username) return;
-        setCommunityStatus(`Sending request to ${username}...`);
+      function formatRequestDate(timestamp) {
+        if (!timestamp) return 'just now';
+        const when = new Date(timestamp);
+        const now = new Date();
+        const diffMs = now - when;
+        const diffMinutes = Math.floor(diffMs / 60000);
+        if (diffMinutes < 1) return 'just now';
+        if (diffMinutes < 60) return `${diffMinutes}m ago`;
+        const diffHours = Math.floor(diffMinutes / 60);
+        if (diffHours < 24) return `${diffHours}h ago`;
+        const diffDays = Math.floor(diffHours / 24);
+        return `${diffDays}d ago`;
+      }
+
+      function setFriendRequestStatus(message, isError = false) {
+        if (!friendRequestStatusEl) return;
+        friendRequestStatusEl.textContent = message;
+        friendRequestStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(255, 255, 255, 0.65)';
+      }
+
+      async function refreshCommunityFriendRequests() {
+        if (!incomingFriendRequestsEl && !outgoingFriendRequestsEl) return;
         try {
-          const response = await fetch('/api/profile/friend', {
+          const response = await fetch('/api/profile/friend-requests');
+          if (response.status === 401) {
+            setFriendRequestStatus('Log in to see pending requests.', true);
+            if (incomingFriendRequestsEl) {
+              incomingFriendRequestsEl.innerHTML =
+                '<li class="friend-request-card">Log in to view incoming requests.</li>';
+            }
+            if (outgoingFriendRequestsEl) {
+              outgoingFriendRequestsEl.innerHTML =
+                '<li class="friend-request-card">Log in to view outgoing requests.</li>';
+            }
+            return;
+          }
+          if (!response.ok) {
+            setFriendRequestStatus('Unable to load friend requests.', true);
+            return;
+          }
+          const payload = await response.json();
+          renderFriendRequestList(
+            incomingFriendRequestsEl,
+            Array.isArray(payload?.incoming) ? payload.incoming : [],
+            'incoming',
+          );
+          renderFriendRequestList(
+            outgoingFriendRequestsEl,
+            Array.isArray(payload?.outgoing) ? payload.outgoing : [],
+            'outgoing',
+          );
+          setFriendRequestStatus('Friend requests synced.');
+        } catch (error) {
+          console.error('Failed to load friend requests', error);
+          setFriendRequestStatus('Could not refresh requests.', true);
+        }
+      }
+
+      function renderFriendRequestList(container, requests, type) {
+        if (!container) return;
+        container.innerHTML = '';
+        if (!requests.length) {
+          const empty = document.createElement('li');
+          empty.className = 'friend-request-card';
+          empty.textContent =
+            type === 'incoming' ? 'No incoming requests.' : 'No outgoing requests.';
+          container.appendChild(empty);
+          return;
+        }
+        requests.forEach((request) => {
+          const card = document.createElement('li');
+          card.className = 'friend-request-card';
+          const title = document.createElement('strong');
+          title.textContent =
+            type === 'incoming' ? request.requesterUsername : request.recipientUsername;
+          const meta = document.createElement('p');
+          meta.className = 'friend-request-meta';
+          meta.textContent = `Requested ${formatRequestDate(request.createdAt)}`;
+          card.appendChild(title);
+          card.appendChild(meta);
+          const actions = document.createElement('div');
+          actions.className = 'friend-request-actions';
+          if (type === 'incoming') {
+            const accept = document.createElement('button');
+            accept.type = 'button';
+            accept.className = 'button primary';
+            accept.textContent = 'Accept';
+            accept.addEventListener('click', () =>
+              respondToFriendRequest(request.id, 'accept', request.requesterUsername),
+            );
+            const decline = document.createElement('button');
+            decline.type = 'button';
+            decline.className = 'button ghost-button';
+            decline.textContent = 'Decline';
+            decline.addEventListener('click', () =>
+              respondToFriendRequest(request.id, 'decline', request.requesterUsername),
+            );
+            actions.appendChild(accept);
+            actions.appendChild(decline);
+          } else {
+            const cancel = document.createElement('button');
+            cancel.type = 'button';
+            cancel.className = 'button ghost-button';
+            cancel.textContent = 'Cancel';
+            cancel.addEventListener('click', () =>
+              respondToFriendRequest(request.id, 'decline', request.recipientUsername),
+            );
+            actions.appendChild(cancel);
+          }
+          card.appendChild(actions);
+          container.appendChild(card);
+        });
+      }
+
+      async function respondToFriendRequest(requestId, action, username) {
+        if (!requestId || !action) return;
+        const statusMessage =
+          action === 'accept'
+            ? `Accepting ${username}'s request...`
+            : `${username} will no longer see this request.`;
+        setCommunityStatus(statusMessage);
+        try {
+          const response = await fetch(`/api/profile/friend-requests/${requestId}/respond`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username }),
+            body: JSON.stringify({ action }),
           });
           const payload = await response.json().catch(() => ({}));
           if (!response.ok) {
             if (response.status === 401) {
-              setCommunityStatus('Please log in to send friend requests.', true);
+              setCommunityStatus('Please log in to manage requests.', true);
             } else {
-              setCommunityStatus(payload.error || 'Unable to send friend request.', true);
+              setCommunityStatus(payload.error || 'Unable to process that request.', true);
             }
             return;
           }
-
-          setCommunityStatus(`${username} added to your crew.`);
+          if (action === 'accept') {
+            setCommunityStatus(`${username} is now in your crew.`);
+          } else if (payload?.canceled) {
+            setCommunityStatus(`Canceled request to ${username}.`);
+          } else {
+            setCommunityStatus(`Declined ${username}'s request.`);
+          }
+          await refreshCommunityFriendRequests();
+          await refreshFriendlySessionFriends();
           if (communitySearchInput?.value?.trim()) {
             searchCommunity(communitySearchInput.value);
           }
+        } catch (error) {
+          console.error('Friend request response failed', error);
+          setCommunityStatus('Could not update that request.', true);
+        }
+      }
+
+      function populateStackjackFriendSelect(friends = []) {
+        if (!stackjackDuelFriendSelect) return;
+        stackjackDuelFriendSelect.innerHTML = '';
+        if (!friends.length) {
+          const empty = document.createElement('option');
+          empty.value = '';
+          empty.textContent = 'No friends yet';
+          stackjackDuelFriendSelect.appendChild(empty);
+          stackjackDuelFriendSelect.disabled = true;
+          return;
+        }
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Select a friend';
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        stackjackDuelFriendSelect.appendChild(placeholder);
+        friends.forEach((friend) => {
+          const option = document.createElement('option');
+          option.value = friend.username;
+          option.textContent = friend.username;
+          stackjackDuelFriendSelect.appendChild(option);
+        });
+        stackjackDuelFriendSelect.disabled = false;
+      }
+
+      function setStackjackDuelStatus(message, isError = false) {
+        if (!stackjackDuelStatusEl) return;
+        stackjackDuelStatusEl.textContent = message;
+        stackjackDuelStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(255, 255, 255, 0.75)';
+      }
+
+      function showStackjackDuelLink(link) {
+        if (!stackjackDuelLinkContainer || !stackjackDuelLinkInput) return;
+        stackjackDuelLinkInput.value = link || '';
+        stackjackDuelLinkContainer.hidden = !link;
+      }
+
+      async function createStackjackDuel() {
+        if (!stackjackDuelFriendSelect || !stackjackDuelFriendSelect.value) {
+          setStackjackDuelStatus('Choose a friend to invite.', true);
+          return;
+        }
+        const friend = stackjackDuelFriendSelect.value;
+        setStackjackDuelStatus(`Inviting ${friend} to StackJack...`);
+        try {
+          const response = await fetch('/api/multiplayer/stackjack/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: friend }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setStackjackDuelStatus(payload.error || 'Unable to create StackJack duel.', true);
+            return;
+          }
+          showStackjackDuelLink(payload.link);
+          setStackjackDuelStatus(`Session ready. Share the link with ${friend}.`);
+        } catch (error) {
+          console.error('StackJack duel failed', error);
+          setStackjackDuelStatus('Unable to reach the duel service.', true);
+        }
+      }
+
+      async function copyStackjackDuelLink() {
+        if (!stackjackDuelLinkInput?.value) return;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(stackjackDuelLinkInput.value);
+          } else {
+            stackjackDuelLinkInput.select();
+            document.execCommand('copy');
+          }
+          setStackjackDuelStatus('Link copied. Share it with your friend!');
+        } catch (error) {
+          console.error('Failed to copy stackjack link', error);
+          setStackjackDuelStatus('Unable to copy link.', true);
+        }
+      }
+
+      const chatWsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      let chatSocket = null;
+      let chatReconnectTimer = null;
+      let chatUnread = 0;
+
+      function setChatStatus(message, isError = false) {
+        if (!chatStatusEl) return;
+        chatStatusEl.textContent = message;
+        chatStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(255, 255, 255, 0.75)';
+      }
+
+      function updateChatUnreadBadge() {
+        if (!chatUnreadBadge) return;
+        if (chatUnread > 0) {
+          chatUnreadBadge.textContent = chatUnread.toString();
+          chatUnreadBadge.hidden = false;
+        } else {
+          chatUnreadBadge.hidden = true;
+        }
+      }
+
+      function appendChatMessage(message) {
+        if (!chatMessagesEl || !message) return;
+        const entry = document.createElement('li');
+        entry.className = 'floating-chat-entry';
+        const name = document.createElement('strong');
+        name.textContent = message.username || 'Pilot';
+        const text = document.createElement('span');
+        text.textContent = message.message || '';
+        const time = document.createElement('time');
+        time.textContent = formatRequestDate(message.createdAt);
+        entry.appendChild(name);
+        entry.appendChild(text);
+        entry.appendChild(time);
+        chatMessagesEl.appendChild(entry);
+        while (chatMessagesEl.children.length > 120) {
+          chatMessagesEl.removeChild(chatMessagesEl.firstChild);
+        }
+        chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+        if (chatPanel && chatPanel.hidden) {
+          chatUnread += 1;
+          updateChatUnreadBadge();
+        }
+      }
+
+      async function refreshChatHistory() {
+        if (!chatMessagesEl) return;
+        try {
+          const response = await fetch('/api/chat/history');
+          if (!response.ok) {
+            setChatStatus('Unable to load chat history.', true);
+            return;
+          }
+          const payload = await response.json();
+          chatMessagesEl.innerHTML = '';
+          const messages = Array.isArray(payload?.messages) ? payload.messages : [];
+          messages.forEach((msg) => appendChatMessage(msg));
+          chatUnread = 0;
+          updateChatUnreadBadge();
+          setChatStatus('Crew chat ready.');
+        } catch (error) {
+          console.error('Failed to load chat history', error);
+          setChatStatus('Could not refresh chat.', true);
+        }
+      }
+
+      function connectChatSocket() {
+        if (chatSocket) return;
+        const wsUrl = `${chatWsScheme}://${window.location.host}/ws/chat`;
+        chatSocket = new WebSocket(wsUrl);
+        chatSocket.addEventListener('open', () => {
+          setChatStatus('Crew chat connected.');
+          refreshChatHistory();
+        });
+        chatSocket.addEventListener('message', (event) => {
+          try {
+            const payload = JSON.parse(event.data);
+            if (payload?.type === 'chat.message') {
+              appendChatMessage(payload.message);
+            }
+          } catch (error) {
+            console.error('Chat socket parse error', error);
+          }
+        });
+        chatSocket.addEventListener('close', () => {
+          chatSocket = null;
+          setChatStatus('Chat disconnected. Reconnecting...');
+          if (chatReconnectTimer) clearTimeout(chatReconnectTimer);
+          chatReconnectTimer = setTimeout(connectChatSocket, 3000);
+        });
+        chatSocket.addEventListener('error', () => {
+          setChatStatus('Chat connection error.', true);
+        });
+      }
+
+      function shutdownChatSocket() {
+        if (chatReconnectTimer) {
+          clearTimeout(chatReconnectTimer);
+          chatReconnectTimer = null;
+        }
+        if (chatSocket) {
+          chatSocket.close();
+          chatSocket = null;
+        }
+      }
+
+      function toggleChatPanel(forceOpen) {
+        if (!chatPanel) return;
+        chatPanel.hidden = forceOpen === undefined ? !chatPanel.hidden : !forceOpen;
+        if (!chatPanel.hidden) {
+          chatUnread = 0;
+          updateChatUnreadBadge();
+          if (!chatSocket) {
+            connectChatSocket();
+          }
+        }
+      }
+
+      function handleChatFormSubmit(event) {
+        event.preventDefault();
+        if (!chatInput) return;
+        const text = chatInput.value?.trim();
+        if (!text) return;
+        if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
+          setChatStatus('Chat reconnecting...', true);
+          return;
+        }
+        chatSocket.send(JSON.stringify({ type: 'chat.message', message: text }));
+        chatInput.value = '';
+      }
+
+      chatToggleBtn?.addEventListener('click', () => toggleChatPanel());
+      chatCloseBtn?.addEventListener('click', () => toggleChatPanel(false));
+      chatForm?.addEventListener('submit', handleChatFormSubmit);
+      stackjackDuelCreateBtn?.addEventListener('click', createStackjackDuel);
+      stackjackDuelLinkCopyBtn?.addEventListener('click', copyStackjackDuelLink);
+
+      function setFriendlySessionStatus(message, isError = false) {
+        if (!friendlySessionStatusEl) return;
+        friendlySessionStatusEl.textContent = message;
+        friendlySessionStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(255, 255, 255, 0.72)';
+      }
+
+      function setFriendlySessionBanner(message) {
+        if (!friendlySessionBannerEl) return;
+        friendlySessionBannerEl.textContent = message || 'Invite friends to share a run against the computer.';
+      }
+
+      function setFriendlySessionLink(friend, game) {
+        if (!friendlySessionLinkContainer || !friendlySessionLinkInput) return;
+        const canonicalGame = resolveFriendlyGame(game);
+        if (!friend || !canonicalGame) {
+          friendlySessionLinkContainer.hidden = true;
+          return;
+        }
+        const params = new URLSearchParams({ friend, game: canonicalGame });
+        friendlySessionLinkInput.value = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        friendlySessionLinkContainer.hidden = false;
+      }
+
+      function populateFriendlyGames() {
+        if (!friendlySessionGameSelect) return;
+        friendlySessionGameSelect.innerHTML = '';
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        placeholder.textContent = 'Select a game';
+        friendlySessionGameSelect.appendChild(placeholder);
+        FRIENDLY_GAMES.forEach((entry) => {
+          const option = document.createElement('option');
+          option.value = entry.value;
+          option.textContent = entry.label;
+          friendlySessionGameSelect.appendChild(option);
+        });
+        if (initialFriendlyParams.game) {
+          friendlySessionGameSelect.value = initialFriendlyParams.game;
+        }
+      }
+
+      async function refreshFriendlySessionFriends() {
+        if (!friendlySessionFriendSelect) return;
+        friendlySessionFriendSelect.disabled = true;
+        friendlySessionFriendSelect.innerHTML = '<option value="">Loading friends...</option>';
+        try {
+          const response = await fetch('/api/profile/friends');
+          if (response.status === 401) {
+            friendlySessionFriendSelect.innerHTML = '<option value="">Login to view friends</option>';
+            setFriendlySessionStatus('Please log in to invite friends.', true);
+            return;
+          }
+          if (!response.ok) {
+            friendlySessionFriendSelect.innerHTML = '<option value="">Unable to load friends</option>';
+            setFriendlySessionStatus('Unable to load friends right now.', true);
+            return;
+          }
+          const payload = await response.json();
+          const friends = Array.isArray(payload?.friends) ? payload.friends : [];
+          friendlySessionFriendSelect.innerHTML = '';
+          populateStackjackFriendSelect(friends);
+          if (!friends.length) {
+            friendlySessionFriendSelect.innerHTML = '<option value="">No friends yet</option>';
+            setFriendlySessionStatus('Add a friend to start shared sessions.');
+            friendlySessionFriendSelect.disabled = true;
+            return;
+          }
+          const placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = 'Select a friend';
+          friendlySessionFriendSelect.appendChild(placeholder);
+          friends.forEach((friend) => {
+            const option = document.createElement('option');
+            option.value = friend.username;
+            option.textContent = friend.username;
+            friendlySessionFriendSelect.appendChild(option);
+          });
+          friendlySessionFriendSelect.disabled = false;
+          setFriendlySessionStatus('Friends are ready for shared sessions.');
+          if (initialFriendlyParams.friend) {
+            friendlySessionFriendSelect.value = initialFriendlyParams.friend;
+          }
+        } catch (error) {
+          console.error('Failed to load friend list', error);
+          friendlySessionFriendSelect.innerHTML = '<option value="">Unable to load friends</option>';
+          setFriendlySessionStatus('Could not load friend list.', true);
+        }
+      }
+
+      function handleFriendlySessionLaunch() {
+        if (!friendlySessionFriendSelect || !friendlySessionGameSelect) return;
+        const friend = friendlySessionFriendSelect.value?.trim();
+        const resolvedGame = resolveFriendlyGame(friendlySessionGameSelect.value);
+        if (!friend) {
+          setFriendlySessionStatus('Select a friend before sharing a session.', true);
+          return;
+        }
+        if (!resolvedGame) {
+          setFriendlySessionStatus('Choose a game for the friendly run.', true);
+          return;
+        }
+        const label =
+          FRIENDLY_GAMES.find((entry) => entry.value === resolvedGame)?.label || resolvedGame;
+        setFriendlySessionStatus(
+          `Ready to play ${label} with ${friend}. Share the link or jump into the run.`,
+        );
+        setFriendlySessionBanner(`Playing ${label} vs the computer with ${friend}.`);
+        setFriendlySessionLink(friend, resolvedGame);
+        scheduleFriendlyGameLaunch(resolvedGame);
+      }
+
+      async function copyFriendlySessionLink() {
+        if (!friendlySessionLinkInput?.value) return;
+        const text = friendlySessionLinkInput.value;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            friendlySessionLinkInput.select();
+            document.execCommand('copy');
+          }
+          setFriendlySessionStatus('Link copied. Share it with your friend!');
+        } catch (error) {
+          console.error('Failed to copy friendly link', error);
+          setFriendlySessionStatus('Unable to copy link automatically.', true);
+        }
+      }
+
+      function initializeFriendlySessionFromUrl() {
+        const friend = initialFriendlyParams.friend;
+        const normalizedGame = resolveFriendlyGame(initialFriendlyParams.game);
+        if (friend && normalizedGame) {
+          const label =
+            FRIENDLY_GAMES.find((entry) => entry.value === normalizedGame)?.label || normalizedGame;
+          setFriendlySessionBanner(`Playing ${label} vs the computer with ${friend}.`);
+          setFriendlySessionStatus(`Shared session ready for ${label}.`);
+          setFriendlySessionLink(friend, normalizedGame);
+          if (friendlySessionFriendSelect) {
+            friendlySessionFriendSelect.value = friend;
+          }
+          if (friendlySessionGameSelect) {
+            friendlySessionGameSelect.value = normalizedGame;
+          }
+          scheduleFriendlyGameLaunch(normalizedGame);
+        } else {
+          setFriendlySessionBanner('Invite friends to share a run against the computer.');
+          setFriendlySessionStatus('Pick a friend and game to share a challenge link.');
+        }
+      }
+
+      async function sendFriendRequest(username) {
+        if (!username) return;
+        setCommunityStatus(`Sending request to ${username}...`);
+        try {
+      const response = await fetch('/api/profile/friend-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        if (response.status === 401) {
+          setCommunityStatus('Please log in to send friend requests.', true);
+        } else {
+          setCommunityStatus(payload.error || 'Unable to send friend request.', true);
+        }
+        return;
+      }
+
+      if (payload?.accepted) {
+        setCommunityStatus(`${username} accepted your invite!`);
+      } else {
+        setCommunityStatus(`Friend request sent to ${username}.`);
+      }
+      await refreshCommunityFriendRequests();
+      await refreshFriendlySessionFriends();
+      if (communitySearchInput?.value?.trim()) {
+        searchCommunity(communitySearchInput.value);
+      }
         } catch (error) {
           console.error('Friend request failed', error);
           setCommunityStatus('Unable to send friend request.', true);
@@ -6161,8 +7132,10 @@
           case 'leaderboardPage':
             loadLeaderboard();
             break;
-          case 'communityPage':
+        case 'communityPage':
             setCommunityStatus('Enter a username to search pilots.');
+            refreshCommunityFriendRequests();
+            refreshFriendlySessionFriends();
             break;
           default:
             break;
@@ -6338,6 +7311,12 @@
       window.enterCategory = enterCategory;
       window.enterGame = enterGame;
       window.backToMainLobby = backToMainLobby;
+      populateFriendlyGames();
+      friendlySessionLaunchBtn?.addEventListener('click', handleFriendlySessionLaunch);
+      friendlySessionLinkCopyBtn?.addEventListener('click', copyFriendlySessionLink);
+      refreshFriendlySessionFriends()
+        .catch(() => {})
+        .finally(() => initializeFriendlySessionFromUrl());
 
       // ---------------- StackJack helpers ----------------
       function startStackJack() {

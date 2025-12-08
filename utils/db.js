@@ -117,6 +117,46 @@ async function ensureDatabase() {
     )`,
   );
 
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS friend_requests (
+      id SERIAL PRIMARY KEY,
+      requester_id TEXT NOT NULL,
+      recipient_id TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      CONSTRAINT fk_requester FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE,
+      CONSTRAINT fk_recipient FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE,
+      CONSTRAINT unique_request_pair UNIQUE (requester_id, recipient_id)
+    )`,
+  );
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS chat_messages (
+      id SERIAL PRIMARY KEY,
+      user_id TEXT,
+      username TEXT NOT NULL,
+      message TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      CONSTRAINT fk_chat_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    )`,
+  );
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS multiplayer_sessions (
+      id TEXT PRIMARY KEY,
+      game TEXT NOT NULL,
+      host_id TEXT NOT NULL,
+      guest_id TEXT NOT NULL,
+      status TEXT DEFAULT 'waiting',
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      last_activity TIMESTAMPTZ DEFAULT NOW(),
+      CONSTRAINT fk_multiplayer_host FOREIGN KEY (host_id) REFERENCES users(id) ON DELETE CASCADE,
+      CONSTRAINT fk_multiplayer_guest FOREIGN KEY (guest_id) REFERENCES users(id) ON DELETE CASCADE
+    )`,
+  );
+
   await pool.query(`UPDATE cashouts SET status = 'pending' WHERE status IS NULL`);
   await pool.query(`UPDATE cashouts SET paid_amount = COALESCE(paid_amount, 0)`);
 }

@@ -45,7 +45,7 @@ router.post('/register', async (req, res) => {
   try {
     const hash = await bcrypt.hash(password, 10);
     const user = await createUser(username, hash, email, 100);
-    req.session.user = { username: user.username };
+    req.session.user = { id: user.id, username: user.username };
 
     if (isEmailConfigured()) {
       sendWelcomeEmail(user.email).catch((error) =>
@@ -80,7 +80,7 @@ router.post('/login', async (req, res) => {
   }
 
   const refreshedUser = (await markUserActivity(user.username)) || user;
-  req.session.user = { username: refreshedUser.username };
+  req.session.user = { id: refreshedUser.id, username: refreshedUser.username };
   const friendCount = await getFriendCount(refreshedUser.id);
   return res.json({ user: { ...publicUser(refreshedUser), friendCount } });
 });
