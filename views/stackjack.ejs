@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#040712" />
     <title>StackJack · NeonArc</title>
+    <link rel="stylesheet" href="/css/stackjack-session.css">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap');
 
@@ -503,24 +504,7 @@
         <p id="stackFriendlyMessage">Share this session with a friend and face the computer together.</p>
       </div>
 
-      <div class="stackjack-session-panel" id="stackjackSessionPanel" hidden>
-        <div class="stackjack-session-header">
-          <h3>StackJack Multiplayer</h3>
-          <p id="stackjackSessionStatus">Link up with a friend to face the shoe together.</p>
-        </div>
-        <div class="stackjack-participants">
-          <span>Host: <strong id="stackjackHostName">You</strong></span>
-          <span>Guest: <strong id="stackjackGuestName">Waiting</strong></span>
-        </div>
-        <div id="stackjackEventFeed" class="stackjack-event-feed"></div>
-        <div class="stackjack-video-grid">
-          <video id="stackjackLocalVideo" autoplay muted playsinline></video>
-          <video id="stackjackRemoteVideo" autoplay playsinline></video>
-        </div>
-        <div class="stackjack-session-actions">
-          <button class="button ghost-button" type="button" id="stackjackCallBtn">Start video call</button>
-        </div>
-      </div>
+      <%- include('partials/stackjack-session-panel') %>
 
       <article id="table" class="table-shell">
         <div class="table-top">
@@ -598,6 +582,7 @@
       </section>
     </main>
 
+    <script src="/js/stackjack-session.js"></script>
     <script>
       const suits = [
         { key: 'hearts', symbol: '♥', red: true },
@@ -650,19 +635,6 @@
       const quickMin = document.getElementById('quickMin');
       const quickMax = document.getElementById('quickMax');
       const resetBank = document.getElementById('resetBank');
-      const stackjackSessionPanel = document.getElementById('stackjackSessionPanel');
-      const stackjackSessionStatus = document.getElementById('stackjackSessionStatus');
-      const stackjackHostName = document.getElementById('stackjackHostName');
-      const stackjackGuestName = document.getElementById('stackjackGuestName');
-      const stackjackEventFeed = document.getElementById('stackjackEventFeed');
-      const stackjackCallBtn = document.getElementById('stackjackCallBtn');
-      const stackjackLocalVideo = document.getElementById('stackjackLocalVideo');
-      const stackjackRemoteVideo = document.getElementById('stackjackRemoteVideo');
-      let stackjackSessionId = null;
-      let stackjackRole = null;
-      let stackjackSignalSocket = null;
-      let stackjackPeerConnection = null;
-      let stackjackLocalStream = null;
 
       const saveState = () => {
         localStorage.setItem('stackjack.bankroll', bankroll);
@@ -877,16 +849,14 @@
         saveState();
         setLog(message);
         updateUI();
-        if (stackjackSessionId) {
-          sendStackjackEvent({
-            event: 'round.result',
-            result: reason,
-            playerTotal,
-            dealerTotal,
-            payout,
-            message,
-          });
-        }
+        window.stackjackSession?.sendEvent({
+          event: 'round.result',
+          result: reason,
+          playerTotal,
+          dealerTotal,
+          payout,
+          message,
+        });
       };
 
       betRangeEl.addEventListener('input', (e) => {
@@ -922,188 +892,10 @@
       standBtn.addEventListener('click', () => stand(false));
       stackBtn.addEventListener('click', stackMove);
 
-      function setStackjackSessionStatus(message, isError = false) {
-        if (!stackjackSessionStatus) return;
-        stackjackSessionStatus.textContent = message;
-        stackjackSessionStatus.style.color = isError ? '#ff6ee6' : 'rgba(255, 255, 255, 0.85)';
-      }
-
-      function updateStackjackParticipants(participants = {}) {
-        if (!stackjackSessionPanel) return;
-        stackjackSessionPanel.hidden = false;
-        if (stackjackHostName) {
-          stackjackHostName.textContent = participants.host || 'Host';
-        }
-        if (stackjackGuestName) {
-          stackjackGuestName.textContent = participants.guest || 'Guest';
-        }
-      }
-
-      function renderStackjackEvent(payload) {
-        if (!stackjackEventFeed || !payload) return;
-        const entry = document.createElement('div');
-        entry.className = 'stackjack-event';
-        const header = document.createElement('div');
-        header.textContent = `${payload.origin || 'Friend'} · ${payload.message || payload.event || 'Round update'}`;
-        const timestamp = document.createElement('time');
-        timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        timestamp.style.fontSize = '11px';
-        timestamp.style.color = 'rgba(255, 255, 255, 0.4)';
-        entry.appendChild(header);
-        entry.appendChild(timestamp);
-        stackjackEventFeed.prepend(entry);
-        while (stackjackEventFeed.children.length > 8) {
-          stackjackEventFeed.removeChild(stackjackEventFeed.lastChild);
-        }
-      }
-
-      function sendStackjackEvent(data = {}) {
-        if (!stackjackSignalSocket || stackjackSignalSocket.readyState !== WebSocket.OPEN) return;
-        stackjackSignalSocket.send(JSON.stringify({ type: 'game.event', ...data }));
-      }
-
-      function createStackjackPeerConnection() {
-        const pc = new RTCPeerConnection();
-        pc.addEventListener('icecandidate', (event) => {
-          if (event.candidate) {
-            stackjackSignalSocket?.send(
-              JSON.stringify({ type: 'signal.candidate', candidate: event.candidate }),
-            );
-          }
-        });
-        pc.addEventListener('track', (event) => {
-          if (stackjackRemoteVideo) {
-            stackjackRemoteVideo.srcObject = event.streams[0];
-          }
-        });
-        return pc;
-      }
-
-      async function handleStackjackSignal(payload) {
-        if (!payload || !payload.type) return;
-        if (!stackjackPeerConnection) {
-          stackjackPeerConnection = createStackjackPeerConnection();
-        }
-        if (payload.type === 'signal.offer') {
-          await stackjackPeerConnection.setRemoteDescription(
-            new RTCSessionDescription(payload.offer),
-          );
-          const answer = await stackjackPeerConnection.createAnswer();
-          await stackjackPeerConnection.setLocalDescription(answer);
-          stackjackSignalSocket?.send(JSON.stringify({ type: 'signal.answer', answer }));
-        } else if (payload.type === 'signal.answer') {
-          await stackjackPeerConnection.setRemoteDescription(
-            new RTCSessionDescription(payload.answer),
-          );
-        } else if (payload.type === 'signal.candidate' && payload.candidate) {
-          await stackjackPeerConnection.addIceCandidate(
-            new RTCIceCandidate(payload.candidate),
-          );
-        }
-      }
-
-      function connectStackjackSocket(sessionId) {
-        if (!sessionId) return;
-        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        stackjackSignalSocket = new WebSocket(
-          `${protocol}://${window.location.host}/ws/stackjack?session=${encodeURIComponent(sessionId)}`,
-        );
-        stackjackSignalSocket.addEventListener('message', (event) => {
-          try {
-            const payload = JSON.parse(event.data);
-            if (payload?.type === 'session.participants') {
-              updateStackjackParticipants(payload.participants);
-            }
-            if (payload?.type === 'session.ready') {
-              stackjackRole = payload.role;
-              setStackjackSessionStatus('Connected to shared StackJack session.');
-            }
-            if (payload?.type === 'game.event') {
-              renderStackjackEvent(payload);
-            }
-            if (payload?.type?.startsWith('signal.')) {
-              handleStackjackSignal(payload);
-            }
-          } catch (error) {
-            console.error('StackJack signaling parse error', error);
-          }
-        });
-        stackjackSignalSocket.addEventListener('close', () => {
-          setStackjackSessionStatus('Session disconnected.', true);
-        });
-        stackjackSignalSocket.addEventListener('error', () => {
-          setStackjackSessionStatus('Signaling error.', true);
-        });
-      }
-
-      async function initializeStackjackMultiplayer() {
-        const sessionId = new URLSearchParams(window.location.search).get('session');
-        if (!sessionId) return;
-        stackjackSessionId = sessionId;
-        setStackjackSessionStatus('Joining shared session...');
-        connectStackjackSocket(sessionId);
-        try {
-          const response = await fetch(
-            `/api/multiplayer/stackjack/session/${encodeURIComponent(sessionId)}/join`,
-            { method: 'POST' },
-          );
-          const payload = await response.json().catch(() => ({}));
-          if (!response.ok) {
-            setStackjackSessionStatus(payload.error || 'Unable to join session.', true);
-            return;
-          }
-          stackjackRole = payload.role;
-          updateStackjackParticipants({
-            host: payload.role === 'host' ? 'You' : payload.partner?.username || 'Host',
-            guest: payload.role === 'guest' ? 'You' : payload.partner?.username || 'Guest',
-          });
-          setStackjackSessionStatus(`Session active (${payload.role}).`);
-        } catch (error) {
-          console.error('Failed to join StackJack session', error);
-          setStackjackSessionStatus('Unable to join session.', true);
-        }
-      }
-
-      async function startStackjackCall() {
-        if (!stackjackSessionId || !stackjackSignalSocket) {
-          setStackjackSessionStatus('Join a session before starting a video call.', true);
-          return;
-        }
-        if (!stackjackPeerConnection) {
-          stackjackPeerConnection = createStackjackPeerConnection();
-        }
-        if (!stackjackLocalStream) {
-          try {
-            stackjackLocalStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            if (stackjackLocalVideo) {
-              stackjackLocalVideo.srcObject = stackjackLocalStream;
-            }
-            stackjackLocalStream.getTracks().forEach((track) => {
-              stackjackPeerConnection.addTrack(track, stackjackLocalStream);
-            });
-          } catch (error) {
-            console.error('Failed to capture media', error);
-            setStackjackSessionStatus('Unable to access camera/mic.', true);
-            return;
-          }
-        }
-        try {
-          const offer = await stackjackPeerConnection.createOffer();
-          await stackjackPeerConnection.setLocalDescription(offer);
-          stackjackSignalSocket.send(JSON.stringify({ type: 'signal.offer', offer }));
-        } catch (error) {
-          console.error('Failed to start video call', error);
-          setStackjackSessionStatus('Unable to start call.', true);
-        }
-      }
-
-      stackjackCallBtn?.addEventListener('click', startStackjackCall);
-
       // Initialize deck and UI
       deck = buildDeck();
       updateUI();
       setLog('Tap Deal to begin.');
-      initializeStackjackMultiplayer();
       const stackFriendlyBanner = document.getElementById('stackFriendlyBanner');
       const stackFriendlyMessage = document.getElementById('stackFriendlyMessage');
       const stackFriendParam = new URLSearchParams(window.location.search).get('friend')?.trim();

@@ -115,6 +115,7 @@ chatWss.on('connection', (ws, request) => {
   });
 
   ws.send(JSON.stringify({ type: 'chat.ready' }));
+});
 function broadcastSessionParticipants(sessionId, room = {}) {
   const message = JSON.stringify({
     type: 'session.participants',

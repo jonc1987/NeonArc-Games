@@ -10,6 +10,7 @@
     <meta name="theme-color" content="#050814" />
     <meta name="format-detection" content="telephone=no" />
     <title>NeonArc Games Lobby · Your Favorite Arcade Hub</title>
+    <link rel="stylesheet" href="/css/stackjack-session.css">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@400;500&display=swap');
 
@@ -1194,6 +1195,76 @@
         border: 1px solid rgba(255, 255, 255, 0.2);
         background: rgba(0, 0, 0, 0.25);
         color: rgba(255, 255, 255, 0.9);
+      }
+
+      .friendly-session-participants {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 12px;
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .friendly-session-participants strong {
+        color: #00f0ff;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .friendly-session-events {
+        margin-top: 14px;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.4);
+        max-height: 140px;
+        overflow-y: auto;
+        display: grid;
+        gap: 8px;
+      }
+
+      .friendly-session-event {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .friendly-session-event strong {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+      }
+
+      .friendly-session-event span {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .friendly-video-grid {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+      }
+
+      .friendly-video-grid video {
+        width: 100%;
+        height: 120px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: #010510;
+        object-fit: cover;
+      }
+
+      .friendly-session-actions {
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-end;
       }
 
       .lobby-view,
@@ -3953,6 +4024,10 @@
               <label for="friendlySessionGame">Game</label>
               <select id="friendlySessionGame"></select>
             </div>
+            <div class="friendly-session-participants">
+              <span>Host: <strong id="friendlySessionHostName">You</strong></span>
+              <span>Guest: <strong id="friendlySessionGuestName">Waiting</strong></span>
+            </div>
             <button class="button primary" type="button" id="friendlySessionLaunch">Prepare shared challenge</button>
             <p class="api-note" id="friendlySessionStatus">Pick a crew member to start playing together.</p>
             <div class="friendly-link" id="friendlySessionLinkContainer" hidden>
@@ -3962,6 +4037,14 @@
                 <button class="button ghost-button" type="button" id="friendlySessionLinkCopy">Copy</button>
               </div>
               <p class="api-note">Send this to a friend to sync your run.</p>
+            </div>
+            <div class="friendly-session-events" id="friendlySessionEvents" aria-live="polite"></div>
+            <div class="friendly-video-grid" id="friendlyVideoGrid">
+              <video id="friendlyLocalVideo" autoplay muted playsinline></video>
+              <video id="friendlyRemoteVideo" autoplay playsinline></video>
+            </div>
+            <div class="friendly-session-actions">
+              <button class="button ghost-button" type="button" id="friendlySessionCallBtn">Start video call</button>
             </div>
           </div>
           <div class="stackjack-duel-panel" id="stackjackDuelPanel">
@@ -4629,10 +4712,12 @@
       const initialFriendlyParams = {
         friend: null,
         game: null,
+        session: null,
       };
       const urlParams = new URLSearchParams(window.location.search);
       initialFriendlyParams.friend = urlParams.get('friend')?.trim() || null;
       initialFriendlyParams.game = resolveFriendlyGame(urlParams.get('game'));
+      initialFriendlyParams.session = urlParams.get('session')?.trim() || null;
 
       function normalizeCurrency(value, { clamp = true } = {}) {
         const numeric = Number(value);
@@ -4919,6 +5004,12 @@
       const friendlySessionLinkContainer = document.getElementById('friendlySessionLinkContainer');
       const friendlySessionLinkInput = document.getElementById('friendlySessionLink');
       const friendlySessionLinkCopyBtn = document.getElementById('friendlySessionLinkCopy');
+      const friendlySessionHostName = document.getElementById('friendlySessionHostName');
+      const friendlySessionGuestName = document.getElementById('friendlySessionGuestName');
+      const friendlySessionEventFeed = document.getElementById('friendlySessionEvents');
+      const friendlySessionCallBtn = document.getElementById('friendlySessionCallBtn');
+      const friendlyLocalVideo = document.getElementById('friendlyLocalVideo');
+      const friendlyRemoteVideo = document.getElementById('friendlyRemoteVideo');
       const stackjackDuelFriendSelect = document.getElementById('stackjackDuelFriend');
       const stackjackDuelCreateBtn = document.getElementById('stackjackDuelCreate');
       const stackjackDuelStatusEl = document.getElementById('stackjackDuelStatus');
@@ -6259,23 +6350,13 @@
         }
         const friend = stackjackDuelFriendSelect.value;
         setStackjackDuelStatus(`Inviting ${friend} to StackJack...`);
-        try {
-          const response = await fetch('/api/multiplayer/stackjack/session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: friend }),
-          });
-          const payload = await response.json().catch(() => ({}));
-          if (!response.ok) {
-            setStackjackDuelStatus(payload.error || 'Unable to create StackJack duel.', true);
-            return;
-          }
-          showStackjackDuelLink(payload.link);
-          setStackjackDuelStatus(`Session ready. Share the link with ${friend}.`);
-        } catch (error) {
-          console.error('StackJack duel failed', error);
-          setStackjackDuelStatus('Unable to reach the duel service.', true);
+        const payload = await createFriendlyMultiplayerSession(friend, 'stack');
+        if (!payload) {
+          return;
         }
+        const link = payload.link || friendlySessionLinkInput?.value || '';
+        showStackjackDuelLink(link);
+        setStackjackDuelStatus(`Session ready. Share the link with ${friend}.`);
       }
 
       async function copyStackjackDuelLink() {
@@ -6298,6 +6379,12 @@
       let chatSocket = null;
       let chatReconnectTimer = null;
       let chatUnread = 0;
+      let multiplayerSessionId = null;
+      let multiplayerRole = null;
+      let multiplayerGame = null;
+      let multiplayerSocket = null;
+      let multiplayerPeerConnection = null;
+      let multiplayerLocalStream = null;
 
       function setChatStatus(message, isError = false) {
         if (!chatStatusEl) return;
@@ -6430,6 +6517,7 @@
       chatForm?.addEventListener('submit', handleChatFormSubmit);
       stackjackDuelCreateBtn?.addEventListener('click', createStackjackDuel);
       stackjackDuelLinkCopyBtn?.addEventListener('click', copyStackjackDuelLink);
+      friendlySessionCallBtn?.addEventListener('click', startMultiplayerCall);
 
       function setFriendlySessionStatus(message, isError = false) {
         if (!friendlySessionStatusEl) return;
@@ -6442,7 +6530,11 @@
         friendlySessionBannerEl.textContent = message || 'Invite friends to share a run against the computer.';
       }
 
-      function setFriendlySessionLink(friend, game) {
+      function getFriendlyGameLabel(game) {
+        return FRIENDLY_GAMES.find((entry) => entry.value === game)?.label || game;
+      }
+
+      function setFriendlySessionLink(friend, game, overrideLink) {
         if (!friendlySessionLinkContainer || !friendlySessionLinkInput) return;
         const canonicalGame = resolveFriendlyGame(game);
         if (!friend || !canonicalGame) {
@@ -6450,8 +6542,233 @@
           return;
         }
         const params = new URLSearchParams({ friend, game: canonicalGame });
-        friendlySessionLinkInput.value = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        if (!overrideLink && multiplayerSessionId) {
+          params.set('session', multiplayerSessionId);
+        }
+        friendlySessionLinkInput.value =
+          overrideLink || `${window.location.origin}${window.location.pathname}?${params.toString()}`;
         friendlySessionLinkContainer.hidden = false;
+      }
+
+      function updateFriendlyParticipants(participants = {}) {
+        if (friendlySessionHostName) {
+          friendlySessionHostName.textContent = participants.host || 'Host';
+        }
+        if (friendlySessionGuestName) {
+          friendlySessionGuestName.textContent = participants.guest || 'Guest';
+        }
+      }
+
+      function appendFriendlyEvent(payload = {}) {
+        if (!friendlySessionEventFeed || !payload.event) return;
+        const entry = document.createElement('div');
+        entry.className = 'friendly-session-event';
+        const title = document.createElement('strong');
+        title.textContent = payload.origin ? `${payload.origin}: ${payload.event}` : payload.event;
+        const body = document.createElement('span');
+        body.textContent = payload.message || (payload.details ? JSON.stringify(payload.details) : '');
+        entry.appendChild(title);
+        entry.appendChild(body);
+        friendlySessionEventFeed.prepend(entry);
+        while (friendlySessionEventFeed.children.length > 10) {
+          friendlySessionEventFeed.removeChild(friendlySessionEventFeed.lastChild);
+        }
+      }
+
+      function sendMultiplayerEvent(eventName, details = {}) {
+        if (!multiplayerSocket || multiplayerSocket.readyState !== WebSocket.OPEN) return;
+        const payload = {
+          type: 'game.event',
+          event: eventName,
+          game: multiplayerGame,
+          ...details,
+        };
+        try {
+          multiplayerSocket.send(JSON.stringify(payload));
+        } catch (error) {
+          console.error('Failed to send multiplayer event', error);
+        }
+      }
+
+      async function joinMultiplayerSession(sessionId) {
+        if (!sessionId) return;
+        try {
+          const response = await fetch(`/api/multiplayer/session/${encodeURIComponent(sessionId)}/join`, {
+            method: 'POST',
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setFriendlySessionStatus(payload.error || 'Unable to join shared session.', true);
+            return;
+          }
+          multiplayerSessionId = sessionId;
+          multiplayerRole = payload.role;
+          multiplayerGame = payload.game || multiplayerGame;
+          const partnerName = payload.partner?.username;
+          if (multiplayerRole === 'host') {
+            updateFriendlyParticipants({
+              host: 'You',
+              guest: partnerName || 'Guest',
+            });
+          } else {
+            updateFriendlyParticipants({
+              host: partnerName || 'Host',
+              guest: 'You',
+            });
+          }
+          const friendPlaceholder = initialFriendlyParams.friend || partnerName || 'Pilot';
+          setFriendlySessionLink(friendPlaceholder, multiplayerGame);
+          setFriendlySessionStatus(`Session active (${multiplayerRole}).`);
+          connectMultiplayerSocket(sessionId);
+        } catch (error) {
+          console.error('Failed to join multiplayer session', error);
+          setFriendlySessionStatus('Unable to join session.', true);
+        }
+      }
+
+      async function createFriendlyMultiplayerSession(friend, game) {
+        const label = getFriendlyGameLabel(game);
+        setFriendlySessionStatus(`Creating ${label} session with ${friend}...`);
+        try {
+          const response = await fetch('/api/multiplayer/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: friend, game }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            setFriendlySessionStatus(payload.error || 'Unable to create multiplayer session.', true);
+            return;
+          }
+          multiplayerSessionId = payload.sessionId;
+          multiplayerGame = payload.game || game;
+          setFriendlySessionBanner(`Playing ${payload.label || label} vs the computer with ${friend}.`);
+          setFriendlySessionLink(friend, payload.game, payload.link);
+          setFriendlySessionStatus(`Session ready. Share link or wait for ${friend}.`);
+          await joinMultiplayerSession(payload.sessionId);
+          return payload;
+        } catch (error) {
+          console.error('Failed to create multiplayer session', error);
+          setFriendlySessionStatus('Failed to create session.', true);
+        }
+      }
+
+      function connectMultiplayerSocket(sessionId) {
+        if (!sessionId) return;
+        if (multiplayerSocket) {
+          multiplayerSocket.close();
+        }
+        const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const socket = new WebSocket(
+          `${wsScheme}://${window.location.host}/ws/multiplayer?session=${encodeURIComponent(sessionId)}`,
+        );
+        multiplayerSocket = socket;
+        socket.addEventListener('open', () => {
+          setFriendlySessionStatus('Multiplayer signaling connected.');
+        });
+        socket.addEventListener('message', (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data?.type === 'session.participants') {
+              updateFriendlyParticipants(data.participants);
+              appendFriendlyEvent({
+                event: 'session.update',
+                message: `Status: ${data.status || 'waiting'}`,
+              });
+            }
+            if (data?.type === 'game.event') {
+              appendFriendlyEvent(data);
+            }
+            if (data?.type?.startsWith('signal.')) {
+              handleMultiplayerSignal(data).catch((error) => {
+                console.error('Signal handling failed', error);
+              });
+            }
+          } catch (error) {
+            console.error('Multiplayer socket parse error', error);
+          }
+        });
+        socket.addEventListener('close', () => {
+          multiplayerSocket = null;
+          setFriendlySessionStatus('Session disconnected.', true);
+          appendFriendlyEvent({ event: 'session.closed', message: 'Connection lost.' });
+        });
+        socket.addEventListener('error', () => {
+          setFriendlySessionStatus('Multiplayer signaling error.', true);
+        });
+      }
+
+      function createMultiplayerPeerConnection() {
+        const pc = new RTCPeerConnection();
+        pc.addEventListener('icecandidate', (event) => {
+          if (event.candidate) {
+            multiplayerSocket?.send(
+              JSON.stringify({ type: 'signal.candidate', candidate: event.candidate }),
+            );
+          }
+        });
+        pc.addEventListener('track', (event) => {
+          if (friendlyRemoteVideo) {
+            friendlyRemoteVideo.srcObject = event.streams[0];
+          }
+        });
+        return pc;
+      }
+
+      async function handleMultiplayerSignal(payload) {
+        if (!payload?.type) return;
+        if (!multiplayerPeerConnection) {
+          multiplayerPeerConnection = createMultiplayerPeerConnection();
+        }
+        if (payload.type === 'signal.offer' && payload.offer) {
+          await multiplayerPeerConnection.setRemoteDescription(new RTCSessionDescription(payload.offer));
+          const answer = await multiplayerPeerConnection.createAnswer();
+          await multiplayerPeerConnection.setLocalDescription(answer);
+          multiplayerSocket?.send(JSON.stringify({ type: 'signal.answer', answer }));
+        } else if (payload.type === 'signal.answer' && payload.answer) {
+          await multiplayerPeerConnection.setRemoteDescription(
+            new RTCSessionDescription(payload.answer),
+          );
+        } else if (payload.type === 'signal.candidate' && payload.candidate) {
+          await multiplayerPeerConnection.addIceCandidate(new RTCIceCandidate(payload.candidate));
+        }
+      }
+
+      async function startMultiplayerCall() {
+        if (!multiplayerSessionId || !multiplayerSocket) {
+          setFriendlySessionStatus('Join a session before starting a call.', true);
+          return;
+        }
+        if (!multiplayerPeerConnection) {
+          multiplayerPeerConnection = createMultiplayerPeerConnection();
+        }
+        if (!multiplayerLocalStream) {
+          try {
+            multiplayerLocalStream = await navigator.mediaDevices.getUserMedia({
+              audio: true,
+              video: true,
+            });
+            if (friendlyLocalVideo) {
+              friendlyLocalVideo.srcObject = multiplayerLocalStream;
+            }
+            multiplayerLocalStream.getTracks().forEach((track) => {
+              multiplayerPeerConnection.addTrack(track, multiplayerLocalStream);
+            });
+          } catch (error) {
+            console.error('Media capture failed', error);
+            setFriendlySessionStatus('Unable to access camera/mic.', true);
+            return;
+          }
+        }
+        try {
+          const offer = await multiplayerPeerConnection.createOffer();
+          await multiplayerPeerConnection.setLocalDescription(offer);
+          multiplayerSocket.send(JSON.stringify({ type: 'signal.offer', offer }));
+          setFriendlySessionStatus('Video call starting...');
+        } catch (error) {
+          console.error('Call start failed', error);
+          setFriendlySessionStatus('Unable to start video call.', true);
+        }
       }
 
       function populateFriendlyGames() {
@@ -6536,11 +6853,9 @@
         }
         const label =
           FRIENDLY_GAMES.find((entry) => entry.value === resolvedGame)?.label || resolvedGame;
-        setFriendlySessionStatus(
-          `Ready to play ${label} with ${friend}. Share the link or jump into the run.`,
-        );
+        setFriendlySessionStatus(`Preparing shared ${label} session for ${friend}.`);
         setFriendlySessionBanner(`Playing ${label} vs the computer with ${friend}.`);
-        setFriendlySessionLink(friend, resolvedGame);
+        createFriendlyMultiplayerSession(friend, resolvedGame);
         scheduleFriendlyGameLaunch(resolvedGame);
       }
 
@@ -6580,6 +6895,9 @@
         } else {
           setFriendlySessionBanner('Invite friends to share a run against the computer.');
           setFriendlySessionStatus('Pick a friend and game to share a challenge link.');
+        }
+        if (initialFriendlyParams.session) {
+          joinMultiplayerSession(initialFriendlyParams.session);
         }
       }
 
@@ -7356,6 +7674,7 @@
         updateStackControls();
         updateStackHUD();
         setStackStatus('Tower initialized. Hit to draw your first card.');
+        sendMultiplayerEvent('stack.start', { bet: stackBet, playerTotal: stackTotal });
       }
 
       function hitStackJack() {
@@ -7377,6 +7696,11 @@
         if (stackInstability >= 100) {
           collapseTower();
         }
+        sendMultiplayerEvent('stack.hit', {
+          value,
+          total: stackTotal,
+          instability: stackInstability,
+        });
       }
 
       function holdStackJack() {
@@ -7402,21 +7726,40 @@
         }
         payout = Math.max(0, payout);
 
+        let resultType = 'loss';
+        let payoutAwarded = 0;
         if (opponentResult.bust || stackTotal > opponentResult.total) {
+          resultType = 'win';
           addCashWinnings(payout);
+          payoutAwarded = payout;
           const stackMessage = opponentResult.bust
             ? `AI tower overbalanced. You secured ${formatCredits(payout)}.`
             : `You beat the AI's ${opponentResult.total}. Won ${formatCredits(payout)}.`;
           setStackStatus(stackMessage);
         } else if (stackTotal === opponentResult.total) {
+          resultType = 'push';
+          payoutAwarded = stackBet;
           addCashWinnings(stackBet);
           setStackStatus(`Push with the AI at ${stackTotal}. Bet returned.`);
         } else {
           setStackStatus(`Computer tower held at ${opponentResult.total}. Bet lost.`);
           updateStackHUD();
           scheduleStackReset();
+          sendMultiplayerEvent('stack.result', {
+            result: 'loss',
+            playerTotal: stackTotal,
+            opponentTotal: opponentResult.total,
+            payout: 0,
+            message: 'AI won the tower.',
+          });
           return;
         }
+        sendMultiplayerEvent('stack.result', {
+          result: resultType,
+          playerTotal: stackTotal,
+          opponentTotal: opponentResult.total,
+          payout: payoutAwarded,
+        });
 
         updateStackHUD();
         scheduleStackReset();
@@ -7443,6 +7786,7 @@
         updateStackHUD();
         setStackStatus('Tower collapsed! Bet lost.');
         scheduleStackReset();
+        sendMultiplayerEvent('stack.collapse', { playerTotal: stackTotal });
       }
 
       function updateStackControls() {
@@ -9188,8 +9532,9 @@
         roundTag.textContent = 'Live';
         setStatus('Hold steady...');
         resultEl.classList.remove('win', 'loss');
-        resultEl.textContent = 'In flight — watch the line!';
+        resultEl.textContent = 'In flight - watch the line!';
         updateRocketDisplays();
+        sendMultiplayerEvent('rocket.launch', { bet: currentBet });
 
         flightInterval = setInterval(updateFlight, settings.tickInterval);
       }
@@ -9271,6 +9616,11 @@
         resultEl.textContent = `Won = ${formatCredits(winnings)}`;
         roundTag.textContent = 'Cashed Out';
         recordHistory(true, multiplier);
+        sendMultiplayerEvent('rocket.cashout', {
+          multiplier: parseFloat(multiplier.toFixed(2)),
+          bet: currentBet,
+          winnings,
+        });
         endFlight();
         scheduleReset();
       }
@@ -9281,9 +9631,13 @@
         setStatus(`Explosion at ${explosionPoint.toFixed(2)}x. Bet lost.`);
         resultEl.classList.remove('win');
         resultEl.classList.add('loss');
-        resultEl.textContent = 'Busted — bet lost.';
+        resultEl.textContent = 'Busted - bet lost.';
         roundTag.textContent = 'Busted';
         recordHistory(false, explosionPoint);
+        sendMultiplayerEvent('rocket.explode', {
+          explosionPoint: parseFloat(explosionPoint.toFixed(2)),
+          bet: currentBet,
+        });
         endFlight();
         scheduleReset();
       }
@@ -9772,7 +10126,9 @@
 
       function setMindStatus(message) {
         mindStatusEl.textContent = message;
-      }
+    }
     </script>
+  <%- include('partials/stackjack-session-panel') %>
+  <script src="/js/stackjack-session.js"></script>
   </body>
 </html>

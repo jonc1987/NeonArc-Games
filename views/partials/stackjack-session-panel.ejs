@@ -1,0 +1,19 @@
+<div class="stackjack-session-panel" id="stackjackSessionPanel" hidden>
+  <div class="stackjack-session-header">
+    <h3>StackJack Multiplayer</h3>
+    <p id="stackjackSessionStatus">Link up with a friend to face the shoe together.</p>
+  </div>
+  <div class="stackjack-participants">
+    <span>Host: <strong id="stackjackHostName">You</strong></span>
+    <span>Guest: <strong id="stackjackGuestName">Waiting</strong></span>
+  </div>
+  <div id="stackjackEventFeed" class="stackjack-event-feed"></div>
+  <div class="stackjack-video-grid">
+    <video id="stackjackLocalVideo" autoplay muted playsinline></video>
+    <video id="stackjackRemoteVideo" autoplay playsinline></video>
+  </div>
+  <div class="stackjack-session-actions">
+    <button class="button ghost-button" type="button" id="stackjackCallBtn">Start video call</button>
+    <button class="button ghost-button" type="button" id="stackjackMuteBtn" hidden>Unmute microphone</button>
+  </div>
+</div>
