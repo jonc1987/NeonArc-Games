@@ -66,24 +66,24 @@
       }
     },
     "hjwkjd": {
-      "date": "2025-12-09",
+      "date": "2025-12-14",
       "progress": {
         "neon-trainee": {
-          "value": 2,
+          "value": 1,
           "claimed": false,
           "completedAt": null,
           "claimedAt": null,
-          "updatedAt": "2025-12-09T00:21:10.283Z"
+          "updatedAt": "2025-12-14T18:45:19.969Z"
         },
-        "profit-surge": {
-          "value": 120,
+        "gear-collector": {
+          "value": 1,
           "claimed": false,
-          "completedAt": "2025-12-09T00:17:38.623Z",
+          "completedAt": "2025-12-14T18:48:31.377Z",
           "claimedAt": null,
-          "updatedAt": "2025-12-09T00:17:38.623Z"
+          "updatedAt": "2025-12-14T18:48:31.377Z"
         }
       },
-      "lastReset": "2025-12-09T00:17:34.832Z"
+      "lastReset": "2025-12-14T18:45:19.966Z"
     }
   }
 }

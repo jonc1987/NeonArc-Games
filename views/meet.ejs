@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#050814" />
+    <title>NeonArc Meet</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@400;500&display=swap');
+
+      :root {
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at 20% 20%, #061023, #02040f 60%, #000000);
+        font-family: 'Poppins', 'Orbitron', system-ui, sans-serif;
+        color: #f4f9ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(20px, 4vw, 48px);
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"140\" height=\"140\" viewBox=\"0 0 140 140\"%3E%3Ccircle cx=\"12\" cy=\"18\" r=\"1\" fill=\"rgba(255,255,255,0.25)\"/%3E%3Ccircle cx=\"88\" cy=\"60\" r=\"1\" fill=\"rgba(255,255,255,0.25)\"/%3E%3Ccircle cx=\"120\" cy=\"18\" r=\"1\" fill=\"rgba(255,255,255,0.2)\"/%3E%3Ccircle cx=\"60\" cy=\"120\" r=\"1\" fill=\"rgba(255,255,255,0.18)\"/%3E%3C/svg%3E');
+        opacity: 0.35;
+        pointer-events: none;
+        animation: starSlide 36s linear infinite alternate;
+        mix-blend-mode: screen;
+      }
+
+      @keyframes starSlide {
+        0% {
+          transform: translate3d(0, 0, 0);
+        }
+        100% {
+          transform: translate3d(-32px, -22px, 0);
+        }
+      }
+
+      .meet-container {
+        width: min(960px, 100%);
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .meet-hero {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 26px;
+        padding: 22px;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      }
+
+      .meet-hero h1 {
+        margin: 0;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.18em;
+        font-size: clamp(24px, 2vw, 32px);
+      }
+
+      .meet-hero p {
+        margin: 6px 0 0;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.75);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .meet-panel {
+        background: rgba(5, 8, 24, 0.92);
+        border-radius: 32px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: clamp(24px, 3vw, 32px);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .meet-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .meet-controls button {
+        align-self: flex-start;
+      }
+
+      .meet-link {
+        border-radius: 16px;
+        border: 1px dashed rgba(110, 243, 255, 0.4);
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .meet-link-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .meet-link-row input {
+        flex: 1;
+        min-width: 220px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 8px 10px;
+        background: rgba(0, 0, 0, 0.25);
+        color: #eaf9ff;
+      }
+
+      .meet-status {
+        font-size: 14px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .meet-video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+
+      .video-card {
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.02);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .video-card label {
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.45);
+      }
+
+      video {
+        width: 100%;
+        height: 220px;
+        border-radius: 16px;
+        background: #02050c;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        object-fit: cover;
+      }
+
+      .meet-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .meet-participants-panel {
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .meet-participants-panel h3 {
+        margin: 0 0 8px;
+        letter-spacing: 0.18em;
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+
+      .meet-participants-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .meet-participants-list .muted {
+        opacity: 0.6;
+      }
+
+      .button {
+        font-family: 'Orbitron', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        border: none;
+        border-radius: 999px;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .button.primary {
+        background: linear-gradient(135deg, rgba(110, 243, 255, 0.95), rgba(255, 110, 230, 0.95));
+        color: #050814;
+        font-weight: 700;
+      }
+
+      .button.ghost-button {
+        background: rgba(255, 255, 255, 0.07);
+        color: #eaf9ff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      @media (max-width: 640px) {
+        .meet-video-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .meet-actions {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="meet-container">
+      <div class="meet-hero">
+        <h1>Meet</h1>
+        <p>Start a live link and call any pilot who joins.</p>
+      </div>
+      <div class="meet-panel">
+        <div class="meet-controls">
+          <button class="button primary" type="button" id="createMeetingBtn">Create Meeting</button>
+          <div class="meet-link" id="meetingLinkContainer" hidden>
+            <label for="meetingLink">Meeting link</label>
+            <div class="meet-link-row">
+              <input id="meetingLink" type="text" readonly />
+              <button class="button ghost-button" id="meetingLinkCopy" type="button">Copy</button>
+            </div>
+          </div>
+        </div>
+        <div class="meet-status" id="meetStatus">Log in to create or join a meeting.</div>
+        <div class="meet-video-grid">
+          <div class="video-card">
+            <label>Your camera</label>
+            <video id="meetLocalVideo" autoplay muted playsinline></video>
+          </div>
+          <div class="video-card">
+            <label>Remote pilot</label>
+            <video id="meetRemoteVideo" autoplay playsinline></video>
+          </div>
+        </div>
+        <div class="meet-actions">
+          <button class="button ghost-button" type="button" id="meetStartCallBtn">Start video call</button>
+        </div>
+        <div class="meet-participants-panel">
+          <h3>Participants</h3>
+          <ul class="meet-participants-list" id="meetParticipants">
+            <li class="muted">Waiting for pilots to join...</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <script src="/js/meet.js"></script>
+  </body>
+</html>

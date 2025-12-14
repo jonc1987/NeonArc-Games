@@ -168,6 +168,49 @@
         gap: 12px;
       }
 
+      .game-navigation {
+        margin-top: 16px;
+        padding: 22px;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(5, 8, 20, 0.9);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .game-navigation-header h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .game-navigation-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .nav-pill {
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.06);
+        color: #eaf9ff;
+        padding: 10px 18px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-size: 12px;
+        cursor: pointer;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+      }
+
+      .nav-pill:hover {
+        transform: translateY(-2px);
+        border-color: rgba(110, 243, 255, 0.5);
+      }
+
       .credit-card {
         padding: 16px;
         border-radius: 16px;
@@ -926,6 +969,25 @@
         background: rgba(10, 16, 32, 0.8);
       }
 
+      .community-meet-teaser {
+        margin-top: 18px;
+        padding: 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(110, 243, 255, 0.3);
+        background: rgba(8, 12, 28, 0.9);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .community-meet-teaser h3 {
+        margin: 0;
+        font-size: 15px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #6ef3ff;
+      }
+
       .friend-request-header,
       .friendly-session-header {
         display: flex;
@@ -993,11 +1055,24 @@
       }
 
       .friendly-session-panel {
-        margin-top: 16px;
+        margin: 0;
         padding: 14px;
-        border-radius: 14px;
+        border-radius: 16px;
         border: 1px solid rgba(110, 243, 255, 0.2);
-        background: rgba(10, 16, 32, 0.85);
+        background: rgba(10, 16, 32, 0.95);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+        width: clamp(280px, 24vw, 360px);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+        transform: translateY(12px);
+        transition: opacity 0.3s ease, max-height 0.35s ease, transform 0.3s ease, visibility 0.3s ease;
+        backdrop-filter: blur(18px);
       }
 
       .stackjack-duel-panel {
@@ -1038,6 +1113,44 @@
       .stackjack-link-row input {
         flex: 1;
         min-width: 200px;
+      }
+
+      .floating-meet-shell {
+        position: fixed;
+        bottom: 120px;
+        right: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+        z-index: 520;
+      }
+
+      .floating-meet-toggle {
+        border: none;
+        border-radius: 999px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, rgba(110, 243, 255, 0.95), rgba(255, 110, 230, 0.95));
+        color: #050814;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+        transition: transform 0.2s ease;
+      }
+
+      .floating-meet-toggle:hover {
+        transform: translateY(-2px) scale(1.02);
+      }
+
+      .floating-meet-shell.open .friendly-session-panel {
+        max-height: 640px;
+        overflow-y: auto;
+        opacity: 1;
+        pointer-events: auto;
+        visibility: visible;
+        transform: translateY(0);
       }
 
       .floating-chat-toggle {
@@ -3763,6 +3876,18 @@
       <div class="credit-grid" id="creditPackGrid"></div>
       <p class="api-note" id="creditPackStatus">Select a pack and apply credits instantly. Login required.</p>
     </section>
+    <section class="game-navigation" aria-label="Quick game navigation">
+      <div class="game-navigation-header">
+        <h2>Jump straight to the games</h2>
+        <p class="api-note">Skip the scroll and launch a lobby or meet your crew in one tap.</p>
+      </div>
+      <div class="game-navigation-actions">
+        <button class="nav-pill" data-category-button="skill" type="button">Skill Games</button>
+        <button class="nav-pill" data-category-button="card" type="button">Card Games</button>
+        <button class="nav-pill" type="button" onclick="enterCategory('main')">Main Lobby</button>
+        <button class="nav-pill" type="button" onclick="openMeetPanel()">Meet Crew</button>
+      </div>
+    </section>
 <main class="lobby-system">
   <section class="lobby-view active" id="mainLobby" aria-label="Main Lobby">
     <div class="category-grid">
@@ -4011,41 +4136,10 @@
               </div>
             </div>
           </div>
-          <div class="friendly-session-panel" id="friendlySessionPanel">
-            <div class="friendly-session-header">
-              <h3>Friendly Sessions</h3>
-              <p class="api-note friendly-session-banner" id="friendlySessionBanner">Invite friends to share a run against the computer.</p>
-            </div>
-            <div class="friendly-controls">
-              <label for="friendlySessionFriend">Friend</label>
-              <select id="friendlySessionFriend">
-                <option value="">Loading friends...</option>
-              </select>
-              <label for="friendlySessionGame">Game</label>
-              <select id="friendlySessionGame"></select>
-            </div>
-            <div class="friendly-session-participants">
-              <span>Host: <strong id="friendlySessionHostName">You</strong></span>
-              <span>Guest: <strong id="friendlySessionGuestName">Waiting</strong></span>
-            </div>
-            <button class="button primary" type="button" id="friendlySessionLaunch">Prepare shared challenge</button>
-            <p class="api-note" id="friendlySessionStatus">Pick a crew member to start playing together.</p>
-            <div class="friendly-link" id="friendlySessionLinkContainer" hidden>
-              <label for="friendlySessionLink">Shareable session link</label>
-              <div class="friendly-link-row">
-                <input id="friendlySessionLink" type="text" readonly />
-                <button class="button ghost-button" type="button" id="friendlySessionLinkCopy">Copy</button>
-              </div>
-              <p class="api-note">Send this to a friend to sync your run.</p>
-            </div>
-            <div class="friendly-session-events" id="friendlySessionEvents" aria-live="polite"></div>
-            <div class="friendly-video-grid" id="friendlyVideoGrid">
-              <video id="friendlyLocalVideo" autoplay muted playsinline></video>
-              <video id="friendlyRemoteVideo" autoplay playsinline></video>
-            </div>
-            <div class="friendly-session-actions">
-              <button class="button ghost-button" type="button" id="friendlySessionCallBtn">Start video call</button>
-            </div>
+          <div class="community-meet-teaser">
+            <h3>Meet on the move</h3>
+            <p class="api-note">Tap the floating Meet button to invite crew, generate a join link, and keep talking while you explore the arcade.</p>
+            <button class="button ghost-button" type="button" id="communityMeetButton">Open Meet Panel</button>
           </div>
           <div class="stackjack-duel-panel" id="stackjackDuelPanel">
             <div class="stackjack-duel-header">
@@ -4641,6 +4735,45 @@
         <button class="button primary" type="submit">Send</button>
       </form>
     </div>
+    <div class="floating-meet-shell" id="floatingMeetShell">
+      <button class="floating-meet-toggle" id="floatingMeetToggle" type="button">Meet Crew</button>
+      <div class="friendly-session-panel" id="friendlySessionPanel">
+        <div class="friendly-session-header">
+          <h3>Friendly Sessions</h3>
+          <p class="api-note friendly-session-banner" id="friendlySessionBanner">Invite friends, create a meeting link, and keep talking while you play.</p>
+        </div>
+        <div class="friendly-controls">
+          <label for="friendlySessionFriend">Friend</label>
+          <select id="friendlySessionFriend">
+            <option value="">Loading friends...</option>
+          </select>
+          <label for="friendlySessionGame">Game</label>
+          <select id="friendlySessionGame"></select>
+        </div>
+        <div class="friendly-session-participants">
+          <span>Host: <strong id="friendlySessionHostName">You</strong></span>
+          <span>Guest: <strong id="friendlySessionGuestName">Waiting</strong></span>
+        </div>
+        <button class="button primary" type="button" id="friendlySessionLaunch">Create Meeting</button>
+        <p class="api-note" id="friendlySessionStatus">Pick a crew member and game to generate an invite link.</p>
+        <div class="friendly-link" id="friendlySessionLinkContainer" hidden>
+          <label for="friendlySessionLink">Shareable session link</label>
+          <div class="friendly-link-row">
+            <input id="friendlySessionLink" type="text" readonly />
+            <button class="button ghost-button" type="button" id="friendlySessionLinkCopy">Copy</button>
+          </div>
+          <p class="api-note">Send it to a friend so they can join the meeting and talk.</p>
+        </div>
+        <div class="friendly-session-events" id="friendlySessionEvents" aria-live="polite"></div>
+        <div class="friendly-video-grid" id="friendlyVideoGrid">
+          <video id="friendlyLocalVideo" autoplay muted playsinline></video>
+          <video id="friendlyRemoteVideo" autoplay playsinline></video>
+        </div>
+        <div class="friendly-session-actions">
+          <button class="button ghost-button" type="button" id="friendlySessionCallBtn">Start video call</button>
+        </div>
+      </div>
+    </div>
 
     <script>
       // ---------------- Configurable parameters ----------------
@@ -5010,6 +5143,9 @@
       const friendlySessionCallBtn = document.getElementById('friendlySessionCallBtn');
       const friendlyLocalVideo = document.getElementById('friendlyLocalVideo');
       const friendlyRemoteVideo = document.getElementById('friendlyRemoteVideo');
+      const floatingMeetShell = document.getElementById('floatingMeetShell');
+      const floatingMeetToggle = document.getElementById('floatingMeetToggle');
+      const communityMeetButton = document.getElementById('communityMeetButton');
       const stackjackDuelFriendSelect = document.getElementById('stackjackDuelFriend');
       const stackjackDuelCreateBtn = document.getElementById('stackjackDuelCreate');
       const stackjackDuelStatusEl = document.getElementById('stackjackDuelStatus');
@@ -5325,6 +5461,11 @@
               exitCardGame();
             }
           });
+        });
+        floatingMeetToggle?.addEventListener('click', () => toggleFloatingMeetPanel());
+        communityMeetButton?.addEventListener('click', (event) => {
+          event.preventDefault();
+          openMeetPanel();
         });
         if (binaryInstructionsToggle) {
           binaryInstructionsToggle.addEventListener('click', () => toggleBinaryInstructions());
@@ -6527,7 +6668,8 @@
 
       function setFriendlySessionBanner(message) {
         if (!friendlySessionBannerEl) return;
-        friendlySessionBannerEl.textContent = message || 'Invite friends to share a run against the computer.';
+        friendlySessionBannerEl.textContent =
+          message || 'Invite friends, create a meeting link, and keep talking while you play.';
       }
 
       function getFriendlyGameLabel(game) {
@@ -6893,12 +7035,30 @@
           }
           scheduleFriendlyGameLaunch(normalizedGame);
         } else {
-          setFriendlySessionBanner('Invite friends to share a run against the computer.');
+          setFriendlySessionBanner('Invite friends, create a meeting link, and keep talking while you play.');
           setFriendlySessionStatus('Pick a friend and game to share a challenge link.');
         }
         if (initialFriendlyParams.session) {
           joinMultiplayerSession(initialFriendlyParams.session);
         }
+      }
+
+      function setFloatingMeetVisible(forcedState) {
+        if (!floatingMeetShell) return;
+        const nextState =
+          typeof forcedState === 'boolean'
+            ? forcedState
+            : !floatingMeetShell.classList.contains('open');
+        floatingMeetShell.classList.toggle('open', nextState);
+      }
+
+      function toggleFloatingMeetPanel() {
+        setFloatingMeetVisible();
+      }
+
+      function openMeetPanel() {
+        setFloatingMeetVisible(true);
+        friendlySessionFriendSelect?.focus();
       }
 
       async function sendFriendRequest(username) {
@@ -7629,6 +7789,7 @@
       window.enterCategory = enterCategory;
       window.enterGame = enterGame;
       window.backToMainLobby = backToMainLobby;
+      window.openMeetPanel = openMeetPanel;
       populateFriendlyGames();
       friendlySessionLaunchBtn?.addEventListener('click', handleFriendlySessionLaunch);
       friendlySessionLinkCopyBtn?.addEventListener('click', copyFriendlySessionLink);

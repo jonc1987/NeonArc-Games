@@ -9,7 +9,11 @@ require('dotenv').config();
 const { ensureDatabase, query } = require('./utils/db');
 const { getUsers, getCashouts } = require('./utils/userStorage');
 const { addChatMessage } = require('./utils/chatStorage');
-const { getMultiplayerSession, touchMultiplayerSession } = require('./utils/multiplayerStorage');
+const {
+  getMultiplayerSession,
+  touchMultiplayerSession,
+} = require('./utils/multiplayerStorage');
+const { getMeetSession, removeMeetSession } = require('./utils/meetStorage');
 
 const app = express();
 
@@ -44,6 +48,7 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/campaigns', require('./routes/campaigns'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/multiplayer', require('./routes/multiplayer'));
+app.use('/api/meet', require('./routes/meet'));
 
 app.get('/', (req, res) => {
   res.render('home');
@@ -69,10 +74,15 @@ app.get('/stackjack', (req, res) => {
   res.render('stackjack');
 });
 
+app.get('/meet', (req, res) => {
+  res.render('meet');
+});
+
 const server = http.createServer(app);
 
 const chatWss = new WebSocket.Server({ noServer: true });
 const sessionWss = new WebSocket.Server({ noServer: true });
+const meetWss = new WebSocket.Server({ noServer: true });
 
 const chatClients = new Set();
 const sessionClients = new Map();
@@ -227,6 +237,93 @@ sessionWss.on('connection', async (ws, request) => {
   );
 });
 
+function broadcastMeetParticipants(session) {
+  if (!session) return;
+  const payload = JSON.stringify({
+    type: 'meet.participants',
+    host: {
+      id: session.hostId,
+      username: session.hostUsername,
+    },
+    participants: Array.from(session.clients).map((entry) => ({
+      id: entry.userId,
+      username: entry.username,
+    })),
+  });
+  session.clients.forEach((entry) => {
+    if (entry.ws.readyState === WebSocket.OPEN) {
+      entry.ws.send(payload);
+    }
+  });
+}
+
+function broadcastMeetSignal(session, payload, originWs) {
+  if (!session || !payload) return;
+  const message = JSON.stringify(payload);
+  session.clients.forEach((entry) => {
+    if (entry.ws !== originWs && entry.ws.readyState === WebSocket.OPEN) {
+      entry.ws.send(message);
+    }
+  });
+}
+
+meetWss.on('connection', (ws, request) => {
+  const user = request.session?.user;
+  const hostHeader = request.headers.host || 'localhost';
+  let sessionId;
+  try {
+    const parsedUrl = new URL(request.url, `http://${hostHeader}`);
+    sessionId = parsedUrl.searchParams.get('room');
+  } catch (error) {
+    sessionId = null;
+  }
+  if (!user || !sessionId) {
+    ws.close();
+    return;
+  }
+  const session = getMeetSession(sessionId);
+  if (!session) {
+    ws.close();
+    return;
+  }
+  const client = { ws, userId: user.id, username: user.username };
+  session.clients.add(client);
+  broadcastMeetParticipants(session);
+  ws.send(
+    JSON.stringify({
+      type: 'meet.ready',
+      sessionId,
+      host: {
+        id: session.hostId,
+        username: session.hostUsername,
+      },
+    }),
+  );
+
+  ws.on('message', (raw) => {
+    let payload;
+    try {
+      payload = JSON.parse(raw.toString());
+    } catch (error) {
+      console.error('Meet signaling error', error);
+      return;
+    }
+    if (!payload?.type) return;
+    if (payload.type.startsWith('signal.')) {
+      broadcastMeetSignal(session, payload, ws);
+    }
+  });
+
+  ws.on('close', () => {
+    session.clients.delete(client);
+    if (!session.clients.size) {
+      removeMeetSession(sessionId);
+      return;
+    }
+    broadcastMeetParticipants(session);
+  });
+});
+
 server.on('upgrade', (request, socket, head) => {
   sessionMiddleware(request, {}, () => {
     const hostname = request.headers.host || 'localhost';
@@ -241,6 +338,8 @@ server.on('upgrade', (request, socket, head) => {
       chatWss.handleUpgrade(request, socket, head, (ws) => chatWss.emit('connection', ws, request));
     } else if (pathname === '/ws/multiplayer') {
       sessionWss.handleUpgrade(request, socket, head, (ws) => sessionWss.emit('connection', ws, request));
+    } else if (pathname === '/ws/meet') {
+      meetWss.handleUpgrade(request, socket, head, (ws) => meetWss.emit('connection', ws, request));
     } else {
       socket.destroy();
     }
@@ -439,8 +538,9 @@ app.get('/management', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-ensureDatabase()
-  .then(() => {
+async function startServer() {
+  try {
+    await ensureDatabase();
     const adminKey = process.env.ADMIN_KEY?.toString().trim() || '';
     const masked =
       adminKey.length > 4 ? `${adminKey.slice(0, 2)}***${adminKey.slice(-2)}` : adminKey || 'NOT SET';
@@ -453,8 +553,10 @@ ensureDatabase()
         );
       }
     });
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error('Database initialization failed', error);
     process.exit(1);
-  });
+  }
+}
+
+startServer();
