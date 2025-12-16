@@ -168,6 +168,84 @@
         justify-content: flex-end;
       }
 
+      .meet-audio-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        padding-top: 8px;
+      }
+
+      .audio-mic-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.05);
+        color: #f4f9ff;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .audio-mic-button:hover {
+        border-color: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .audio-mic-button.muted {
+        border-color: rgba(255, 155, 179, 0.9);
+        color: #ff9bb3;
+        box-shadow: 0 6px 20px rgba(255, 155, 179, 0.3);
+      }
+
+      .mic-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+
+      .audio-levels {
+        flex: 1;
+        min-width: 180px;
+        display: grid;
+        gap: 6px;
+      }
+
+      .audio-level {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .audio-label {
+        font-size: 11px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .audio-meter {
+        height: 6px;
+        width: 100%;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+      }
+
+      .audio-meter-fill {
+        display: block;
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(135deg, #7ef5ff, #7cccff 60%, #ffb0e3);
+        transform-origin: 0 50%;
+        transform: scaleX(0);
+        transition: transform 0.08s linear;
+      }
+
+
       .meet-participants-panel {
         border-radius: 18px;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -266,6 +344,30 @@
         </div>
         <div class="meet-actions">
           <button class="button ghost-button" type="button" id="meetStartCallBtn">Start video call</button>
+        </div>
+        <div class="meet-audio-controls">
+          <button class="audio-mic-button" type="button" id="toggleMuteBtn">
+            <span class="mic-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zM9 20h6v2a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2z" />
+              </svg>
+            </span>
+            <span class="mic-text">Mute microphone</span>
+          </button>
+          <div class="audio-levels">
+            <div class="audio-level">
+              <span class="audio-label">Mic level</span>
+              <div class="audio-meter" aria-hidden="true">
+                <span class="audio-meter-fill" id="localLevelBar"></span>
+              </div>
+            </div>
+            <div class="audio-level">
+              <span class="audio-label">Remote level</span>
+              <div class="audio-meter" aria-hidden="true">
+                <span class="audio-meter-fill" id="remoteLevelBar"></span>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="meet-participants-panel">
           <h3>Participants</h3>

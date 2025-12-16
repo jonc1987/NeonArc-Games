@@ -6,8 +6,11 @@
   const statusEl = document.getElementById('meetStatus');
   const participantsList = document.getElementById('meetParticipants');
   const startCallBtn = document.getElementById('meetStartCallBtn');
+  const toggleMuteBtn = document.getElementById('toggleMuteBtn');
   const localVideo = document.getElementById('meetLocalVideo');
   const remoteVideo = document.getElementById('meetRemoteVideo');
+  const localLevelBar = document.getElementById('localLevelBar');
+  const remoteLevelBar = document.getElementById('remoteLevelBar');
 
   let sessionId = new URLSearchParams(window.location.search).get('room');
   let isHost = false;
@@ -15,10 +18,18 @@
   let meetPeerConnection = null;
   let meetLocalStream = null;
   let localTracksAttached = false;
+  let isMuted = false;
+  let audioContext = null;
+  let localAnalyser = null;
+  let remoteAnalyser = null;
+  let meterAnimationFrame = null;
+  let autoJoinTriggered = false;
 
   createMeetingBtn?.addEventListener('click', handleCreateMeeting);
   startCallBtn?.addEventListener('click', () => startMeetCall());
   meetingLinkCopyBtn?.addEventListener('click', copyMeetingLink);
+  toggleMuteBtn?.addEventListener('click', toggleMute);
+  updateMicButton();
 
   if (sessionId) {
     createMeetingBtn?.setAttribute('disabled', 'true');
@@ -120,6 +131,8 @@
       if (localVideo) {
         localVideo.srcObject = meetLocalStream;
       }
+      prepareLocalMeter(meetLocalStream);
+      updateMicButton();
       return meetLocalStream;
     } catch (error) {
       setStatus('Camera & mic access denied.', true);
@@ -131,6 +144,9 @@
     if (!meetPeerConnection || !meetLocalStream || localTracksAttached) return;
     meetLocalStream.getTracks().forEach((track) => {
       meetPeerConnection.addTrack(track, meetLocalStream);
+    });
+    meetLocalStream.getAudioTracks().forEach((track) => {
+      track.enabled = !isMuted;
     });
     localTracksAttached = true;
   }
@@ -146,8 +162,108 @@
       if (remoteVideo) {
         remoteVideo.srcObject = event.streams[0];
       }
+      prepareRemoteMeter(event.streams[0]);
     });
     return pc;
+  }
+
+  async function toggleMute() {
+    if (!meetLocalStream) {
+      try {
+        await ensureLocalStream();
+      } catch (error) {
+        console.error('Unable to access microphone', error);
+        return;
+      }
+    }
+    if (!meetLocalStream) return;
+    isMuted = !isMuted;
+    meetLocalStream.getAudioTracks().forEach((track) => {
+      track.enabled = !isMuted;
+    });
+    setStatus(isMuted ? 'Microphone muted.' : 'Microphone live.');
+    updateMicButton();
+  }
+
+  function updateMicButton() {
+    if (!toggleMuteBtn) return;
+    toggleMuteBtn.classList.toggle('muted', isMuted);
+    toggleMuteBtn.setAttribute('aria-pressed', String(isMuted));
+    const micText = toggleMuteBtn.querySelector('.mic-text');
+    if (micText) {
+      micText.textContent = isMuted ? 'Unmute microphone' : 'Mute microphone';
+    }
+  }
+
+  function ensureAudioContext() {
+    if (audioContext) return audioContext;
+    const ContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!ContextCtor) return null;
+    audioContext = new ContextCtor();
+    if (audioContext.state === 'suspended' && audioContext.resume) {
+      audioContext.resume().catch(() => {});
+    }
+    return audioContext;
+  }
+
+  function prepareLocalMeter(stream) {
+    if (!stream || localAnalyser) return;
+    try {
+      const context = ensureAudioContext();
+      if (!context) return;
+      const source = context.createMediaStreamSource(stream);
+      const analyser = context.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      localAnalyser = analyser;
+      startMeterLoop();
+    } catch (error) {
+      console.error('Local audio meter initialization failed', error);
+    }
+  }
+
+  function prepareRemoteMeter(stream) {
+    if (!stream || remoteAnalyser) return;
+    try {
+      const context = ensureAudioContext();
+      if (!context) return;
+      const source = context.createMediaStreamSource(stream);
+      const analyser = context.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      remoteAnalyser = analyser;
+    } catch (error) {
+      console.error('Remote audio meter initialization failed', error);
+    }
+  }
+
+  function startMeterLoop() {
+    if (meterAnimationFrame) return;
+    const step = () => {
+      const localLevel = isMuted ? 0 : getAudioLevel(localAnalyser);
+      const remoteLevel = getAudioLevel(remoteAnalyser);
+      if (localLevelBar) {
+        localLevelBar.style.transform = `scaleX(${localLevel})`;
+      }
+      if (remoteLevelBar) {
+        remoteLevelBar.style.transform = `scaleX(${remoteLevel})`;
+      }
+      meterAnimationFrame = requestAnimationFrame(step);
+    };
+    meterAnimationFrame = requestAnimationFrame(step);
+  }
+
+  function getAudioLevel(analyser) {
+    if (!analyser) return 0;
+    const data = new Uint8Array(analyser.fftSize);
+    analyser.getByteTimeDomainData(data);
+    let sum = 0;
+    for (let i = 0; i < data.length; i += 1) {
+      const normalized = (data[i] - 128) / 128;
+      sum += normalized * normalized;
+    }
+    const rms = Math.sqrt(sum / data.length);
+    return Math.min(1, rms * 2);
   }
 
   async function handleMeetSignal(payload) {
@@ -198,6 +314,13 @@
     }
   }
 
+  function autoJoinMeeting() {
+    if (!sessionId || autoJoinTriggered) return;
+    autoJoinTriggered = true;
+    setStatus('Auto-joining the meeting...');
+    startMeetCall();
+  }
+
   function openMeetSocket() {
     if (!sessionId) return;
     if (meetSocket && meetSocket.readyState === WebSocket.OPEN) return;
@@ -205,6 +328,7 @@
     meetSocket = new WebSocket(`${wsScheme}://${window.location.host}/ws/meet?room=${encodeURIComponent(sessionId)}`);
     meetSocket.addEventListener('open', () => {
       setStatus(isHost ? 'Meeting signal ready. Share the link.' : 'Connected. Waiting for host.');
+      autoJoinMeeting();
     });
     meetSocket.addEventListener('message', (event) => {
       try {
