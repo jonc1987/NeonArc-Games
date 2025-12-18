@@ -51,7 +51,7 @@ app.use('/api/multiplayer', require('./routes/multiplayer'));
 app.use('/api/meet', require('./routes/meet'));
 
 app.get('/', (req, res) => {
-  res.render('home');
+  res.render('index');
 });
 
 app.get('/login', (req, res) => {
