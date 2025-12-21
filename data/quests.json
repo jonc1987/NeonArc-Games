@@ -21,16 +21,17 @@
       "lastReset": "2025-12-09T00:21:12.717Z"
     },
     "dfnj32872joni": {
-      "date": "2025-12-07",
+      "date": "2025-12-20",
       "progress": {
-        "prize-hunter": {
-          "value": 1,
-          "claimed": true,
-          "completedAt": "2025-12-07T13:47:14.280Z",
-          "claimedAt": "2025-12-07T13:47:22.353Z",
-          "updatedAt": "2025-12-07T13:47:14.280Z"
+        "neon-trainee": {
+          "value": 2,
+          "claimed": false,
+          "completedAt": null,
+          "claimedAt": null,
+          "updatedAt": "2025-12-20T21:59:12.560Z"
         }
-      }
+      },
+      "lastReset": "2025-12-20T21:42:42.356Z"
     },
     "hj": {
       "date": "2025-12-07",

@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 const cors = require('cors');
 const http = require('http');
 const { URL } = require('url');
@@ -21,9 +22,15 @@ const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET || 'neonarc-session-secret',
   resave: false,
   saveUninitialized: false,
+  store: new FileStore({
+    path: path.join(__dirname, '.sessions'),
+    retries: 0,
+    logFn: () => {},
+  }),
   cookie: {
     httpOnly: true,
     sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 24 * 30,
   },
 });
 
@@ -63,15 +70,19 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/app', (req, res) => {
-  res.render('index');
+  res.redirect('/lobby');
+});
+
+app.get('/lobby', (req, res) => {
+  res.render('index', { initialGame: null, gameOnly: false });
+});
+
+app.get('/games/:game', (req, res) => {
+  res.render('index', { initialGame: req.params.game, gameOnly: true });
 });
 
 app.get('/confirm', (req, res) => {
   res.render('confirm');
-});
-
-app.get('/stackjack', (req, res) => {
-  res.render('stackjack');
 });
 
 app.get('/meet', (req, res) => {

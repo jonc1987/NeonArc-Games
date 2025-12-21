@@ -10,7 +10,6 @@
     <meta name="theme-color" content="#050814" />
     <meta name="format-detection" content="telephone=no" />
     <title>NeonArc Games Lobby · Your Favorite Arcade Hub</title>
-    <link rel="stylesheet" href="/css/stackjack-session.css">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@400;500&display=swap');
 
@@ -35,6 +34,10 @@
         background: radial-gradient(circle at 20% 20%, #020514, #01020b 55%, #000000);
         font-family: 'Poppins', 'Orbitron', system-ui, sans-serif;
         color: #eaf9ff;
+      }
+
+      body.game-only {
+        padding-top: clamp(16px, 3vw, 28px);
       }
 
       body::before {
@@ -93,6 +96,38 @@
         flex-direction: column;
         gap: clamp(16px, 3vw, 28px);
       }
+
+      .game-only-bar {
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(110, 243, 255, 0.22);
+        background: rgba(6, 12, 26, 0.9);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      }
+
+      .game-only .game-only-bar {
+        display: none;
+      }
+
+      .game-only-title {
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: rgba(234, 249, 255, 0.75);
+      }
+
+      .game-only .hero-section,
+      .game-only .feature-grid,
+      .game-only .auth-panel,
+      .game-only .credit-packs,
+      .game-only .game-navigation,
+      .game-only .lobby-view,
+      .game-only .account-view,
 
       .hero-section {
         display: flex;
@@ -988,8 +1023,7 @@
         color: #6ef3ff;
       }
 
-      .friend-request-header,
-      .friendly-session-header {
+      .friend-request-header {
         display: flex;
         justify-content: space-between;
         align-items: baseline;
@@ -1054,67 +1088,6 @@
         letter-spacing: 0.12em;
       }
 
-      .friendly-session-panel {
-        margin: 0;
-        padding: 14px;
-        border-radius: 16px;
-        border: 1px solid rgba(110, 243, 255, 0.2);
-        background: rgba(10, 16, 32, 0.95);
-        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
-        width: clamp(280px, 24vw, 360px);
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        pointer-events: none;
-        visibility: hidden;
-        transform: translateY(12px);
-        transition: opacity 0.3s ease, max-height 0.35s ease, transform 0.3s ease, visibility 0.3s ease;
-        backdrop-filter: blur(18px);
-      }
-
-      .stackjack-duel-panel {
-        margin-top: 18px;
-        padding: 14px;
-        border-radius: 14px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        background: rgba(4, 7, 18, 0.9);
-      }
-
-      .stackjack-duel-controls {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        align-items: flex-start;
-      }
-
-      .stackjack-duel-controls select {
-        flex: 1;
-        min-width: 180px;
-      }
-
-      .stackjack-duel-link {
-        margin-top: 12px;
-        padding: 10px;
-        border-radius: 10px;
-        border: 1px dashed rgba(110, 243, 255, 0.3);
-        background: rgba(255, 255, 255, 0.03);
-      }
-
-      .stackjack-link-row {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 6px;
-      }
-
-      .stackjack-link-row input {
-        flex: 1;
-        min-width: 200px;
-      }
-
       .floating-meet-shell {
         position: fixed;
         bottom: 120px;
@@ -1124,33 +1097,354 @@
         align-items: flex-end;
         gap: 10px;
         z-index: 520;
+        touch-action: none;
+      }
+
+      .meet-floating-panel {
+        margin: 0;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(110, 243, 255, 0.32);
+        background: linear-gradient(140deg, rgba(10, 18, 36, 0.98), rgba(6, 10, 22, 0.92));
+        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55);
+        width: clamp(320px, 28vw, 420px);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+        transform: translateY(12px) scale(0.98);
+        transition: opacity 0.3s ease, max-height 0.4s ease, transform 0.3s ease, visibility 0.3s ease;
+        backdrop-filter: blur(18px);
+        position: relative;
+      }
+
+      .panel-drag-handle {
+        cursor: move;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .panel-actions {
+        display: inline-flex;
+        gap: 6px;
+      }
+
+      .panel-action-btn {
+        border: none;
+        border-radius: 8px;
+        padding: 4px 8px;
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(234, 249, 255, 0.75);
+        cursor: pointer;
+        transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+      }
+
+      .panel-action-btn:hover {
+        transform: translateY(-1px);
+        background: rgba(110, 243, 255, 0.2);
+        color: #eaf9ff;
+      }
+
+      .panel-resize-handle {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: linear-gradient(135deg, rgba(110, 243, 255, 0.35), rgba(255, 110, 230, 0.2));
+        cursor: se-resize;
+        opacity: 0.7;
+      }
+
+      .panel-resize-handle:hover {
+        opacity: 1;
+      }
+
+      .meet-floating-panel::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(circle at 20% 10%, rgba(110, 243, 255, 0.15), transparent 55%);
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .meet-floating-panel > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .meet-floating-header {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        text-align: left;
+      }
+
+      .meet-floating-header h3 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #6ef3ff;
+      }
+
+      .meet-floating-header p {
+        margin: 0;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .meet-floating-panel .meet-controls {
+        gap: 10px;
+      }
+
+      .meet-floating-panel .meet-status {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+      }
+
+      .meet-floating-panel .meet-video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 10px;
+      }
+
+      .meet-floating-panel video {
+        height: clamp(140px, 20vw, 180px);
+        border-radius: 12px;
+      }
+
+      .meet-floating-panel .video-card {
+        border-radius: 16px;
+        padding: 10px;
+      }
+
+      .meet-floating-panel .meet-audio-controls {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .meet-floating-panel .audio-levels {
+        width: 100%;
+      }
+
+      .floating-meet-shell.open .meet-floating-panel {
+        max-height: 760px;
+        overflow-y: auto;
+        opacity: 1;
+        pointer-events: auto;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+      }
+
+      .meet-floating-panel .meet-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .meet-floating-panel .meet-controls button {
+        align-self: flex-start;
+      }
+
+      .meet-floating-panel .meet-link {
+        border-radius: 14px;
+        border: 1px dashed rgba(110, 243, 255, 0.35);
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .meet-floating-panel .meet-link-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .meet-floating-panel .meet-link-row input {
+        flex: 1;
+        min-width: 180px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 8px 10px;
+        background: rgba(0, 0, 0, 0.25);
+        color: #eaf9ff;
+      }
+
+      .meet-floating-panel .meet-status {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .meet-floating-panel .video-card {
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .meet-floating-panel .video-card label {
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .meet-floating-panel .meet-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .meet-floating-panel .meet-audio-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .meet-floating-panel .audio-mic-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.05);
+        color: #f4f9ff;
+        font-weight: 600;
+        font-size: 0.75rem;
+        transition: border 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      }
+
+      .meet-floating-panel .audio-mic-button:hover {
+        border-color: rgba(255, 255, 255, 0.7);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .meet-floating-panel .audio-mic-button.muted {
+        border-color: rgba(255, 155, 179, 0.9);
+        color: #ff9bb3;
+        box-shadow: 0 6px 20px rgba(255, 155, 179, 0.3);
+      }
+
+      .meet-floating-panel .mic-icon svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+      }
+
+      .meet-floating-panel .audio-levels {
+        flex: 1;
+        display: grid;
+        gap: 6px;
+      }
+
+      .meet-floating-panel .audio-level {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .meet-floating-panel .audio-label {
+        font-size: 10px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .meet-floating-panel .audio-meter {
+        height: 6px;
+        width: 100%;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+      }
+
+      .meet-floating-panel .audio-meter-fill {
+        display: block;
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(135deg, #7ef5ff, #7cccff 60%, #ffb0e3);
+        transform-origin: 0 50%;
+        transform: scaleX(0);
+        transition: transform 0.08s linear;
+      }
+
+      .meet-floating-panel .meet-participants-panel {
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .meet-floating-panel .meet-participants-panel h3 {
+        margin: 0 0 6px;
+        letter-spacing: 0.16em;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+
+      .meet-floating-panel .meet-participants-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.75);
       }
 
       .floating-meet-toggle {
         border: none;
         border-radius: 999px;
-        padding: 12px 24px;
+        padding: 14px 26px;
         background: linear-gradient(135deg, rgba(110, 243, 255, 0.95), rgba(255, 110, 230, 0.95));
         color: #050814;
         font-weight: 700;
         letter-spacing: 0.16em;
         text-transform: uppercase;
         cursor: pointer;
+        font-size: 12px;
         box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
         transition: transform 0.2s ease;
+        animation: meetPulse 3.2s ease-in-out infinite;
       }
 
       .floating-meet-toggle:hover {
         transform: translateY(-2px) scale(1.02);
       }
 
-      .floating-meet-shell.open .friendly-session-panel {
-        max-height: 640px;
-        overflow-y: auto;
-        opacity: 1;
-        pointer-events: auto;
-        visibility: visible;
-        transform: translateY(0);
+      @keyframes meetPulse {
+        0%,
+        100% {
+          box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+        }
+        50% {
+          box-shadow: 0 18px 40px rgba(110, 243, 255, 0.4), 0 0 30px rgba(255, 110, 230, 0.25);
+        }
       }
 
       .floating-chat-toggle {
@@ -1194,6 +1488,7 @@
         gap: 8px;
         box-shadow: 0 24px 40px rgba(0, 0, 0, 0.45);
         z-index: 490;
+        touch-action: none;
       }
 
       .floating-chat-panel ul {
@@ -1258,126 +1553,6 @@
         color: rgba(255, 255, 255, 0.7);
         font-size: 18px;
         cursor: pointer;
-      }
-
-      .friendly-session-panel .friendly-session-banner {
-        margin: 6px 0;
-        font-size: 13px;
-      }
-
-      .friendly-controls {
-        display: grid;
-        gap: 8px;
-        margin: 12px 0;
-      }
-
-      .friendly-controls label {
-        font-size: 11px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-      }
-
-      .friendly-controls select {
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid rgba(110, 243, 255, 0.3);
-        background: rgba(0, 0, 0, 0.3);
-        color: rgba(234, 249, 255, 0.92);
-      }
-
-      .friendly-link {
-        margin-top: 14px;
-        padding: 10px;
-        border-radius: 10px;
-        border: 1px dashed rgba(255, 255, 255, 0.2);
-        background: rgba(255, 255, 255, 0.02);
-      }
-
-      .friendly-link-row {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 6px;
-      }
-
-      .friendly-link-row input {
-        flex: 1;
-        min-width: 200px;
-        padding: 8px;
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(0, 0, 0, 0.25);
-        color: rgba(255, 255, 255, 0.9);
-      }
-
-      .friendly-session-participants {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        margin-top: 12px;
-        font-size: 13px;
-        letter-spacing: 0.1em;
-        color: rgba(255, 255, 255, 0.75);
-      }
-
-      .friendly-session-participants strong {
-        color: #00f0ff;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-      }
-
-      .friendly-session-events {
-        margin-top: 14px;
-        padding: 10px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(0, 0, 0, 0.4);
-        max-height: 140px;
-        overflow-y: auto;
-        display: grid;
-        gap: 8px;
-      }
-
-      .friendly-session-event {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        padding: 6px 8px;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-      }
-
-      .friendly-session-event strong {
-        font-size: 11px;
-        letter-spacing: 0.12em;
-      }
-
-      .friendly-session-event span {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.7);
-      }
-
-      .friendly-video-grid {
-        margin-top: 14px;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 10px;
-      }
-
-      .friendly-video-grid video {
-        width: 100%;
-        height: 120px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: #010510;
-        object-fit: cover;
-      }
-
-      .friendly-session-actions {
-        margin-top: 10px;
-        display: flex;
-        justify-content: flex-end;
       }
 
       .lobby-view,
@@ -3744,6 +3919,15 @@
           padding: 18px;
           border-radius: 22px;
         }
+
+        .floating-meet-shell {
+          bottom: 96px;
+          right: 18px;
+        }
+
+        .meet-floating-panel {
+          width: min(92vw, 420px);
+        }
       }
 
       @media (max-width: 960px) {
@@ -3775,6 +3959,25 @@
           width: 100%;
         }
 
+        .floating-meet-shell {
+          right: 12px;
+          left: 12px;
+          align-items: stretch;
+        }
+
+        .floating-meet-tabs {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .meet-floating-panel {
+          width: 100%;
+        }
+
+        .meet-floating-panel .meet-video-grid {
+          grid-template-columns: 1fr;
+        }
+
         .stack-grid {
           flex-direction: column;
         }
@@ -3793,9 +3996,13 @@
       }
     </style>
   </head>
-    <body>
+    <body class="<%= gameOnly ? 'game-only' : '' %>">
 
     <div class="app-shell">
+      <div class="game-only-bar">
+        <a class="button ghost-button" href="/lobby">Return to Lobby</a>
+        <div class="game-only-title" id="gameOnlyTitle">Live Game</div>
+      </div>
 
       <section class="hero-section">
 
@@ -4140,26 +4347,6 @@
             <h3>Meet on the move</h3>
             <p class="api-note">Tap the floating Meet button to invite crew, generate a join link, and keep talking while you explore the arcade.</p>
             <button class="button ghost-button" type="button" id="communityMeetButton">Open Meet Panel</button>
-          </div>
-          <div class="stackjack-duel-panel" id="stackjackDuelPanel">
-            <div class="stackjack-duel-header">
-              <h3>StackJack Duel</h3>
-              <p class="api-note" id="stackjackDuelStatus">Invite a friend to split the Deck.</p>
-            </div>
-            <div class="stackjack-duel-controls">
-              <label for="stackjackDuelFriend">Crewmate</label>
-              <select id="stackjackDuelFriend">
-                <option value="">Loading friends...</option>
-              </select>
-              <button class="button primary" type="button" id="stackjackDuelCreate">Invite to StackJack</button>
-            </div>
-            <div class="stackjack-duel-link" id="stackjackDuelLink" hidden>
-              <label for="stackjackDuelLinkInput">Session link</label>
-              <div class="stackjack-link-row">
-                <input id="stackjackDuelLinkInput" type="text" readonly />
-                <button class="button ghost-button" type="button" id="stackjackDuelLinkCopy">Copy</button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -4724,54 +4911,85 @@
       Crew Chat <span id="floatingChatUnreadCount" hidden>0</span>
     </button>
     <div class="floating-chat-panel" id="floatingChatPanel" hidden>
-      <div class="floating-chat-header">
+      <div class="floating-chat-header panel-drag-handle" id="chatDragHandle">
         <strong>NeonArc Crew Chat</strong>
         <span id="floatingChatStatus">Connecting...</span>
-        <button class="floating-chat-close" id="floatingChatClose" type="button">×</button>
+        <button class="floating-chat-close" id="floatingChatClose" type="button">Hide</button>
       </div>
       <ul id="floatingChatMessages"></ul>
       <form id="floatingChatForm">
         <input id="floatingChatInput" type="text" placeholder="Send a message to the crew" autocomplete="off" />
         <button class="button primary" type="submit">Send</button>
       </form>
+      <span class="panel-resize-handle" id="chatResizeHandle" aria-hidden="true"></span>
     </div>
     <div class="floating-meet-shell" id="floatingMeetShell">
       <button class="floating-meet-toggle" id="floatingMeetToggle" type="button">Meet Crew</button>
-      <div class="friendly-session-panel" id="friendlySessionPanel">
-        <div class="friendly-session-header">
-          <h3>Friendly Sessions</h3>
-          <p class="api-note friendly-session-banner" id="friendlySessionBanner">Invite friends, create a meeting link, and keep talking while you play.</p>
-        </div>
-        <div class="friendly-controls">
-          <label for="friendlySessionFriend">Friend</label>
-          <select id="friendlySessionFriend">
-            <option value="">Loading friends...</option>
-          </select>
-          <label for="friendlySessionGame">Game</label>
-          <select id="friendlySessionGame"></select>
-        </div>
-        <div class="friendly-session-participants">
-          <span>Host: <strong id="friendlySessionHostName">You</strong></span>
-          <span>Guest: <strong id="friendlySessionGuestName">Waiting</strong></span>
-        </div>
-        <button class="button primary" type="button" id="friendlySessionLaunch">Create Meeting</button>
-        <p class="api-note" id="friendlySessionStatus">Pick a crew member and game to generate an invite link.</p>
-        <div class="friendly-link" id="friendlySessionLinkContainer" hidden>
-          <label for="friendlySessionLink">Shareable session link</label>
-          <div class="friendly-link-row">
-            <input id="friendlySessionLink" type="text" readonly />
-            <button class="button ghost-button" type="button" id="friendlySessionLinkCopy">Copy</button>
+      <div class="meet-floating-panel" id="meetFloatingPanel">
+        <div class="meet-floating-header panel-drag-handle" id="meetDragHandle">
+          <div>
+            <h3>Meet Crew</h3>
+            <p>Floating comms while you play.</p>
           </div>
-          <p class="api-note">Send it to a friend so they can join the meeting and talk.</p>
+          <div class="panel-actions">
+            <button class="panel-action-btn" type="button" id="meetPanelHide">Hide</button>
+          </div>
         </div>
-        <div class="friendly-session-events" id="friendlySessionEvents" aria-live="polite"></div>
-        <div class="friendly-video-grid" id="friendlyVideoGrid">
-          <video id="friendlyLocalVideo" autoplay muted playsinline></video>
-          <video id="friendlyRemoteVideo" autoplay playsinline></video>
+        <div class="meet-controls">
+          <button class="button primary" type="button" id="createMeetingBtn">Create Meeting</button>
+          <div class="meet-link" id="meetingLinkContainer" hidden>
+            <label for="meetingLink">Meeting link</label>
+            <div class="meet-link-row">
+              <input id="meetingLink" type="text" readonly />
+              <button class="button ghost-button" id="meetingLinkCopy" type="button">Copy</button>
+            </div>
+          </div>
         </div>
-        <div class="friendly-session-actions">
-          <button class="button ghost-button" type="button" id="friendlySessionCallBtn">Start video call</button>
+        <div class="meet-status" id="meetStatus">Log in to create or join a meeting.</div>
+        <div class="meet-video-grid">
+          <div class="video-card">
+            <label>Your camera</label>
+            <video id="meetLocalVideo" autoplay muted playsinline></video>
+          </div>
+          <div class="video-card">
+            <label>Remote pilot</label>
+            <video id="meetRemoteVideo" autoplay playsinline></video>
+          </div>
         </div>
+        <div class="meet-actions">
+          <button class="button ghost-button" type="button" id="meetStartCallBtn">Start meeting</button>
+        </div>
+        <div class="meet-audio-controls">
+          <button class="audio-mic-button" type="button" id="toggleMuteBtn">
+            <span class="mic-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zM9 20h6v2a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2z" />
+              </svg>
+            </span>
+            <span class="mic-text">Mute microphone</span>
+          </button>
+          <div class="audio-levels">
+            <div class="audio-level">
+              <span class="audio-label">Mic level</span>
+              <div class="audio-meter" aria-hidden="true">
+                <span class="audio-meter-fill" id="localLevelBar"></span>
+              </div>
+            </div>
+            <div class="audio-level">
+              <span class="audio-label">Remote level</span>
+              <div class="audio-meter" aria-hidden="true">
+                <span class="audio-meter-fill" id="remoteLevelBar"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="meet-participants-panel">
+          <h3>Participants</h3>
+          <ul class="meet-participants-list" id="meetParticipants">
+            <li class="muted">Waiting for pilots to join...</li>
+          </ul>
+        </div>
+        <span class="panel-resize-handle" id="meetResizeHandle" aria-hidden="true"></span>
       </div>
     </div>
 
@@ -4791,6 +5009,8 @@
         resetDelay: 1700,
       };
 
+      const initialGameRoute = <%- JSON.stringify(initialGame || '') %>;
+
       // ---------------- Shared state ----------------
       let balance = 0;
       let cashBalance = 0;
@@ -4800,57 +5020,7 @@
       const historyItems = [];
       let glowWheelSpinTimer = null;
 
-      const FRIENDLY_GAMES = [
-        { value: 'rocket', label: 'Rocket Line' },
-        { value: 'pulse', label: 'Pulse Cash' },
-        { value: 'mind', label: 'Mind Bet' },
-        { value: 'stack', label: 'StackJack' },
-        { value: 'binaryPoker', label: 'Binary Poker' },
-        { value: 'echoHand', label: 'Echo Hand' },
-        { value: 'fuse', label: 'Fuse' },
-        { value: 'perception', label: 'Perception' },
-      ];
-      const FRIENDLY_GAME_ALIASES = new Map([
-        ['stackjack', 'stack'],
-        ['stack-jack', 'stack'],
-        ['stack_jack', 'stack'],
-      ]);
-      const FRIENDLY_GAME_CANONICAL = new Map(
-        FRIENDLY_GAMES.map((entry) => [entry.value.toLowerCase(), entry.value]),
-      );
-
-      function resolveFriendlyGame(value) {
-        if (!value) return null;
-        const normalized = value?.toString().trim();
-        if (!normalized) return null;
-        const key = normalized.toLowerCase();
-        if (FRIENDLY_GAME_CANONICAL.has(key)) {
-          return FRIENDLY_GAME_CANONICAL.get(key);
-        }
-        if (FRIENDLY_GAME_ALIASES.has(key)) {
-          return FRIENDLY_GAME_ALIASES.get(key);
-        }
-        return null;
-      }
-
-      function scheduleFriendlyGameLaunch(game) {
-        if (!game || typeof enterGame !== 'function') return;
-        const runner = () => enterGame(game);
-        if (window.requestAnimationFrame) {
-          window.requestAnimationFrame(runner);
-        } else {
-          setTimeout(runner, 0);
-        }
-      }
-      const initialFriendlyParams = {
-        friend: null,
-        game: null,
-        session: null,
-      };
       const urlParams = new URLSearchParams(window.location.search);
-      initialFriendlyParams.friend = urlParams.get('friend')?.trim() || null;
-      initialFriendlyParams.game = resolveFriendlyGame(urlParams.get('game'));
-      initialFriendlyParams.session = urlParams.get('session')?.trim() || null;
 
       function normalizeCurrency(value, { clamp = true } = {}) {
         const numeric = Number(value);
@@ -5129,29 +5299,10 @@
       const incomingFriendRequestsEl = document.getElementById('incomingFriendRequests');
       const outgoingFriendRequestsEl = document.getElementById('outgoingFriendRequests');
       const friendRequestStatusEl = document.getElementById('friendRequestStatus');
-      const friendlySessionBannerEl = document.getElementById('friendlySessionBanner');
-      const friendlySessionFriendSelect = document.getElementById('friendlySessionFriend');
-      const friendlySessionGameSelect = document.getElementById('friendlySessionGame');
-      const friendlySessionLaunchBtn = document.getElementById('friendlySessionLaunch');
-      const friendlySessionStatusEl = document.getElementById('friendlySessionStatus');
-      const friendlySessionLinkContainer = document.getElementById('friendlySessionLinkContainer');
-      const friendlySessionLinkInput = document.getElementById('friendlySessionLink');
-      const friendlySessionLinkCopyBtn = document.getElementById('friendlySessionLinkCopy');
-      const friendlySessionHostName = document.getElementById('friendlySessionHostName');
-      const friendlySessionGuestName = document.getElementById('friendlySessionGuestName');
-      const friendlySessionEventFeed = document.getElementById('friendlySessionEvents');
-      const friendlySessionCallBtn = document.getElementById('friendlySessionCallBtn');
-      const friendlyLocalVideo = document.getElementById('friendlyLocalVideo');
-      const friendlyRemoteVideo = document.getElementById('friendlyRemoteVideo');
       const floatingMeetShell = document.getElementById('floatingMeetShell');
       const floatingMeetToggle = document.getElementById('floatingMeetToggle');
+      const meetCreateButton = document.getElementById('createMeetingBtn');
       const communityMeetButton = document.getElementById('communityMeetButton');
-      const stackjackDuelFriendSelect = document.getElementById('stackjackDuelFriend');
-      const stackjackDuelCreateBtn = document.getElementById('stackjackDuelCreate');
-      const stackjackDuelStatusEl = document.getElementById('stackjackDuelStatus');
-      const stackjackDuelLinkContainer = document.getElementById('stackjackDuelLink');
-      const stackjackDuelLinkInput = document.getElementById('stackjackDuelLinkInput');
-      const stackjackDuelLinkCopyBtn = document.getElementById('stackjackDuelLinkCopy');
       const chatToggleBtn = document.getElementById('floatingChatToggle');
       const chatPanel = document.getElementById('floatingChatPanel');
       const chatMessagesEl = document.getElementById('floatingChatMessages');
@@ -5160,8 +5311,15 @@
       const chatStatusEl = document.getElementById('floatingChatStatus');
       const chatUnreadBadge = document.getElementById('floatingChatUnreadCount');
       const chatCloseBtn = document.getElementById('floatingChatClose');
+      const chatDragHandle = document.getElementById('chatDragHandle');
+      const chatResizeHandle = document.getElementById('chatResizeHandle');
       const leaderboardStatusEl = document.getElementById('leaderboardStatus');
       const leaderboardBodyEl = document.querySelector('#leaderboardPage tbody');
+      const gameOnlyTitleEl = document.getElementById('gameOnlyTitle');
+      const meetDragHandle = document.getElementById('meetDragHandle');
+      const meetResizeHandle = document.getElementById('meetResizeHandle');
+      const meetPanelHideBtn = document.getElementById('meetPanelHide');
+      const meetFloatingPanel = document.getElementById('meetFloatingPanel');
       const cardPanels = {
         binaryPoker: binaryGamePanel,
         echoHand: echoGamePanel,
@@ -5352,6 +5510,26 @@
         toggleFuseInstructions(false);
         showView(lobbyViews.main);
         setTitle('Main Lobby');
+        if (document.body.classList.contains('game-only')) {
+          setFloatingMeetVisible(false);
+          toggleChatPanel(true);
+        } else {
+          setFloatingMeetVisible(true);
+        }
+        applyInitialGameRoute();
+        window.addEventListener('popstate', () => {
+          const routed = getInitialGameFromLocation();
+          if (routed) {
+            setGameOnlyMode(true);
+            enterGame(routed, { fromRoute: true });
+          } else {
+            setGameOnlyMode(false);
+            showView(lobbyViews.main);
+            setTitle('Main Lobby');
+            setFloatingMeetVisible(true);
+            toggleChatPanel(false);
+          }
+        });
         if (openAccountHubBtn) {
           openAccountHubBtn.addEventListener('click', () => {
             if (!accountData) {
@@ -5450,10 +5628,20 @@
           tile.addEventListener('click', () => enterGame(tile.dataset.game));
         });
         backToMainButtons.forEach((button) => {
-          button.addEventListener('click', () => backToMainLobby());
+          button.addEventListener('click', () => {
+            if (document.body.classList.contains('game-only')) {
+              window.location.href = '/lobby';
+              return;
+            }
+            backToMainLobby();
+          });
         });
         backButtons.forEach((button) => {
           button.addEventListener('click', () => {
+            if (document.body.classList.contains('game-only')) {
+              window.location.href = '/lobby';
+              return;
+            }
             const target = button.dataset.backLobby;
             if (target === 'skill') {
               exitSkillGame();
@@ -6436,83 +6624,12 @@
             setCommunityStatus(`Declined ${username}'s request.`);
           }
           await refreshCommunityFriendRequests();
-          await refreshFriendlySessionFriends();
           if (communitySearchInput?.value?.trim()) {
             searchCommunity(communitySearchInput.value);
           }
         } catch (error) {
           console.error('Friend request response failed', error);
           setCommunityStatus('Could not update that request.', true);
-        }
-      }
-
-      function populateStackjackFriendSelect(friends = []) {
-        if (!stackjackDuelFriendSelect) return;
-        stackjackDuelFriendSelect.innerHTML = '';
-        if (!friends.length) {
-          const empty = document.createElement('option');
-          empty.value = '';
-          empty.textContent = 'No friends yet';
-          stackjackDuelFriendSelect.appendChild(empty);
-          stackjackDuelFriendSelect.disabled = true;
-          return;
-        }
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = 'Select a friend';
-        placeholder.disabled = true;
-        placeholder.selected = true;
-        stackjackDuelFriendSelect.appendChild(placeholder);
-        friends.forEach((friend) => {
-          const option = document.createElement('option');
-          option.value = friend.username;
-          option.textContent = friend.username;
-          stackjackDuelFriendSelect.appendChild(option);
-        });
-        stackjackDuelFriendSelect.disabled = false;
-      }
-
-      function setStackjackDuelStatus(message, isError = false) {
-        if (!stackjackDuelStatusEl) return;
-        stackjackDuelStatusEl.textContent = message;
-        stackjackDuelStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(255, 255, 255, 0.75)';
-      }
-
-      function showStackjackDuelLink(link) {
-        if (!stackjackDuelLinkContainer || !stackjackDuelLinkInput) return;
-        stackjackDuelLinkInput.value = link || '';
-        stackjackDuelLinkContainer.hidden = !link;
-      }
-
-      async function createStackjackDuel() {
-        if (!stackjackDuelFriendSelect || !stackjackDuelFriendSelect.value) {
-          setStackjackDuelStatus('Choose a friend to invite.', true);
-          return;
-        }
-        const friend = stackjackDuelFriendSelect.value;
-        setStackjackDuelStatus(`Inviting ${friend} to StackJack...`);
-        const payload = await createFriendlyMultiplayerSession(friend, 'stack');
-        if (!payload) {
-          return;
-        }
-        const link = payload.link || friendlySessionLinkInput?.value || '';
-        showStackjackDuelLink(link);
-        setStackjackDuelStatus(`Session ready. Share the link with ${friend}.`);
-      }
-
-      async function copyStackjackDuelLink() {
-        if (!stackjackDuelLinkInput?.value) return;
-        try {
-          if (navigator.clipboard?.writeText) {
-            await navigator.clipboard.writeText(stackjackDuelLinkInput.value);
-          } else {
-            stackjackDuelLinkInput.select();
-            document.execCommand('copy');
-          }
-          setStackjackDuelStatus('Link copied. Share it with your friend!');
-        } catch (error) {
-          console.error('Failed to copy stackjack link', error);
-          setStackjackDuelStatus('Unable to copy link.', true);
         }
       }
 
@@ -6640,6 +6757,86 @@
         }
       }
 
+      function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+      }
+
+      function enableDrag(container, handle) {
+        if (!container || !handle) return;
+        let startX = 0;
+        let startY = 0;
+        let startLeft = 0;
+        let startTop = 0;
+
+        const onPointerMove = (event) => {
+          const dx = event.clientX - startX;
+          const dy = event.clientY - startY;
+          const rect = container.getBoundingClientRect();
+          const maxX = window.innerWidth - rect.width;
+          const maxY = window.innerHeight - rect.height;
+          const nextLeft = clamp(startLeft + dx, 0, Math.max(0, maxX));
+          const nextTop = clamp(startTop + dy, 0, Math.max(0, maxY));
+          container.style.left = `${nextLeft}px`;
+          container.style.top = `${nextTop}px`;
+        };
+
+        const onPointerUp = () => {
+          window.removeEventListener('pointermove', onPointerMove);
+          window.removeEventListener('pointerup', onPointerUp);
+        };
+
+        handle.addEventListener('pointerdown', (event) => {
+          if (event.button !== 0) return;
+          const rect = container.getBoundingClientRect();
+          startX = event.clientX;
+          startY = event.clientY;
+          startLeft = rect.left;
+          startTop = rect.top;
+          container.style.right = 'auto';
+          container.style.bottom = 'auto';
+          container.style.left = `${startLeft}px`;
+          container.style.top = `${startTop}px`;
+          window.addEventListener('pointermove', onPointerMove);
+          window.addEventListener('pointerup', onPointerUp);
+        });
+      }
+
+      function enableResize(panel, handle, { minWidth = 260, minHeight = 220 } = {}) {
+        if (!panel || !handle) return;
+        let startX = 0;
+        let startY = 0;
+        let startWidth = 0;
+        let startHeight = 0;
+
+        const onPointerMove = (event) => {
+          const dx = event.clientX - startX;
+          const dy = event.clientY - startY;
+          const maxWidth = window.innerWidth - panel.getBoundingClientRect().left - 12;
+          const maxHeight = window.innerHeight - panel.getBoundingClientRect().top - 12;
+          const nextWidth = clamp(startWidth + dx, minWidth, Math.max(minWidth, maxWidth));
+          const nextHeight = clamp(startHeight + dy, minHeight, Math.max(minHeight, maxHeight));
+          panel.style.width = `${nextWidth}px`;
+          panel.style.height = `${nextHeight}px`;
+          panel.style.maxHeight = 'none';
+        };
+
+        const onPointerUp = () => {
+          window.removeEventListener('pointermove', onPointerMove);
+          window.removeEventListener('pointerup', onPointerUp);
+        };
+
+        handle.addEventListener('pointerdown', (event) => {
+          if (event.button !== 0) return;
+          const rect = panel.getBoundingClientRect();
+          startX = event.clientX;
+          startY = event.clientY;
+          startWidth = rect.width;
+          startHeight = rect.height;
+          window.addEventListener('pointermove', onPointerMove);
+          window.addEventListener('pointerup', onPointerUp);
+        });
+      }
+
       function handleChatFormSubmit(event) {
         event.preventDefault();
         if (!chatInput) return;
@@ -6656,66 +6853,11 @@
       chatToggleBtn?.addEventListener('click', () => toggleChatPanel());
       chatCloseBtn?.addEventListener('click', () => toggleChatPanel(false));
       chatForm?.addEventListener('submit', handleChatFormSubmit);
-      stackjackDuelCreateBtn?.addEventListener('click', createStackjackDuel);
-      stackjackDuelLinkCopyBtn?.addEventListener('click', copyStackjackDuelLink);
-      friendlySessionCallBtn?.addEventListener('click', startMultiplayerCall);
-
-      function setFriendlySessionStatus(message, isError = false) {
-        if (!friendlySessionStatusEl) return;
-        friendlySessionStatusEl.textContent = message;
-        friendlySessionStatusEl.style.color = isError ? '#ff9bb3' : 'rgba(255, 255, 255, 0.72)';
-      }
-
-      function setFriendlySessionBanner(message) {
-        if (!friendlySessionBannerEl) return;
-        friendlySessionBannerEl.textContent =
-          message || 'Invite friends, create a meeting link, and keep talking while you play.';
-      }
-
-      function getFriendlyGameLabel(game) {
-        return FRIENDLY_GAMES.find((entry) => entry.value === game)?.label || game;
-      }
-
-      function setFriendlySessionLink(friend, game, overrideLink) {
-        if (!friendlySessionLinkContainer || !friendlySessionLinkInput) return;
-        const canonicalGame = resolveFriendlyGame(game);
-        if (!friend || !canonicalGame) {
-          friendlySessionLinkContainer.hidden = true;
-          return;
-        }
-        const params = new URLSearchParams({ friend, game: canonicalGame });
-        if (!overrideLink && multiplayerSessionId) {
-          params.set('session', multiplayerSessionId);
-        }
-        friendlySessionLinkInput.value =
-          overrideLink || `${window.location.origin}${window.location.pathname}?${params.toString()}`;
-        friendlySessionLinkContainer.hidden = false;
-      }
-
-      function updateFriendlyParticipants(participants = {}) {
-        if (friendlySessionHostName) {
-          friendlySessionHostName.textContent = participants.host || 'Host';
-        }
-        if (friendlySessionGuestName) {
-          friendlySessionGuestName.textContent = participants.guest || 'Guest';
-        }
-      }
-
-      function appendFriendlyEvent(payload = {}) {
-        if (!friendlySessionEventFeed || !payload.event) return;
-        const entry = document.createElement('div');
-        entry.className = 'friendly-session-event';
-        const title = document.createElement('strong');
-        title.textContent = payload.origin ? `${payload.origin}: ${payload.event}` : payload.event;
-        const body = document.createElement('span');
-        body.textContent = payload.message || (payload.details ? JSON.stringify(payload.details) : '');
-        entry.appendChild(title);
-        entry.appendChild(body);
-        friendlySessionEventFeed.prepend(entry);
-        while (friendlySessionEventFeed.children.length > 10) {
-          friendlySessionEventFeed.removeChild(friendlySessionEventFeed.lastChild);
-        }
-      }
+      meetPanelHideBtn?.addEventListener('click', () => setFloatingMeetVisible(false));
+      enableDrag(floatingMeetShell, meetDragHandle);
+      enableResize(meetFloatingPanel, meetResizeHandle, { minWidth: 320, minHeight: 360 });
+      enableDrag(chatPanel, chatDragHandle);
+      enableResize(chatPanel, chatResizeHandle, { minWidth: 260, minHeight: 220 });
 
       function sendMultiplayerEvent(eventName, details = {}) {
         if (!multiplayerSocket || multiplayerSocket.readyState !== WebSocket.OPEN) return;
@@ -6729,317 +6871,6 @@
           multiplayerSocket.send(JSON.stringify(payload));
         } catch (error) {
           console.error('Failed to send multiplayer event', error);
-        }
-      }
-
-      async function joinMultiplayerSession(sessionId) {
-        if (!sessionId) return;
-        try {
-          const response = await fetch(`/api/multiplayer/session/${encodeURIComponent(sessionId)}/join`, {
-            method: 'POST',
-          });
-          const payload = await response.json().catch(() => ({}));
-          if (!response.ok) {
-            setFriendlySessionStatus(payload.error || 'Unable to join shared session.', true);
-            return;
-          }
-          multiplayerSessionId = sessionId;
-          multiplayerRole = payload.role;
-          multiplayerGame = payload.game || multiplayerGame;
-          const partnerName = payload.partner?.username;
-          if (multiplayerRole === 'host') {
-            updateFriendlyParticipants({
-              host: 'You',
-              guest: partnerName || 'Guest',
-            });
-          } else {
-            updateFriendlyParticipants({
-              host: partnerName || 'Host',
-              guest: 'You',
-            });
-          }
-          const friendPlaceholder = initialFriendlyParams.friend || partnerName || 'Pilot';
-          setFriendlySessionLink(friendPlaceholder, multiplayerGame);
-          setFriendlySessionStatus(`Session active (${multiplayerRole}).`);
-          connectMultiplayerSocket(sessionId);
-        } catch (error) {
-          console.error('Failed to join multiplayer session', error);
-          setFriendlySessionStatus('Unable to join session.', true);
-        }
-      }
-
-      async function createFriendlyMultiplayerSession(friend, game) {
-        const label = getFriendlyGameLabel(game);
-        setFriendlySessionStatus(`Creating ${label} session with ${friend}...`);
-        try {
-          const response = await fetch('/api/multiplayer/session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: friend, game }),
-          });
-          const payload = await response.json().catch(() => ({}));
-          if (!response.ok) {
-            setFriendlySessionStatus(payload.error || 'Unable to create multiplayer session.', true);
-            return;
-          }
-          multiplayerSessionId = payload.sessionId;
-          multiplayerGame = payload.game || game;
-          setFriendlySessionBanner(`Playing ${payload.label || label} vs the computer with ${friend}.`);
-          setFriendlySessionLink(friend, payload.game, payload.link);
-          setFriendlySessionStatus(`Session ready. Share link or wait for ${friend}.`);
-          await joinMultiplayerSession(payload.sessionId);
-          return payload;
-        } catch (error) {
-          console.error('Failed to create multiplayer session', error);
-          setFriendlySessionStatus('Failed to create session.', true);
-        }
-      }
-
-      function connectMultiplayerSocket(sessionId) {
-        if (!sessionId) return;
-        if (multiplayerSocket) {
-          multiplayerSocket.close();
-        }
-        const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        const socket = new WebSocket(
-          `${wsScheme}://${window.location.host}/ws/multiplayer?session=${encodeURIComponent(sessionId)}`,
-        );
-        multiplayerSocket = socket;
-        socket.addEventListener('open', () => {
-          setFriendlySessionStatus('Multiplayer signaling connected.');
-        });
-        socket.addEventListener('message', (event) => {
-          try {
-            const data = JSON.parse(event.data);
-            if (data?.type === 'session.participants') {
-              updateFriendlyParticipants(data.participants);
-              appendFriendlyEvent({
-                event: 'session.update',
-                message: `Status: ${data.status || 'waiting'}`,
-              });
-            }
-            if (data?.type === 'game.event') {
-              appendFriendlyEvent(data);
-            }
-            if (data?.type?.startsWith('signal.')) {
-              handleMultiplayerSignal(data).catch((error) => {
-                console.error('Signal handling failed', error);
-              });
-            }
-          } catch (error) {
-            console.error('Multiplayer socket parse error', error);
-          }
-        });
-        socket.addEventListener('close', () => {
-          multiplayerSocket = null;
-          setFriendlySessionStatus('Session disconnected.', true);
-          appendFriendlyEvent({ event: 'session.closed', message: 'Connection lost.' });
-        });
-        socket.addEventListener('error', () => {
-          setFriendlySessionStatus('Multiplayer signaling error.', true);
-        });
-      }
-
-      function createMultiplayerPeerConnection() {
-        const pc = new RTCPeerConnection();
-        pc.addEventListener('icecandidate', (event) => {
-          if (event.candidate) {
-            multiplayerSocket?.send(
-              JSON.stringify({ type: 'signal.candidate', candidate: event.candidate }),
-            );
-          }
-        });
-        pc.addEventListener('track', (event) => {
-          if (friendlyRemoteVideo) {
-            friendlyRemoteVideo.srcObject = event.streams[0];
-          }
-        });
-        return pc;
-      }
-
-      async function handleMultiplayerSignal(payload) {
-        if (!payload?.type) return;
-        if (!multiplayerPeerConnection) {
-          multiplayerPeerConnection = createMultiplayerPeerConnection();
-        }
-        if (payload.type === 'signal.offer' && payload.offer) {
-          await multiplayerPeerConnection.setRemoteDescription(new RTCSessionDescription(payload.offer));
-          const answer = await multiplayerPeerConnection.createAnswer();
-          await multiplayerPeerConnection.setLocalDescription(answer);
-          multiplayerSocket?.send(JSON.stringify({ type: 'signal.answer', answer }));
-        } else if (payload.type === 'signal.answer' && payload.answer) {
-          await multiplayerPeerConnection.setRemoteDescription(
-            new RTCSessionDescription(payload.answer),
-          );
-        } else if (payload.type === 'signal.candidate' && payload.candidate) {
-          await multiplayerPeerConnection.addIceCandidate(new RTCIceCandidate(payload.candidate));
-        }
-      }
-
-      async function startMultiplayerCall() {
-        if (!multiplayerSessionId || !multiplayerSocket) {
-          setFriendlySessionStatus('Join a session before starting a call.', true);
-          return;
-        }
-        if (!multiplayerPeerConnection) {
-          multiplayerPeerConnection = createMultiplayerPeerConnection();
-        }
-        if (!multiplayerLocalStream) {
-          try {
-            multiplayerLocalStream = await navigator.mediaDevices.getUserMedia({
-              audio: true,
-              video: true,
-            });
-            if (friendlyLocalVideo) {
-              friendlyLocalVideo.srcObject = multiplayerLocalStream;
-            }
-            multiplayerLocalStream.getTracks().forEach((track) => {
-              multiplayerPeerConnection.addTrack(track, multiplayerLocalStream);
-            });
-          } catch (error) {
-            console.error('Media capture failed', error);
-            setFriendlySessionStatus('Unable to access camera/mic.', true);
-            return;
-          }
-        }
-        try {
-          const offer = await multiplayerPeerConnection.createOffer();
-          await multiplayerPeerConnection.setLocalDescription(offer);
-          multiplayerSocket.send(JSON.stringify({ type: 'signal.offer', offer }));
-          setFriendlySessionStatus('Video call starting...');
-        } catch (error) {
-          console.error('Call start failed', error);
-          setFriendlySessionStatus('Unable to start video call.', true);
-        }
-      }
-
-      function populateFriendlyGames() {
-        if (!friendlySessionGameSelect) return;
-        friendlySessionGameSelect.innerHTML = '';
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.disabled = true;
-        placeholder.selected = true;
-        placeholder.textContent = 'Select a game';
-        friendlySessionGameSelect.appendChild(placeholder);
-        FRIENDLY_GAMES.forEach((entry) => {
-          const option = document.createElement('option');
-          option.value = entry.value;
-          option.textContent = entry.label;
-          friendlySessionGameSelect.appendChild(option);
-        });
-        if (initialFriendlyParams.game) {
-          friendlySessionGameSelect.value = initialFriendlyParams.game;
-        }
-      }
-
-      async function refreshFriendlySessionFriends() {
-        if (!friendlySessionFriendSelect) return;
-        friendlySessionFriendSelect.disabled = true;
-        friendlySessionFriendSelect.innerHTML = '<option value="">Loading friends...</option>';
-        try {
-          const response = await fetch('/api/profile/friends');
-          if (response.status === 401) {
-            friendlySessionFriendSelect.innerHTML = '<option value="">Login to view friends</option>';
-            setFriendlySessionStatus('Please log in to invite friends.', true);
-            return;
-          }
-          if (!response.ok) {
-            friendlySessionFriendSelect.innerHTML = '<option value="">Unable to load friends</option>';
-            setFriendlySessionStatus('Unable to load friends right now.', true);
-            return;
-          }
-          const payload = await response.json();
-          const friends = Array.isArray(payload?.friends) ? payload.friends : [];
-          friendlySessionFriendSelect.innerHTML = '';
-          populateStackjackFriendSelect(friends);
-          if (!friends.length) {
-            friendlySessionFriendSelect.innerHTML = '<option value="">No friends yet</option>';
-            setFriendlySessionStatus('Add a friend to start shared sessions.');
-            friendlySessionFriendSelect.disabled = true;
-            return;
-          }
-          const placeholder = document.createElement('option');
-          placeholder.value = '';
-          placeholder.textContent = 'Select a friend';
-          friendlySessionFriendSelect.appendChild(placeholder);
-          friends.forEach((friend) => {
-            const option = document.createElement('option');
-            option.value = friend.username;
-            option.textContent = friend.username;
-            friendlySessionFriendSelect.appendChild(option);
-          });
-          friendlySessionFriendSelect.disabled = false;
-          setFriendlySessionStatus('Friends are ready for shared sessions.');
-          if (initialFriendlyParams.friend) {
-            friendlySessionFriendSelect.value = initialFriendlyParams.friend;
-          }
-        } catch (error) {
-          console.error('Failed to load friend list', error);
-          friendlySessionFriendSelect.innerHTML = '<option value="">Unable to load friends</option>';
-          setFriendlySessionStatus('Could not load friend list.', true);
-        }
-      }
-
-      function handleFriendlySessionLaunch() {
-        if (!friendlySessionFriendSelect || !friendlySessionGameSelect) return;
-        const friend = friendlySessionFriendSelect.value?.trim();
-        const resolvedGame = resolveFriendlyGame(friendlySessionGameSelect.value);
-        if (!friend) {
-          setFriendlySessionStatus('Select a friend before sharing a session.', true);
-          return;
-        }
-        if (!resolvedGame) {
-          setFriendlySessionStatus('Choose a game for the friendly run.', true);
-          return;
-        }
-        const label =
-          FRIENDLY_GAMES.find((entry) => entry.value === resolvedGame)?.label || resolvedGame;
-        setFriendlySessionStatus(`Preparing shared ${label} session for ${friend}.`);
-        setFriendlySessionBanner(`Playing ${label} vs the computer with ${friend}.`);
-        createFriendlyMultiplayerSession(friend, resolvedGame);
-        scheduleFriendlyGameLaunch(resolvedGame);
-      }
-
-      async function copyFriendlySessionLink() {
-        if (!friendlySessionLinkInput?.value) return;
-        const text = friendlySessionLinkInput.value;
-        try {
-          if (navigator.clipboard?.writeText) {
-            await navigator.clipboard.writeText(text);
-          } else {
-            friendlySessionLinkInput.select();
-            document.execCommand('copy');
-          }
-          setFriendlySessionStatus('Link copied. Share it with your friend!');
-        } catch (error) {
-          console.error('Failed to copy friendly link', error);
-          setFriendlySessionStatus('Unable to copy link automatically.', true);
-        }
-      }
-
-      function initializeFriendlySessionFromUrl() {
-        const friend = initialFriendlyParams.friend;
-        const normalizedGame = resolveFriendlyGame(initialFriendlyParams.game);
-        if (friend && normalizedGame) {
-          const label =
-            FRIENDLY_GAMES.find((entry) => entry.value === normalizedGame)?.label || normalizedGame;
-          setFriendlySessionBanner(`Playing ${label} vs the computer with ${friend}.`);
-          setFriendlySessionStatus(`Shared session ready for ${label}.`);
-          setFriendlySessionLink(friend, normalizedGame);
-          if (friendlySessionFriendSelect) {
-            friendlySessionFriendSelect.value = friend;
-          }
-          if (friendlySessionGameSelect) {
-            friendlySessionGameSelect.value = normalizedGame;
-          }
-          scheduleFriendlyGameLaunch(normalizedGame);
-        } else {
-          setFriendlySessionBanner('Invite friends, create a meeting link, and keep talking while you play.');
-          setFriendlySessionStatus('Pick a friend and game to share a challenge link.');
-        }
-        if (initialFriendlyParams.session) {
-          joinMultiplayerSession(initialFriendlyParams.session);
         }
       }
 
@@ -7058,7 +6889,7 @@
 
       function openMeetPanel() {
         setFloatingMeetVisible(true);
-        friendlySessionFriendSelect?.focus();
+        meetCreateButton?.focus();
       }
 
       async function sendFriendRequest(username) {
@@ -7086,7 +6917,6 @@
         setCommunityStatus(`Friend request sent to ${username}.`);
       }
       await refreshCommunityFriendRequests();
-      await refreshFriendlySessionFriends();
       if (communitySearchInput?.value?.trim()) {
         searchCommunity(communitySearchInput.value);
       }
@@ -7613,7 +7443,6 @@
         case 'communityPage':
             setCommunityStatus('Enter a username to search pilots.');
             refreshCommunityFriendRequests();
-            refreshFriendlySessionFriends();
             break;
           default:
             break;
@@ -7680,8 +7509,71 @@
         return false;
       }
 
-      function enterGame(gameName) {
+      const GAME_ROUTE_MAP = new Map([
+        ['rocket', 'rocket'],
+        ['pulse', 'pulse'],
+        ['mind', 'mind'],
+        ['stack', 'stack'],
+        ['stackjack', 'stack'],
+        ['binarypoker', 'binaryPoker'],
+        ['echohand', 'echoHand'],
+        ['fuse', 'fuse'],
+        ['perception', 'perception'],
+      ]);
+
+      function resolveGameRoute(rawValue) {
+        if (!rawValue) return '';
+        const cleaned = rawValue.toString().trim().replace(/[^a-zA-Z0-9_-]/g, '');
+        if (!cleaned) return '';
+        const normalized = cleaned.replace(/[-_]/g, '').toLowerCase();
+        return GAME_ROUTE_MAP.get(normalized) || '';
+      }
+
+      function setGameOnlyMode(enabled) {
+        document.body.classList.toggle('game-only', Boolean(enabled));
+      }
+
+      function getInitialGameFromLocation() {
+        if (initialGameRoute) {
+          return resolveGameRoute(initialGameRoute);
+        }
+        const params = new URLSearchParams(window.location.search);
+        const queryGame = params.get('game');
+        if (queryGame) {
+          return resolveGameRoute(queryGame);
+        }
+        const match = window.location.pathname.match(/^\/games\/([^/?#]+)/i);
+        if (match) {
+          return resolveGameRoute(match[1]);
+        }
+        return '';
+      }
+
+      function updateGameRoute(gameName, replace) {
+        const resolved = resolveGameRoute(gameName);
+        if (!resolved) return;
+        const nextPath = `/games/${encodeURIComponent(resolved)}`;
+        setGameOnlyMode(true);
+        if (replace) {
+          window.history.replaceState({ game: resolved }, '', nextPath);
+        } else {
+          window.history.pushState({ game: resolved }, '', nextPath);
+        }
+      }
+
+      function applyInitialGameRoute() {
+        const initial = getInitialGameFromLocation();
+        if (initial) {
+          setGameOnlyMode(true);
+          enterGame(initial, { fromRoute: true });
+        }
+      }
+
+      function enterGame(gameName, options = {}) {
         if (!gameName) return;
+        if (!options?.fromRoute) {
+          updateGameRoute(gameName);
+        }
         if (skillPanels[gameName]) {
           enterSkillGame(gameName);
           return;
@@ -7790,12 +7682,6 @@
       window.enterGame = enterGame;
       window.backToMainLobby = backToMainLobby;
       window.openMeetPanel = openMeetPanel;
-      populateFriendlyGames();
-      friendlySessionLaunchBtn?.addEventListener('click', handleFriendlySessionLaunch);
-      friendlySessionLinkCopyBtn?.addEventListener('click', copyFriendlySessionLink);
-      refreshFriendlySessionFriends()
-        .catch(() => {})
-        .finally(() => initializeFriendlySessionFromUrl());
 
       // ---------------- StackJack helpers ----------------
       function startStackJack() {
@@ -8123,8 +8009,12 @@
       }
 
       function setTitle(suffix) {
-        if (!titleEl) return;
-        titleEl.textContent = suffix ? `${baseTitle} · ${suffix}` : baseTitle;
+        if (titleEl) {
+          titleEl.textContent = suffix ? `${baseTitle} · ${suffix}` : baseTitle;
+        }
+        if (gameOnlyTitleEl) {
+          gameOnlyTitleEl.textContent = suffix || 'Live Game';
+        }
       }
 
       function enterCardGame(gameName) {
@@ -10289,7 +10179,6 @@
         mindStatusEl.textContent = message;
     }
     </script>
-  <%- include('partials/stackjack-session-panel') %>
-  <script src="/js/stackjack-session.js"></script>
+  <script src="/js/meet.js"></script>
   </body>
 </html>

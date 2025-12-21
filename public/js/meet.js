@@ -19,21 +19,79 @@
   let meetLocalStream = null;
   let localTracksAttached = false;
   let isMuted = false;
+  let meetingStarted = false;
   let audioContext = null;
   let localAnalyser = null;
   let remoteAnalyser = null;
   let meterAnimationFrame = null;
-  let autoJoinTriggered = false;
+  let refreshTimer = null;
+  let closeRefreshTimer = null;
+
+  const GAME_ROUTE_PATTERN = /^\\/games\\/([^/?#]+)/i;
 
   createMeetingBtn?.addEventListener('click', handleCreateMeeting);
   startCallBtn?.addEventListener('click', () => startMeetCall());
   meetingLinkCopyBtn?.addEventListener('click', copyMeetingLink);
   toggleMuteBtn?.addEventListener('click', toggleMute);
   updateMicButton();
+  updateStartCallVisibility();
 
   if (sessionId) {
     createMeetingBtn?.setAttribute('disabled', 'true');
     loadExistingSession();
+  }
+
+  function startMeetingRefresh() {
+    if (refreshTimer) return;
+    refreshTimer = setInterval(refreshMeetingStatus, 10000);
+  }
+
+  async function refreshMeetingStatus() {
+    if (!sessionId) return;
+    try {
+      const response = await fetch(`/api/meet/session/${encodeURIComponent(sessionId)}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          setStatus('Meeting ended or no longer available.', true);
+        }
+        return;
+      }
+      const payload = await response.json();
+      isHost = Boolean(payload.youAreHost);
+      updateStartCallVisibility();
+      if (!meetSocket || meetSocket.readyState === WebSocket.CLOSED) {
+        openMeetSocket();
+      }
+      if (isHost && !meetingStarted) {
+        startMeetCall();
+      }
+    } catch (error) {
+      console.error('Meeting refresh failed', error);
+    }
+  }
+
+  function resolvePreferredGame() {
+    const params = new URLSearchParams(window.location.search);
+    const queryGame = params.get('game');
+    if (queryGame) {
+      return sanitizeGame(queryGame);
+    }
+    const match = window.location.pathname.match(GAME_ROUTE_PATTERN);
+    if (match?.[1]) {
+      return sanitizeGame(match[1]);
+    }
+    return 'rocket';
+  }
+
+  function sanitizeGame(value) {
+    if (!value) return null;
+    const cleaned = value.toString().trim().replace(/[^a-zA-Z0-9_-]/g, '');
+    return cleaned || null;
+  }
+
+  function buildMeetingLink(id) {
+    const game = resolvePreferredGame();
+    return `${window.location.origin}/games/${encodeURIComponent(game)}?room=${encodeURIComponent(id)}`;
   }
 
   async function handleCreateMeeting() {
@@ -49,10 +107,12 @@
       const payload = await response.json();
       sessionId = payload.sessionId;
       isHost = true;
-      showMeetingLink(payload.link);
+      updateStartCallVisibility();
+      showMeetingLink(buildMeetingLink(sessionId));
       window.history.replaceState(null, '', `?room=${encodeURIComponent(sessionId)}`);
-      setStatus('Meeting created. Share the link and wait for the crew.');
+      setStatus('Meeting created. Share the link, then press Start Meeting.');
       openMeetSocket();
+      startMeetingRefresh();
     } catch (error) {
       setStatus(error.message, true);
       createMeetingBtn.disabled = false;
@@ -70,9 +130,11 @@
       }
       const payload = await response.json();
       isHost = Boolean(payload.youAreHost);
-      showMeetingLink(`${window.location.origin}/meet?room=${encodeURIComponent(sessionId)}`);
-      setStatus(isHost ? 'You are hosting this meeting.' : 'Joining the meeting.');
+      showMeetingLink(buildMeetingLink(sessionId));
+      setStatus(isHost ? 'You are hosting this meeting. Press Start Meeting when ready.' : 'Waiting for host to start the meeting.');
+      updateStartCallVisibility();
       openMeetSocket();
+      startMeetingRefresh();
     } catch (error) {
       setStatus(error.message, true);
     }
@@ -195,6 +257,12 @@
     }
   }
 
+  function updateStartCallVisibility() {
+    if (!startCallBtn) return;
+    const shouldShow = isHost && !meetingStarted;
+    startCallBtn.hidden = !shouldShow;
+  }
+
   function ensureAudioContext() {
     if (audioContext) return audioContext;
     const ContextCtor = window.AudioContext || window.webkitAudioContext;
@@ -278,6 +346,7 @@
       const answer = await meetPeerConnection.createAnswer();
       await meetPeerConnection.setLocalDescription(answer);
       meetSocket?.send(JSON.stringify({ type: 'signal.answer', answer }));
+      setStatus('Meeting started.');
     } else if (payload.type === 'signal.answer' && payload.answer) {
       await meetPeerConnection.setRemoteDescription(new RTCSessionDescription(payload.answer));
     } else if (payload.type === 'signal.candidate' && payload.candidate) {
@@ -294,6 +363,11 @@
       setStatus('Waiting for meeting connection.', true);
       return;
     }
+    if (!isHost) {
+      setStatus('Waiting for host to start the meeting.');
+      updateStartCallVisibility();
+      return;
+    }
     if (!meetPeerConnection) {
       meetPeerConnection = createMeetPeerConnection();
     }
@@ -304,21 +378,16 @@
         const offer = await meetPeerConnection.createOffer();
         await meetPeerConnection.setLocalDescription(offer);
         meetSocket.send(JSON.stringify({ type: 'signal.offer', offer }));
-        setStatus('Video call starting…');
+        meetingStarted = true;
+        updateStartCallVisibility();
+        setStatus('Meeting started.');
       } else {
-        setStatus('Waiting for host to send an offer.');
+        setStatus('Waiting for host to start the meeting.');
       }
     } catch (error) {
       console.error('Meet call error', error);
       setStatus('Unable to start call.', true);
     }
-  }
-
-  function autoJoinMeeting() {
-    if (!sessionId || autoJoinTriggered) return;
-    autoJoinTriggered = true;
-    setStatus('Auto-joining the meeting...');
-    startMeetCall();
   }
 
   function openMeetSocket() {
@@ -328,7 +397,8 @@
     meetSocket = new WebSocket(`${wsScheme}://${window.location.host}/ws/meet?room=${encodeURIComponent(sessionId)}`);
     meetSocket.addEventListener('open', () => {
       setStatus(isHost ? 'Meeting signal ready. Share the link.' : 'Connected. Waiting for host.');
-      autoJoinMeeting();
+      updateStartCallVisibility();
+      refreshMeetingStatus();
     });
     meetSocket.addEventListener('message', (event) => {
       try {
@@ -346,6 +416,12 @@
     });
     meetSocket.addEventListener('close', () => {
       setStatus('Meeting connection closed.', true);
+      if (closeRefreshTimer) {
+        clearTimeout(closeRefreshTimer);
+      }
+      closeRefreshTimer = setTimeout(() => {
+        refreshMeetingStatus();
+      }, 1000);
     });
     meetSocket.addEventListener('error', () => {
       setStatus('Meeting signaling failed.', true);
